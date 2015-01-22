@@ -14,10 +14,14 @@ import os, sys
 # Django settings for cobra project.
 location = lambda x: os.path.join(
     os.path.dirname(os.path.realpath(__file__)), x)
-sys.path.append(r'F:\opensource\django-cobra\src')
+
 DEBUG = True
 TEMPLATE_DEBUG = True
 SQL_DEBUG = True
+
+if DEBUG:
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+    sys.path.append(os.path.join(BASE_DIR, '../src'))
 
 EMAIL_SUBJECT_PREFIX = '[Cobro Auto Testing System] '
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -55,7 +59,7 @@ SILENCED_SYSTEM_CHECKS = ['1_6.W001', ]
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'Europe/Shanghai'
+TIME_ZONE = 'Asia/Shanghai'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html

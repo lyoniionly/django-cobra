@@ -1,4 +1,4 @@
-from oscar.core.loading import get_class
+from cobra.core.loading import get_class
 
 SingleProduct = get_class('promotions.models', 'SingleProduct')
 RawHTML = get_class('promotions.models', 'RawHTML')

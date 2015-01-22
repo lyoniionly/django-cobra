@@ -5,9 +5,9 @@ from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from oscar.core.loading import get_model
+from cobra.core.loading import get_model
 
-from oscar.models.fields import ExtendedURLField
+from cobra.models.fields import ExtendedURLField
 
 
 # Linking models - these link promotions to content (eg pages, or keywords)

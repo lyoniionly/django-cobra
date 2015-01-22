@@ -37,6 +37,7 @@ nosetests.xml
 # Example sites
 settings_local.py
 /sites/sandbox/*.sqlite
+/sites/sandbox/*.sqlite3
 /sites/sandbox/assets/
 /sites/sandbox/public/
 /sites/sandbox/whoosh_index/
