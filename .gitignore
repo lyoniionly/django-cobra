@@ -1,54 +1,52 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
+# Packaging
+*.pyc
+*.egg-info
+/dist/
+/build/
 
-# C extensions
-*.so
+# Vagrant
+.vagrant
 
-# Distribution / packaging
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
+# Temporary/OS files
+*.swp
+*.swo
+*.*~
+.~lock.*
+*.DS_Store
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+# IDE files
+.project
+.pydevproject
+.settings
+.idea
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+# Docs
+/docs/build/*
+*.pdf
+TODO
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
+# Test files
 .coverage
-.cache
-nosetests.xml
+.noseids
 coverage.xml
+violations.txt
+nosetests.xml
+/htmlcov/*
+/.tox/*
 
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
+# Example sites
+settings_local.py
+/sites/sandbox/*.sqlite
+/sites/sandbox/assets/
+/sites/sandbox/public/
+/sites/sandbox/whoosh_index/
+/sites/sandbox/logs/
+/sites/demo/*.sqlite
+/sites/demo/assets/
+/sites/demo/public/
+/sites/demo/whoosh_index/
+/sites/demo/logs/
+/sites/us/*.sqlite
+/sites/us/public/
+/sites/us/logs/
+sites/puppet/modules/
