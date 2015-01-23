@@ -36,6 +36,7 @@ except ImportError:
 
 from cobra.core.utils import slugify
 
+__all__ = ('AutoSlugField',)
 
 class AutoSlugField(SlugField):
     """ AutoSlugField

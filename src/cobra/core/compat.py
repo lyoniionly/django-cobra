@@ -6,6 +6,15 @@ from django.core.exceptions import ImproperlyConfigured
 
 from cobra.core.loading import get_model
 
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle  # NOQA
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO  # NOQA
 
 # A setting that can be used in foreign key declarations
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')

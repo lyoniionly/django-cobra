@@ -238,5 +238,17 @@ COBRA_SEARCH_FACETS = {
     }
 }
 
+# Cache backend
+COBRA_CACHE = 'cobra.cache.django.DjangoCache'
+COBRA_CACHE_OPTIONS = {}
+
+# Node storage backend
+COBRA_NODESTORE = 'cobra.apps.nodestore.django.DjangoNodeStorage'
+COBRA_NODESTORE_OPTIONS = {}
+
+# You should not change this setting after your database has been created
+# unless you have altered all schemas first
+COBRA_USE_BIG_INTS = False
+
 COBRA_SETTINGS = dict(
     [(k, v) for k, v in locals().items() if k.startswith('COBRA_')])

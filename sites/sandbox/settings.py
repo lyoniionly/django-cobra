@@ -209,6 +209,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
+        'cobra.errors': {
+            'handlers': ['console', 'error_file'],
+            'propagate': False,
+        },
         'cobra.checkout': {
             'handlers': ['console', 'checkout_file'],
             'propagate': True,

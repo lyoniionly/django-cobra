@@ -11,3 +11,11 @@ class AppNotFoundError(Exception):
 
 class ClassNotFoundError(Exception):
     pass
+
+
+class QueryError(Exception):
+    pass
+
+
+class CannotResolveExpression(Exception):
+    pass

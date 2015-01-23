@@ -42,6 +42,8 @@ COBRA_CORE_APPS = [
     # 'cobra.apps.offer',
     # 'cobra.apps.order',
     'cobra.apps.customer',
+    'cobra.apps.organization',
+    'cobra.apps.nodestore',
     # 'cobra.apps.promotions',
     # 'cobra.apps.search',
     # 'cobra.apps.voucher',
