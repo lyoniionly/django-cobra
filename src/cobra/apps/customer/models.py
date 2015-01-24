@@ -13,6 +13,13 @@ if not is_model_registered('customer', 'Email'):
     __all__.append('Email')
 
 
+if not is_model_registered('customer', 'UserOption'):
+    class UserOption(abstract_models.AbstractUserOption):
+        pass
+
+    __all__.append('UserOption')
+
+
 if not is_model_registered('customer', 'CommunicationEventType'):
     class CommunicationEventType(
             abstract_models.AbstractCommunicationEventType):

@@ -12,9 +12,11 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from cobra.apps.customer.managers import CommunicationTypeManager
+from cobra.apps.customer.managers import CommunicationTypeManager, UserOptionManager
 from cobra.core.compat import AUTH_USER_MODEL
 from cobra.models.fields import AutoSlugField
+from cobra.models import Model, fields
+from cobra.models import sane_repr
 
 
 class UserManager(auth_models.BaseUserManager):
@@ -127,6 +129,33 @@ class AbstractEmail(models.Model):
     def __str__(self):
         return _(u"Email to %(user)s with subject '%(subject)s'") % {
             'user': self.user.get_username(), 'subject': self.subject}
+
+
+# TODO(dcramer): the NULL UNIQUE constraint here isnt valid, and instead has to
+# be manually replaced in the database. We should restructure this model.
+@python_2_unicode_compatible
+class AbstractUserOption(Model):
+    """
+    User options apply only to a user, and optionally a project.
+
+    Options which are specific to a plugin should namespace
+    their key. e.g. key='myplugin:optname'
+    """
+    user = fields.FlexibleForeignKey(settings.AUTH_USER_MODEL)
+    project = fields.FlexibleForeignKey('project.Project', null=True)
+    key = models.CharField(max_length=64)
+    value = fields.UnicodePickledObjectField()
+
+    objects = UserOptionManager()
+
+    class Meta:
+        abstract = True
+        app_label = 'customer'
+        verbose_name = _('User Option')
+        verbose_name_plural = _('User Options')
+        unique_together = (('user', 'project', 'key',),)
+
+    __repr__ = sane_repr('user_id', 'project_id', 'key', 'value')
 
 
 @python_2_unicode_compatible

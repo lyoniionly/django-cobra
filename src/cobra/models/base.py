@@ -9,25 +9,25 @@ from .fields.bounded import BoundedBigAutoField
 from .manager import BaseManager
 from .query import update
 
-__all__ = ('BaseModel', 'Model', 'sane_str')
+__all__ = ('BaseModel', 'Model', 'sane_repr')
 
 UNSAVED = object()
 
 
-def sane_str(*attrs):
+def sane_repr(*attrs):
     if 'id' not in attrs and 'pk' not in attrs:
         attrs = ('id',) + attrs
 
-    def _str(self):
+    def _repr(self):
         cls = type(self).__name__
 
         pairs = (
-            '%s=%s' % (a, str(getattr(self, a, None)))
+            '%s=%s' % (a, repr(getattr(self, a, None)))
             for a in attrs)
 
         return u'<%s at 0x%x: %s>' % (cls, id(self), ', '.join(pairs))
 
-    return _str
+    return _repr
 
 
 class BaseModel(models.Model):

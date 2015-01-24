@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-from oscar.core.loading import is_model_registered
+from cobra.core.loading import is_model_registered
 
 from .abstract_models import *  # noqa
 
 __all__ = []
 
 
-if not is_model_registered('wishlists', 'WishList'):
-    class WishList(AbstractWishList):
+if not is_model_registered('organization', 'Organization'):
+    class Organization(AbstractOrganization):
         pass
 
-    __all__.append('WishList')
+    __all__.append('Organization')
 
 
-if not is_model_registered('wishlists', 'Line'):
-    class Line(AbstractLine):
+if not is_model_registered('organization', 'OrganizationMember'):
+    class OrganizationMember(AbstractOrganizationMember):
         pass
 
-    __all__.append('Line')
+    __all__.append('OrganizationMember')

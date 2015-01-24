@@ -250,5 +250,23 @@ COBRA_NODESTORE_OPTIONS = {}
 # unless you have altered all schemas first
 COBRA_USE_BIG_INTS = False
 
+# Allow access to Cobra without authentication.
+COBRA_PUBLIC = False
+
+# SMTP Service
+COBRA_ENABLE_EMAIL_REPLIES = False
+COBRA_SMTP_HOSTNAME = 'localhost'
+COBRA_SMTP_HOST = 'localhost'
+COBRA_SMTP_PORT = 1025
+
+# Absolute URL to the sentry root directory. Should not include a trailing slash.
+COBRA_URL_PREFIX = ''
+
+# Default to not sending the Access-Control-Allow-Origin header on api/store
+COBRA_ALLOW_ORIGIN = None
+
+# URL to embed in js documentation
+COBRA_RAVEN_JS_URL = 'cdn.ravenjs.com/1.1.15/jquery,native/raven.min.js'
+
 COBRA_SETTINGS = dict(
     [(k, v) for k, v in locals().items() if k.startswith('COBRA_')])
