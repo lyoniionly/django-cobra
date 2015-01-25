@@ -15,12 +15,15 @@ from cobra.core.compat import AUTH_USER_MODEL
 from cobra.models import Model
 from cobra.models import fields
 from cobra.models import sane_repr
-from cobra.apps.organization.managers import OrganizationManager
 from cobra.models.utils import slugify_instance
 from cobra.core.constants import RESERVED_ORGANIZATION_SLUGS
 from cobra.core.http import absolute_uri
+from cobra.core.loading import get_class
 
 from .utils import OrganizationStatus, OrganizationMemberType
+
+OrganizationManager = get_class('project.managers', 'OrganizationManager')
+
 
 @python_2_unicode_compatible
 class AbstractOrganization(Model):
@@ -65,6 +68,8 @@ class AbstractOrganization(Model):
         }
 
 
+
+@python_2_unicode_compatible
 class AbstractOrganizationMember(Model):
     """
     Identifies relationships between teams and users.

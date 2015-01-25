@@ -6,7 +6,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ungettext, ugettext_lazy as _
 
 from cobra.models import (
-    BaseModel, GzippedDictField, sane_str)
+    BaseModel, GzippedDictField, sane_repr)
 
 
 @python_2_unicode_compatible
@@ -18,9 +18,12 @@ class Node(BaseModel):
     data = GzippedDictField()
     timestamp = models.DateTimeField(default=timezone.now, db_index=True)
 
-    __str__ = sane_str('timestamp')
+    __repr__ = sane_repr('timestamp')
 
     class Meta:
         app_label = 'nodestore'
         verbose_name = _("Node store")
         verbose_name_plural = _("Node store")
+
+    def __str__(self):
+        return self.id

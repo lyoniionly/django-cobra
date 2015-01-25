@@ -24,10 +24,6 @@ def get_version():
 # Cheeky setting that allows each template to be accessible by two paths.
 # Eg: the template 'cobra/templates/cobra/base.html' can be accessed via both
 # 'base.html' and 'cobra/base.html'.  This allows Cobra's templates to be
-# extended by templates with the same filename
-COBRA_MAIN_TEMPLATE_DIR = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), 'templates/cobra')
-
 COBRA_CORE_APPS = [
     'cobra',
     # 'cobra.apps.analytics',
@@ -41,9 +37,12 @@ COBRA_CORE_APPS = [
     # 'cobra.apps.payment',
     # 'cobra.apps.offer',
     # 'cobra.apps.order',
+    'cobra.apps.accessgroup',
     'cobra.apps.customer',
-    'cobra.apps.organization',
     'cobra.apps.nodestore',
+    'cobra.apps.organization',
+    'cobra.apps.project',
+    'cobra.apps.team',
     # 'cobra.apps.promotions',
     # 'cobra.apps.search',
     # 'cobra.apps.voucher',
@@ -67,6 +66,10 @@ COBRA_CORE_APPS = [
     # 'sorl.thumbnail',
     'django_tables2',
 ]
+# extended by templates with the same filename
+COBRA_MAIN_TEMPLATE_DIR = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), 'templates/cobra')
+
 
 
 def get_core_apps(overrides=None):

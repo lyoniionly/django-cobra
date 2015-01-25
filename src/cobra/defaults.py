@@ -268,5 +268,16 @@ COBRA_ALLOW_ORIGIN = None
 # URL to embed in js documentation
 COBRA_RAVEN_JS_URL = 'cdn.ravenjs.com/1.1.15/jquery,native/raven.min.js'
 
+# URI Prefixes for generating DSN URLs
+# (Defaults to URL_PREFIX by default)
+COBRA_ENDPOINT = None
+COBRA_PUBLIC_ENDPOINT = None
+
+# Project ID for recording frontend (javascript) exceptions
+COBRA_FRONTEND_PROJECT = None
+
+# Default project ID for recording internal exceptions
+COBRA_PROJECT = 1
+
 COBRA_SETTINGS = dict(
     [(k, v) for k, v in locals().items() if k.startswith('COBRA_')])
