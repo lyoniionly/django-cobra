@@ -1,26 +1,43 @@
 from __future__ import absolute_import
 
 import json
+import logging
 
 from django import forms
+from django.conf import settings
 from django.core import validators
+from django.core.context_processors import csrf
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 from django.utils.encoding import smart_str
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.utils import six
 from django.utils.six.moves import map
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_protect
 from django.views.generic.base import View
 
 import phonenumbers
+from sudo.views import redirect_to_sudo
 
-from cobra.core.utils import safe_referrer
+from cobra.core.utils import safe_referrer, get_login_url
 from cobra.core.phonenumber import PhoneNumber
-from core.loading import get_class
+from cobra.core.loading import get_classes, get_model
+from cobra.core.render import render_to_response
 
-OrganizationMemberType = get_class('organization.utils', 'OrganizationMemberType')
+OrganizationMemberType, OrganizationStatus = get_classes('organization.utils',
+                                                         [ 'OrganizationMemberType', 'OrganizationStatus'])
+
+Organization = get_model('organization', 'Organization')
+OrganizationMember = get_model('organization', 'OrganizationMember')
+
+Project = get_model('project', 'Project')
+Team = get_model('team', 'Team')
+
+
 
 class PostActionMixin(object):
     """
@@ -358,7 +375,7 @@ class BaseView(View, OrganizationMixin):
         return super(BaseView, self).dispatch(request, *args, **kwargs)
 
     def get_no_permission_url(request, *args, **kwargs):
-        return reverse('sentry')
+        return settings.COBRA_HOMEPAGE
 
     def has_permission(self, request, *args, **kwargs):
         return True

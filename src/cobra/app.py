@@ -15,6 +15,7 @@ class Frame(Application):
     name = None
 
     # catalogue_app = get_class('catalogue.app', 'application')
+    home_app = get_class('home.app', 'application')
     customer_app = get_class('customer.app', 'application')
     # basket_app = get_class('basket.app', 'application')
     # checkout_app = get_class('checkout.app', 'application')
@@ -76,6 +77,7 @@ class Frame(Application):
                 login_forbidden(auth_views.password_reset_complete),
                 name='password-reset-complete'),
             # url(r'', include(self.promotions_app.urls)),
+            url(r'', include(self.home_app.urls)),
         ]
         return urls
 

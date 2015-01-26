@@ -22,7 +22,7 @@ from cobra.core.loading import get_class
 
 from .utils import OrganizationStatus, OrganizationMemberType
 
-OrganizationManager = get_class('project.managers', 'OrganizationManager')
+OrganizationManager = get_class('organization.managers', 'OrganizationManager')
 
 
 @python_2_unicode_compatible
@@ -49,6 +49,7 @@ class AbstractOrganization(Model):
     class Meta:
         abstract = True
         app_label = 'organization'
+        db_table = 'cobra_organization'
 
     __repr__ = sane_repr('owner_id', 'name')
 
@@ -97,9 +98,13 @@ class AbstractOrganizationMember(Model):
     class Meta:
         abstract = True
         app_label = 'organization'
+        db_table = 'cobra_organizationmember'
         unique_together = (('organization', 'user'), ('organization', 'email'))
 
     __repr__ = sane_repr('organization_id', 'user_id', 'type')
+
+    def __str__(self):
+        return '%s - %s' % (self.organization.name, self.user.username)
 
     def save(self, *args, **kwargs):
         assert self.user_id or self.email, \

@@ -29,7 +29,7 @@ class AbstractTeam(Model):
     """
     A team represents a group of individuals which maintain ownership of projects.
     """
-    organization = fields.FlexibleForeignKey('organization.Organization')
+    organization = fields.FlexibleForeignKey('organization.Organization', related_name='+')
     slug = models.SlugField()
     name = models.CharField(max_length=64)
     owner = fields.FlexibleForeignKey(AUTH_USER_MODEL)
@@ -48,6 +48,7 @@ class AbstractTeam(Model):
     class Meta:
         abstract = True
         app_label = 'team'
+        db_table = 'cobra_team'
         unique_together = (('organization', 'slug'),)
 
     __repr__ = sane_repr('slug', 'owner_id', 'name')
@@ -120,9 +121,13 @@ class AbstractTeamMember(Model):
     class Meta:
         abstract = True
         app_label = 'team'
+        db_table = 'cobra_teammember'
         unique_together = (('team', 'user'),)
 
     __repr__ = sane_repr('team_id', 'user_id', 'type')
+
+    def __str__(self):
+        return '%s - %s' % (self.team.name, self.team.user.username)
 
 
 @python_2_unicode_compatible
@@ -140,9 +145,13 @@ class AbstractPendingTeamMember(Model):
     class Meta:
         abstract = True
         app_label = 'team'
+        db_table = 'cobra_pendingteammember'
         unique_together = (('team', 'email'),)
 
     __repr__ = sane_repr('team_id', 'email', 'type')
+
+    def __str__(self):
+        return '%s - %s' % (self.team.name, self.email)
 
     @property
     def token(self):

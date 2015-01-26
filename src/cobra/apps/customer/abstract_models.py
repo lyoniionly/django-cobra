@@ -141,8 +141,8 @@ class AbstractUserOption(Model):
     Options which are specific to a plugin should namespace
     their key. e.g. key='myplugin:optname'
     """
-    user = fields.FlexibleForeignKey(settings.AUTH_USER_MODEL)
-    project = fields.FlexibleForeignKey('project.Project', null=True)
+    user = fields.FlexibleForeignKey(AUTH_USER_MODEL)
+    project = fields.FlexibleForeignKey('project.Project', related_name='+', null=True)
     key = models.CharField(max_length=64)
     value = fields.UnicodePickledObjectField()
 
@@ -156,6 +156,9 @@ class AbstractUserOption(Model):
         unique_together = (('user', 'project', 'key',),)
 
     __repr__ = sane_repr('user_id', 'project_id', 'key', 'value')
+
+    def __str__(self):
+        return self.user.username + self.key
 
 
 @python_2_unicode_compatible

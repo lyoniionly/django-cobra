@@ -7,14 +7,14 @@ __all__ = []
 
 
 if not is_model_registered('project', 'Project'):
-    class Team(AbstractProject):
+    class Project(AbstractProject):
         pass
 
     __all__.append('Project')
 
 
 if not is_model_registered('project', 'ProjectOption'):
-    class TeamMember(AbstractProjectOption):
+    class ProjectOption(AbstractProjectOption):
         pass
 
     __all__.append('ProjectOption')

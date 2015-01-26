@@ -40,8 +40,8 @@ class AbstractProject(Model):
 
     slug = models.SlugField(null=True)
     name = models.CharField(max_length=200)
-    organization = fields.FlexibleForeignKey('organization.Organization')
-    team = fields.FlexibleForeignKey('team.Team')
+    organization = fields.FlexibleForeignKey('organization.Organization', related_name='+')
+    team = fields.FlexibleForeignKey('team.Team', related_name='+')
     public = models.BooleanField(default=False)
     date_added = models.DateTimeField(default=timezone.now)
     status = fields.BoundedPositiveIntegerField(default=0, choices=(
@@ -59,6 +59,7 @@ class AbstractProject(Model):
     class Meta:
         abstract = True
         app_label = 'project'
+        db_table = 'cobra_project'
         unique_together = (('team', 'slug'), ('organization', 'slug'))
 
     __repr__ = sane_repr('team_id', 'slug')
@@ -179,7 +180,7 @@ class AbstractProjectOption(Model):
     Options which are specific to a plugin should namespace
     their key. e.g. key='myplugin:optname'
     """
-    project = fields.FlexibleForeignKey('project.Project')
+    project = fields.FlexibleForeignKey('project.Project', related_name='+')
     key = models.CharField(max_length=64)
     value = fields.UnicodePickledObjectField()
 
@@ -188,9 +189,13 @@ class AbstractProjectOption(Model):
     class Meta:
         abstract = True
         app_label = 'project'
+        db_table = 'cobra_projectoptions'
         unique_together = (('project', 'key',),)
 
     __repr__ = sane_repr('project_id', 'key', 'value')
+
+    def __str__(self):
+        return '%s - %s' % (self.project.name, self.key)
 
 
 @python_2_unicode_compatible
@@ -220,10 +225,11 @@ class AbstractProjectKey(Model):
     class Meta:
         abstract = True
         app_label = 'project'
+        db_table = 'cobra_projectkey'
 
     __repr__ = sane_repr('project_id', 'user_id', 'public_key')
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.public_key)
 
     @classmethod

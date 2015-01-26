@@ -279,5 +279,11 @@ COBRA_FRONTEND_PROJECT = None
 # Default project ID for recording internal exceptions
 COBRA_PROJECT = 1
 
+# Login url (defaults to LOGIN_URL)
+COBRA_LOGIN_URL = None
+
+# The entry of maintaince mode
+COBRA_MAINTENANCE = False
+
 COBRA_SETTINGS = dict(
     [(k, v) for k, v in locals().items() if k.startswith('COBRA_')])

@@ -1,1 +1,5 @@
-<div class="col-sm-7 h1"><a href="{{ homepage_url }}">{% block brand_title %}{{ shop_name }}</a><small> {{ shop_tagline }}</small>{% endblock %}</div>
+{% if organization %}
+    <a id="logo" href="{% url 'cobra-organization-home' organization.slug %}">Cobra</a>
+{% else %}
+    <a id="logo" href="{% url 'home:home' %}">Cobra</a>
+{% endif %}

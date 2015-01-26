@@ -1,5 +1,6 @@
 from __future__ import absolute_import  # for logging import below
 import logging
+from django.core.urlresolvers import resolve, reverse
 
 from django.shortcuts import redirect, resolve_url
 from django.utils import six
@@ -121,3 +122,23 @@ def get_default_currency():
     OSCAR_DEFAULT_CURRENCY as something it needs to generate a migration for.
     """
     return settings.OSCAR_DEFAULT_CURRENCY
+
+
+_LOGIN_URL = None
+
+def get_login_url(reset=False):
+    global _LOGIN_URL
+
+    if _LOGIN_URL is None or reset:
+        # if LOGIN_URL resolves force login_required to it instead of our own
+        # XXX: this must be done as late as possible to avoid idempotent requirements
+        try:
+            resolve(settings.LOGIN_URL)
+        except Exception:
+            _LOGIN_URL = settings.COBRA_LOGIN_URL
+        else:
+            _LOGIN_URL = settings.LOGIN_URL
+
+        if _LOGIN_URL is None:
+            _LOGIN_URL = reverse('customer:login')
+    return _LOGIN_URL
