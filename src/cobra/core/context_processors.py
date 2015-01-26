@@ -47,8 +47,8 @@ def metadata(request):
     """
     return {'display_version': getattr(settings, 'DISPLAY_VERSION', False),
             'version': getattr(settings, 'VERSION', 'N/A'),
-            'shop_name': settings.COBRA_SHOP_NAME,
-            'shop_tagline': settings.COBRA_SHOP_TAGLINE,
+            'system_name': settings.COBRA_SYSTEM_NAME,
+            'system_tagline': settings.COBRA_SYSTEM_TAGLINE,
             'homepage_url': settings.COBRA_HOMEPAGE,
             'use_less': getattr(settings, 'USE_LESS', False),
             'call_home': usage_statistics_string(),

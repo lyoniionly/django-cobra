@@ -16,6 +16,7 @@
 {% endblock %}
 
 {% block layout %}
+  <div class="outer-wrapper">
     {# Top-horizontal bar with account, notifictions, dashboard links #}
     {% include "partials/nav_accounts.html" %}
 
@@ -63,6 +64,7 @@
     {% endblock %}
 
     {% include "partials/footer.html" %}
+  </div>
 {% endblock %}
 
 {# Local scripts #}

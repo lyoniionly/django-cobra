@@ -1,9 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse_lazy
 
-COBRA_SHOP_NAME = 'Cobra'
-COBRA_SHOP_TAGLINE = ''
-COBRA_HOMEPAGE = reverse_lazy('promotions:home')
+COBRA_SYSTEM_NAME = 'Cobra'
+COBRA_SYSTEM_TAGLINE = ''
+COBRA_HOMEPAGE = reverse_lazy('home:home')
 
 # Basket settings
 COBRA_BASKET_COOKIE_LIFETIME = 7 * 24 * 60 * 60
