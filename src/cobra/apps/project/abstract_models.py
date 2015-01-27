@@ -251,7 +251,7 @@ class AbstractProjectKey(Model):
             key = self.public_key
             url = settings.COBRA_PUBLIC_ENDPOINT
 
-        urlparts = urlparse(url or settings.SENTRY_URL_PREFIX)
+        urlparts = urlparse(url or settings.COBRA_URL_PREFIX)
 
         return '%s://%s@%s/%s' % (
             urlparts.scheme,

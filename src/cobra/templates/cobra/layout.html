@@ -1,7 +1,7 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load staticfiles %}
 {% load compress %}
-{% load promotion_tags %}
 
 {% block mainstyles %}
     {% block styles %}
@@ -17,50 +17,62 @@
 
 {% block layout %}
   <div class="outer-wrapper">
-    {# Top-horizontal bar with account, notifictions, dashboard links #}
-    {% include "partials/nav_accounts.html" %}
 
-    {# Site logo/title, mini-basket, browse dropdown and searchbox #}
-    <header class="header container-fluid">
-        <div class="page_inner">
-            <div class="row">
-                {% include "partials/brand.html" %}
-                {# Mini-basket wrapped in a block so some templates can now display it #}
-                {% block mini_basket %}{% include "partials/mini_basket.html" %}{% endblock %}
+    {# Site logo/title, brand, browse dropdown #}
+    {% block header %}
+      <header id="header">
+        <div class="navbar navbar-inverse">
+          <div class="navbar-inner">
+            <div class="container">
+              {% include "partials/brand.html" %}
+              {% include "partials/nav_primary.html" %}
             </div>
+          </div>
         </div>
-        {% block navigation %}
-            {% include "partials/nav_primary.html" %}
-        {% endblock %}
-    </header>
+      </header>
+    {% endblock %}
+
+    {% block page_header_block %}
+      <section id="page-header" class="toolbar">
+        <div class="container">
+          {% block page_header %}
+            {% if team %}
+              <div class="dashboard-btn">
+                <a href="{% comment %}{% url 'sentry-team-dashboard' organization.slug team.slug %}{% endcomment %}" title="{% trans "Dashboard" %}">
+                  <i aria-hidden="true" class="icon-list"></i>
+                </a>
+              </div>
+            {% endif %}
+          {% endblock %}
+        </div>
+      </section>
+    {% endblock %}
 
     {# Main content of page - other layout templates may override this block #}
     {% block content_wrapper %}
-        <div class="container-fluid page">
-            <div class="page_inner">
+        <section id="content" class="{% block content_class %}with-sidebar{% endblock %}">
+            <div class="container">
                 {% block breadcrumbs %}{% endblock %}
-                {% block header %}
-                    <div class="page-header action">
-                        <h1>{% block headertext %}{% endblock %}</h1>
-                    </div>
-                {% endblock %}
-                {% include "partials/alert_messages.html" %}
+                {% block above_content %}{% endblock %}
                 {% block subnavigation %}{% endblock %}
                 <div class="content">
+                    {% block content_before %}{% endblock %}
                     {% block subheader %}{% endblock subheader %}
 
-                    {# Render promotions #}
-                    <div id="promotions">
-                        {% for promotion in promotions_page %}
-                            {% render_promotion promotion %}
-                        {% endfor %}
-                    </div>
+                    {% block content %}
+                        <div class="main">
+                            {% block alerts %}{% include "partials/alert_messages.html" %}{% endblock %}
+                            {% block main %}{% endblock %}
+                        </div>
+                        <div class="sidebar">
+                            {% block sidebar %}{% endblock %}
+                        </div>
+                    {% endblock %}
 
-                    {# Div exists for AJAX updates to entire content section #}
-                    <div id="content_inner">{% block content %}{% endblock %}</div>
+                    {% block content_after %}{% endblock %}
                 </div>
             </div>
-        </div>
+        </section>
     {% endblock %}
 
     {% include "partials/footer.html" %}
@@ -74,7 +86,7 @@
     <!-- Twitter Bootstrap -->
     <script type="text/javascript" src="{% static "cobra/js/bootstrap3/bootstrap.min.js" %}"></script>
     <!-- Oscar -->
-    <script src="{% static "cobra/js/oscar/ui.js" %}" type="text/javascript" charset="utf-8"></script>
+    <script src="{% static "cobra/js/cobra/ui.js" %}" type="text/javascript" charset="utf-8"></script>
     {% endcompress %}
 {% endblock %}
 
@@ -85,5 +97,5 @@
 
 {% block onbodyload %}
     {{ block.super }}
-    oscar.init();
+{#    cobra.init();#}
 {% endblock %}

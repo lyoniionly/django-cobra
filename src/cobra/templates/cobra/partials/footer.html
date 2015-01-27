@@ -1,12 +1,16 @@
 {% load i18n %}
-<footer class="footer container-fluid">
+<footer>
+  <div class="container">
     {% block footer %}
-        {% comment %}
-            Could be used for displaying links to privacy policy, terms of service, etc.
-            We have a CSS class defined:
-                <ul class="footer_links inline">
-                    ...
-                </ul>
-         {% endcomment %}
+      <div class="contribute">
+        Cobra is <a href="http://en.wikipedia.org/wiki/Open-source_software">Open Source Software</a>
+        <a href="https://github.com/lyoniionly/django-cobra" class="btn btn-small">{% trans "Contribute" %}</a>
+        <a href="" class="btn btn-small">{% trans "Translate" %}</a>
+      </div>
+      <div class="version">Cobra {{ version }} </div>
+      <div class="credits">Handcrafted by the <a href="">Cobra team</a> and its
+        <a href="">many contributors</a>
+      </div>
     {% endblock %}
+  </div>
 </footer>

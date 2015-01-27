@@ -74,7 +74,7 @@ def get_classes(module_label, classnames):
     This works by looping over ``INSTALLED_APPS`` and looking for a match
     against the passed module label.  If the requested class can't be found in
     the matching module, then we attempt to import it from the corresponding
-    core Oscar app (assuming the matched module isn't in Oscar).
+    core Cobra app (assuming the matched module isn't in Cobra).
 
     This is very similar to ``django.db.models.get_model`` function for
     dynamically loading models.  This function is more general though as it can
@@ -93,14 +93,14 @@ def get_classes(module_label, classnames):
         Load a single class:
 
         >>> get_class('dashboard.catalogue.forms', 'ProductForm')
-        oscar.apps.dashboard.catalogue.forms.ProductForm
+        cobra.apps.dashboard.catalogue.forms.ProductForm
 
         Load a list of classes:
 
         >>> get_classes('dashboard.catalogue.forms',
         ...             ['ProductForm', 'StockRecordForm'])
-        [oscar.apps.dashboard.catalogue.forms.ProductForm,
-         oscar.apps.dashboard.catalogue.forms.StockRecordForm]
+        [cobra.apps.dashboard.catalogue.forms.ProductForm,
+         cobra.apps.dashboard.catalogue.forms.StockRecordForm]
 
     Raises:
 
@@ -118,17 +118,17 @@ def get_classes(module_label, classnames):
         raise ValueError(
             "Importing from top-level modules is not supported")
 
-    # import from Oscar package (should succeed in most cases)
-    # e.g. 'oscar.apps.dashboard.catalogue.forms'
-    oscar_module_label = "oscar.apps.%s" % module_label
-    oscar_module = _import_module(oscar_module_label, classnames)
+    # import from Cobra package (should succeed in most cases)
+    # e.g. 'cobra.apps.dashboard.catalogue.forms'
+    cobra_module_label = "cobra.apps.%s" % module_label
+    cobra_module = _import_module(cobra_module_label, classnames)
 
-    # returns e.g. 'oscar.apps.dashboard.catalogue',
+    # returns e.g. 'cobra.apps.dashboard.catalogue',
     # 'yourproject.apps.dashboard.catalogue' or 'dashboard.catalogue',
     # depending on what is set in INSTALLED_APPS
     installed_apps_entry, app_name = _find_installed_apps_entry(module_label)
-    if installed_apps_entry.startswith('oscar.apps.'):
-        # The entry is obviously an Oscar one, we don't import again
+    if installed_apps_entry.startswith('cobra.apps.'):
+        # The entry is obviously an Cobra one, we don't import again
         local_module = None
     else:
         # Attempt to import the classes from the local module
@@ -137,7 +137,7 @@ def get_classes(module_label, classnames):
         local_module_label = installed_apps_entry + sub_module
         local_module = _import_module(local_module_label, classnames)
 
-    if oscar_module is local_module is None:
+    if cobra_module is local_module is None:
         # This intentionally doesn't raise an ImportError, because ImportError
         # can get masked in complex circular import scenarios.
         raise ModuleNotFoundError(
@@ -147,7 +147,7 @@ def get_classes(module_label, classnames):
         )
 
     # return imported classes, giving preference to ones from the local package
-    return _pluck_classes([local_module, oscar_module], classnames)
+    return _pluck_classes([local_module, cobra_module], classnames)
 
 
 def _import_module(module_label, classnames):
@@ -240,7 +240,7 @@ def get_profile_class():
     Return the profile model class
     """
     # The AUTH_PROFILE_MODULE setting was deprecated in Django 1.5, but it
-    # makes sense for Oscar to continue to use it. Projects built on Django
+    # makes sense for Cobra to continue to use it. Projects built on Django
     # 1.4 are likely to have used a profile class and it's very difficult to
     # upgrade to a single user model. Hence, we should continue to support
     # having a separate profile class even if Django doesn't.
@@ -253,10 +253,10 @@ def get_profile_class():
 
 def feature_hidden(feature_name):
     """
-    Test if a certain Oscar feature is disabled.
+    Test if a certain Cobra feature is disabled.
     """
     return (feature_name is not None and
-            feature_name in settings.OSCAR_HIDDEN_FEATURES)
+            feature_name in settings.COBRA_HIDDEN_FEATURES)
 
 
 # The following section is concerned with offering both the
@@ -297,7 +297,7 @@ if django.VERSION < (1, 7):
     def is_model_registered(app_label, model_name):
         """
         Checks whether a given model is registered. This is used to only
-        register Oscar models if they aren't overridden by a forked app.
+        register Cobra models if they aren't overridden by a forked app.
         """
         return bool(django_get_model(app_label, model_name, seed_cache=False))
 
@@ -342,7 +342,7 @@ else:
     def is_model_registered(app_label, model_name):
         """
         Checks whether a given model is registered. This is used to only
-        register Oscar models if they aren't overridden by a forked app.
+        register Cobra models if they aren't overridden by a forked app.
         """
         try:
             apps.get_registered_model(app_label, model_name)

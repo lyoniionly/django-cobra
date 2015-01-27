@@ -37,6 +37,7 @@ COBRA_CORE_APPS = [
     # 'cobra.apps.offer',
     # 'cobra.apps.order',
     'cobra.apps.home',
+    'cobra.apps.option',
     'cobra.apps.project',
     'cobra.apps.accessgroup',
     'cobra.apps.customer',
@@ -66,6 +67,7 @@ COBRA_CORE_APPS = [
     # 'sorl.thumbnail',
     'sudo',
     'django_tables2',
+    'crispy_forms',
 ]
 # 'base.html' and 'cobra/base.html'.  This allows Cobra's templates to be
 # extended by templates with the same filename

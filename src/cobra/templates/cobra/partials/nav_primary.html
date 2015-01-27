@@ -1,75 +1,59 @@
-{% load currency_filters %}
-{% load category_tags %}
 {% load i18n %}
+{% load permissions_tags %}
+{% load organization_tags %}
 
-<div class="navbar primary navbar-static-top navbar-inverse">
-    <div class="container-fluid">
-        <div class="navbar-header pull-right">
-            {# This is used in mobile view #}
-            <a class="navbar-toggle" data-toggle="collapse" data-target=".primary-collapse">
-                <span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </span>
-            </a>
-        </div>
-
-        <a class="btn btn-default navbar-btn btn-cart navbar-right visible-xs-inline-block" href="{% url 'basket:summary' %}">
-            <i class="icon-shopping-cart"></i>
-            {% trans "Basket" %}
-            {% if not request.basket.is_empty %}
-                {% if request.basket.is_tax_known %}
-                    {% blocktrans with total=request.basket.total_incl_tax|currency:request.basket.currency %}
-                        Total: {{ total }}
-                    {% endblocktrans %}
-                {% else %}
-                    {% blocktrans with total=request.basket.total_excl_tax|currency:request.basket.currency %}
-                        Total: {{ total }}
-                    {% endblocktrans %}
-                {% endif %}
-            {% endif %}
+<ul class="nav pull-right">
+  {% block account_nav %}
+    {% if request.user.is_authenticated %}
+      <li><a href="">{% trans "Docs" %}</a></li>
+      <li class="dropdown org-dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          {% if organization %}
+            {{ organization.name }}
+          {% else %}
+            {% trans "Organizations" %}
+          {% endif %}
+          <span class="caret"></span>
         </a>
-
-
-        <div class="navbar-collapse primary-collapse collapse">
-            {% block nav_dropdown %}
-                <ul id="browse" class="nav navbar-nav">
-                    <li class="dropdown active {% if expand_dropdown %}open{% endif %}">
-                        <a href="#" class="dropdown-toggle" {% if not expand_dropdown %} data-toggle="dropdown"{% endif %}>
-                            {% trans "Browse store" %}
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu" data-navigation="dropdown-menu">
-                            {% category_tree depth=2 as tree_categories %}
-                            <li><a tabindex="-1" href="{% url 'catalogue:index' %}">{% trans "All products" %}</a></li>
-                            {% if tree_categories %}
-                                <li class="divider"></li>
-                                {% for tree_category, info in tree_categories %}
-                                    {% if info.has_children %}
-                                        <li class="dropdown-submenu">
-                                            <a tabindex="-1" href="{{ tree_category.get_absolute_url }}">{{ tree_category.name }}</a>
-                                            <ul class="dropdown-menu">
-                                            {% else %}
-                                                <li><a tabindex="-1" href="{{ tree_category.get_absolute_url }}">{{ tree_category.name }}</a></li>
-                                            {% endif %}
-
-                                            {% for close in info.num_to_close %}
-                                                </ul></li>
-                                            {% endfor %}
-                                {% endfor %}
-                            {% endif %}
-                            <li class="divider"></li>
-                            {% block nav_dropdown_extra_items %}
-                                <li><a href="{% url 'offer:list' %}">{% trans "Offers" %}</a></li>
-                            {% endblock %}
-                        </ul>
-                    </li>
-                    {% block nav_extra %}
-                    {% endblock %}
-                </ul>
-            {% endblock %}
-            {% include "partials/search.html" %}
-        </div><!-- /navbar-collapse -->
-    </div>
-</div><!-- /navbar -->
+        <ul class="dropdown-menu">
+          {% if request.user|can_create_organizations %}
+            <li>
+              <h6>
+                <a href="{% comment %}{% url 'sentry-create-organization' %}{% endcomment %}" class="new pull-right">
+                  <span class="icon-plus"></span>
+                </a>
+                {% trans "Organizations" %}
+              </h6>
+            </li>
+          {% endif %}
+          {% for o in request.user|list_organizations %}
+            <li{% if o == organization %} class="active"{% endif %}>
+              <a href="{% comment %}{% url 'sentry-organization-home' o.slug %}{% endcomment %}">{{ o.name }}</a>
+              {% if request.user|can_manage_org:o %}
+                <a href="{% comment %}{% url 'sentry-organization-settings' o.slug %}{% endcomment %}" class="org-settings">
+                  <span class="icon-cog"></span>
+                </a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          <img class="avatar" src="{% comment %}{% gravatar_url user.email size 20 %}{% endcomment %}">
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="{% comment %}{% url 'sentry-account-settings' %}{% endcomment %}">{% trans "Account" %}</a></li>
+          {% if request.user.is_staff %}
+            <li><a href="{% comment %}{% url 'sentry-admin-status' %}{% endcomment %}">{% trans "Admin" %}</a></li>
+          {% endif %}
+          <li class="divider">
+          <li><a href="{% comment %}{% url 'sentry-logout' %}{% endcomment %}">{% trans "Logout" %}</a></li>
+        </ul>
+      </li>
+    {% else %}
+      <li><a href="{% comment %}{% url 'sentry-login' %}{% endcomment %}">{% trans "Login" %}</a></li>
+    {% endif %}
+  {% endblock %}
+</ul>

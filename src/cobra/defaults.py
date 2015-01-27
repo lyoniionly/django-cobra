@@ -285,5 +285,28 @@ COBRA_LOGIN_URL = None
 # The entry of maintaince mode
 COBRA_MAINTENANCE = False
 
+# See cobra/core/options/__init__.py for more information
+COBRA_OPTIONS = {}
+
+# Prevent variables (e.g. context locals, http data, etc) from exceeding this
+# size in characters
+COBRA_MAX_VARIABLE_SIZE = 512
+
+# For various attributes we don't limit the entire attribute on size, but the
+# individual item. In those cases we also want to limit the maximum number of
+# keys
+COBRA_MAX_DICTIONARY_ITEMS = 50
+
+# Redis connection information (see Nydus documentation)
+COBRA_REDIS_OPTIONS = {}
+
+# Should users without superuser permissions be allowed to
+# make projects public
+COBRA_ALLOW_PUBLIC_PROJECTS = True
+
+# Rate limiting backend
+COBRA_RATELIMITER = 'cobra.core.ratelimits.base.RateLimiter'
+COBRA_RATELIMITER_OPTIONS = {}
+
 COBRA_SETTINGS = dict(
     [(k, v) for k, v in locals().items() if k.startswith('COBRA_')])
