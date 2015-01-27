@@ -147,6 +147,9 @@ INTERNAL_IPS = ('127.0.0.1',)
 
 ROOT_URLCONF = 'urls'
 
+# For crispy_forms, use the bootstrap3 UI
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
 from cobra import COBRA_MAIN_TEMPLATE_DIR
 TEMPLATE_DIRS = (
     location('templates'),
@@ -256,10 +259,8 @@ INSTALLED_APPS = [
     # External apps
     'django_extensions',
     'debug_toolbar',
-    # For profile testing
+    # For profile
     'apps.user',
-    # Sentry (for live demo site)
-    #'raven.contrib.django.raven_compat'
 ]
 
 # South is only supported in Django < 1.7
