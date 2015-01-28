@@ -13,13 +13,6 @@ if not is_model_registered('project', 'Project'):
     __all__.append('Project')
 
 
-if not is_model_registered('project', 'ProjectOption'):
-    class ProjectOption(AbstractProjectOption):
-        pass
-
-    __all__.append('ProjectOption')
-
-
 if not is_model_registered('project', 'ProjectKey'):
     class ProjectKey(AbstractProjectKey):
         pass

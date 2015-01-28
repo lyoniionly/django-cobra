@@ -11,3 +11,17 @@ if not is_model_registered('option', 'Option'):
         pass
 
     __all__.append('Option')
+
+
+if not is_model_registered('option', 'UserOption'):
+    class UserOption(AbstractUserOption):
+        pass
+
+    __all__.append('UserOption')
+
+
+if not is_model_registered('option', 'ProjectOption'):
+    class ProjectOption(AbstractProjectOption):
+        pass
+
+    __all__.append('ProjectOption')

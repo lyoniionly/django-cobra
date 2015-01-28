@@ -100,7 +100,7 @@ class MessageBuilder(object):
 
     def add_users(self, user_ids, project=None):
         User = get_user_model()
-        UserOption = get_model('customer', 'UserOption')
+        UserOption = get_model('option', 'UserOption')
 
         email_list = set()
         user_ids = set(user_ids)

@@ -122,7 +122,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # 'cobra.apps.promotions.context_processors.promotions',
     # 'cobra.apps.checkout.context_processors.checkout',
     'cobra.core.context_processors.metadata',
-    'cobra.apps.customer.notifications.context_processors.notifications',
+
+    # allauth specific context processors
+    "allauth.account.context_processors.account",
+    "allauth.socialaccount.context_processors.socialaccount",
 )
 
 MIDDLEWARE_CLASSES = (
@@ -277,8 +280,11 @@ from cobra import get_core_apps
 INSTALLED_APPS = INSTALLED_APPS + get_core_apps()
 
 AUTHENTICATION_BACKENDS = (
-    'cobra.apps.customer.auth_backends.EmailBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
 )
 
 LOGIN_REDIRECT_URL = '/'
@@ -295,6 +301,11 @@ APPEND_SLASH = True
 # We still use this deprecated Django setting since Cobra needs a way of
 # knowing where the profile class is (if one is used).
 AUTH_PROFILE_MODULE = 'user.Profile'
+
+# django-allauth will use 'auth.User' for default
+# but, cobra has custom the User model in cobra.accounts app
+# so, We must set it for django-allauth
+AUTH_USER_MODEL = 'accounts.User'
 
 # Cobra settings
 from cobra.defaults import *

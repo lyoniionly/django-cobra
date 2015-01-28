@@ -20,11 +20,11 @@ from cobra.models import sane_repr
 from cobra.models.utils import slugify_instance
 from cobra.core.constants import PLATFORM_TITLES, PLATFORM_LIST
 from cobra.core.http import absolute_uri
-from cobra.core.loading import get_model, get_classes
+from cobra.core.loading import get_model, get_classes, get_class
 from cobra.core.compat import AUTH_USER_MODEL
 from .utils import ProjectStatus
 
-ProjectManager, ProjectOptionManager = get_classes('project.managers', ['ProjectManager', 'ProjectOptionManager'])
+ProjectManager = get_class('project.managers', 'ProjectManager')
 
 
 @python_2_unicode_compatible
@@ -134,17 +134,17 @@ class AbstractProject(Model):
 
     # TODO: Make these a mixin
     def update_option(self, *args, **kwargs):
-        ProjectOption = get_model('project', 'ProjectOption')
+        ProjectOption = get_model('option', 'ProjectOption')
 
         return ProjectOption.objects.set_value(self, *args, **kwargs)
 
     def get_option(self, *args, **kwargs):
-        ProjectOption = get_model('project', 'ProjectOption')
+        ProjectOption = get_model('option', 'ProjectOption')
 
         return ProjectOption.objects.get_value(self, *args, **kwargs)
 
     def delete_option(self, *args, **kwargs):
-        ProjectOption = get_model('project', 'ProjectOption')
+        ProjectOption = get_model('option', 'ProjectOption')
 
         return ProjectOption.objects.unset_value(self, *args, **kwargs)
 
@@ -170,32 +170,6 @@ class AbstractProject(Model):
             'public': self.public,
             'platform': self.platform,
         }
-
-
-@python_2_unicode_compatible
-class AbstractProjectOption(Model):
-    """
-    Project options apply only to an instance of a project.
-
-    Options which are specific to a plugin should namespace
-    their key. e.g. key='myplugin:optname'
-    """
-    project = fields.FlexibleForeignKey('project.Project', related_name='+')
-    key = models.CharField(max_length=64)
-    value = fields.UnicodePickledObjectField()
-
-    objects = ProjectOptionManager()
-
-    class Meta:
-        abstract = True
-        app_label = 'project'
-        db_table = 'cobra_projectoptions'
-        unique_together = (('project', 'key',),)
-
-    __repr__ = sane_repr('project_id', 'key', 'value')
-
-    def __str__(self):
-        return '%s - %s' % (self.project.name, self.key)
 
 
 @python_2_unicode_compatible

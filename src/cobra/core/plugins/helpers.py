@@ -4,8 +4,8 @@ from __future__ import absolute_import
 from cobra.core import options
 from cobra.core.loading import get_model
 
-ProjectOption = get_model('project', 'ProjectOption')
-UserOption = get_model('customer', 'UserOption')
+ProjectOption = get_model('option', 'ProjectOption')
+UserOption = get_model('option', 'UserOption')
 
 __all__ = ('set_option', 'get_option', 'unset_option')
 

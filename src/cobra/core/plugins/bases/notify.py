@@ -10,7 +10,7 @@ from cobra.singleton import ratelimiter
 from cobra.core.plugins import Notification, Plugin
 from cobra.core.loading import get_model
 
-UserOption = get_model('customer', 'UserOption')
+UserOption = get_model('option', 'UserOption')
 AccessGroup = get_model('accessgroup', 'Accessgroup')
 
 

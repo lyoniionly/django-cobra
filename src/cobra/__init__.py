@@ -36,11 +36,11 @@ COBRA_CORE_APPS = [
     # 'cobra.apps.payment',
     # 'cobra.apps.offer',
     # 'cobra.apps.order',
+    'cobra.apps.accounts',
     'cobra.apps.home',
     'cobra.apps.option',
     'cobra.apps.project',
     'cobra.apps.accessgroup',
-    'cobra.apps.customer',
     'cobra.apps.nodestore',
     'cobra.apps.organization',
     'cobra.apps.team',
@@ -68,6 +68,13 @@ COBRA_CORE_APPS = [
     'sudo',
     'django_tables2',
     'crispy_forms',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # include the providers you want to enable:
+    'allauth.socialaccount.providers.bitbucket',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.weibo',
 ]
 # 'base.html' and 'cobra/base.html'.  This allows Cobra's templates to be
 # extended by templates with the same filename

@@ -17,7 +17,7 @@ except ImportError:
     from StringIO import StringIO  # NOQA
 
 # A setting that can be used in foreign key declarations
-AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'accounts.User')
 # Two additional settings that are useful in South migrations when
 # specifying the user model in the FakeORM
 try:

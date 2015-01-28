@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import bitfield.models
 import cobra.models.fields.bounded
-import cobra.models.fields.pickle
 from django.conf import settings
 import django.utils.timezone
 import cobra.models.fields.foreignkey
@@ -15,7 +14,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('team', '0001_initial'),
-        ('organization', '0002_auto_20150126_1425'),
+        ('organization', '0002_auto_20150128_1414'),
     ]
 
     operations = [
@@ -56,24 +55,6 @@ class Migration(migrations.Migration):
                 'db_table': 'cobra_projectkey',
             },
             bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='ProjectOption',
-            fields=[
-                ('id', cobra.models.fields.bounded.BoundedBigAutoField(serialize=False, primary_key=True)),
-                ('key', models.CharField(max_length=64)),
-                ('value', cobra.models.fields.pickle.UnicodePickledObjectField(editable=False)),
-                ('project', cobra.models.fields.foreignkey.FlexibleForeignKey(related_name='+', to='project.Project')),
-            ],
-            options={
-                'abstract': False,
-                'db_table': 'cobra_projectoptions',
-            },
-            bases=(models.Model,),
-        ),
-        migrations.AlterUniqueTogether(
-            name='projectoption',
-            unique_together=set([('project', 'key')]),
         ),
         migrations.AlterUniqueTogether(
             name='project',
