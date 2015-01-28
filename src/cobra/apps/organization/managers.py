@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from django.conf import settings
 
 from cobra.models import BaseManager
-from cobra.core.loading import get_model
+from cobra.core.loading import get_model, get_class
 from .utils import OrganizationStatus
 
 
@@ -16,7 +16,7 @@ class OrganizationManager(BaseManager):
         holds the OrganizationMemberType value.
         """
         OrganizationMember = get_model('organization', 'OrganizationMember')
-        OrganizationMemberType = get_model('organization', 'OrganizationMemberType')
+        OrganizationMemberType = get_class('organization.utils', 'OrganizationMemberType')
 
         results = []
 

@@ -1,12 +1,16 @@
-{% extends "account/base.html" %}
-
+{% extends "layouts/modal.html" %}
 {% load i18n %}
+{% load crispy_forms_tags %}
 {% load account %}
 {% load url from future %}
 
-{% block head_title %}{% trans "Sign In" %}{% endblock %}
-{% block layout %}vasdf{% endblock %}
-{% block content %}
+{% block title %}
+    {% trans 'Login or register' %} | {{ block.super }}
+{% endblock %}
+
+{% block main %}
+
+  <section class="body">
 
 <h1>{% trans "Sign In" %}</h1>
 
@@ -42,4 +46,5 @@ for a {{site_name}} account and sign in below:{% endblocktrans %}</p>
   <button class="primaryAction" type="submit">{% trans "Sign In" %}</button>
 </form>
 
+  </section>
 {% endblock %}

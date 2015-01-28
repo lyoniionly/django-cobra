@@ -52,6 +52,16 @@ class BaseModel(models.Model):
         (model_unpickle, stuff, _) = super(BaseModel, self).__reduce__()
         return (model_unpickle, stuff, self.__getstate__())
 
+    def __hash__(self):
+        """
+        Before versions of django 1.7 instance without primary key value were hashable.
+        In django 1.7, If the instance does not have a primary key value then a TypeError will be raised.
+        But we dont want the error if the instance has not been saved.
+
+        Important!! We must change this sometime later!
+        """
+        return hash(self._get_pk_val())
+
     def __setstate__(self, state):
         self.__dict__.update(state)
         self._update_tracked_data()

@@ -316,10 +316,29 @@ COBRA_ALLOW_ANON_CHECKOUT = True
 COBRA_SYSTEM_NAME = 'Cobra'
 COBRA_SYSTEM_TAGLINE = 'Sandbox'
 
+# LESS/CSS/statics
+# ================
+
+# We default to using CSS files, rather than the LESS files that generate them.
+# If you want to develop Oscar's CSS, then set USE_LESS=True and
+# COMPRESS_ENABLED=False in your settings_local module and ensure you have
+# 'lessc' installed.
+USE_LESS = True
+
 COMPRESS_ENABLED = False
 COMPRESS_PRECOMPILERS = (
-    ('text/less', 'lessc {infile} {outfile}'),
+    ('text/less', 'lessc --source-map-less-inline --source-map-map-inline {infile} {outfile}'),
 )
+COMPRESS_OFFLINE_CONTEXT = {
+    'STATIC_URL': 'STATIC_URL',
+    'use_less': USE_LESS,
+}
+
+# We do this to work around an issue in compressor where the LESS files are
+# compiled but compression isn't enabled.  When this happens, the relative URL
+# is wrong between the generated CSS file and other assets:
+# https://github.com/jezdez/django_compressor/issues/226
+COMPRESS_OUTPUT_DIR = 'cobra'
 
 THUMBNAIL_KEY_PREFIX = 'cobra-sandbox'
 

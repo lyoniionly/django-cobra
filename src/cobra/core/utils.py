@@ -140,5 +140,5 @@ def get_login_url(reset=False):
             _LOGIN_URL = settings.LOGIN_URL
 
         if _LOGIN_URL is None:
-            _LOGIN_URL = reverse('customer:login')
+            _LOGIN_URL = reverse('account_login')
     return _LOGIN_URL
