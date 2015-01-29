@@ -6,3 +6,6 @@ class OrganizationConfig(AppConfig):
     label = 'organization'
     name = 'cobra.apps.organization'
     verbose_name = _('Organization')
+
+    def ready(self):
+        from . import receivers  # noqa

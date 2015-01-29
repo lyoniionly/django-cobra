@@ -16,7 +16,7 @@ def deprecated(f):
     return _deprecated
 
 
-def ignore_db_failure(func):
+def ignore_db_signal_failure(func):
     @wraps(func)
     def wrapped(*args, **kwargs):
         try:
