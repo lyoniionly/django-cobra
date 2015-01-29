@@ -8,14 +8,13 @@ from cobra.core.loading import get_model
 Team = get_model('team', 'Team')
 
 def get_default_context(request, existing_context=None, team=None):
-    from cobra.plugins import plugins
+    from cobra.core.plugins import plugins
 
     context = {
         'EVENTS_PER_PAGE': EVENTS_PER_PAGE,
         'URL_PREFIX': settings.COBRA_URL_PREFIX,
         'PLUGINS': plugins,
         'ALLOWED_HOSTS': settings.ALLOWED_HOSTS,
-        'COBRA_RAVEN_JS_URL': settings.COBRA_RAVEN_JS_URL,
     }
 
     if request:

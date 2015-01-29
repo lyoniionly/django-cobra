@@ -2,22 +2,22 @@
 {% load i18n %}
 {% load staticfiles %}
 {% load compress %}
+{% load helper_tags %}
 
 {% block mainstyles %}
-    {% block styles %}
-        {% compress css %}
-            {% if use_less %}
-                <link rel="stylesheet" type="text/less" href="{% static "cobra/less/styles.less" %}" />
-            {% else %}
-                <link rel="stylesheet" type="text/css" href="{% static "cobra/css/styles.css" %}" />
-            {% endif %}
-        {% endcompress %}
-    {% endblock %}
+  {% block styles %}
+    {% compress css %}
+      {% if use_less %}
+        <link rel="stylesheet" type="text/less" href="{% static "cobra/less/cobra.less" %}"/>
+      {% else %}
+        <link rel="stylesheet" type="text/css" href="{% static "cobra/css/cobra.css" %}"/>
+      {% endif %}
+    {% endcompress %}
+  {% endblock %}
 {% endblock %}
 
 {% block layout %}
   <div class="outer-wrapper">
-
     {# Site logo/title, brand, browse dropdown #}
     {% block header %}
       <header id="header">
@@ -50,29 +50,29 @@
 
     {# Main content of page - other layout templates may override this block #}
     {% block content_wrapper %}
-        <section id="content" class="{% block content_class %}with-sidebar{% endblock %}">
-            <div class="container">
-                {% block breadcrumbs %}{% endblock %}
-                {% block above_content %}{% endblock %}
-                {% block subnavigation %}{% endblock %}
-                <div class="content">
-                    {% block content_before %}{% endblock %}
-                    {% block subheader %}{% endblock subheader %}
+      <section id="content" class="{% block content_class %}with-sidebar{% endblock %}">
+        <div class="container">
+          {% block breadcrumbs %}{% endblock %}
+          {% block above_content %}{% endblock %}
+          {% block subnavigation %}{% endblock %}
+          <div class="content">
+            {% block content_before %}{% endblock %}
+            {% block subheader %}{% endblock subheader %}
 
-                    {% block content %}
-                        <div class="main">
-                            {% block alerts %}{% include "partials/alert_messages.html" %}{% endblock %}
-                            {% block main %}{% endblock %}
-                        </div>
-                        <div class="sidebar">
-                            {% block sidebar %}{% endblock %}
-                        </div>
-                    {% endblock %}
+            {% block content %}
+              <div class="main">
+                {% block alerts %}{% include "partials/alert_messages.html" %}{% endblock %}
+                {% block main %}{% endblock %}
+              </div>
+              <div class="sidebar">
+                {% block sidebar %}{% endblock %}
+              </div>
+            {% endblock %}
 
-                    {% block content_after %}{% endblock %}
-                </div>
-            </div>
-        </section>
+            {% block content_after %}{% endblock %}
+          </div>
+        </div>
+      </section>
     {% endblock %}
 
     {% include "partials/footer.html" %}
@@ -81,13 +81,87 @@
 
 {# Local scripts #}
 {% block scripts %}
-    {{ block.super }}
-    {% compress js %}
+  {{ block.super }}
+  {% compress js %}
     <!-- Twitter Bootstrap -->
-    <script type="text/javascript" src="{% static "cobra/js/bootstrap3/bootstrap.min.js" %}"></script>
-    <!-- Oscar -->
-    <script src="{% static "cobra/js/cobra/ui.js" %}" type="text/javascript" charset="utf-8"></script>
-    {% endcompress %}
+    <script type="text/javascript" src="{% static "cobra/vendor/bootstrap3/dist/js/bootstrap.min.js" %}"></script>
+    <!-- Twitter Bootstrap plugins -->
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/bootstrap-datepicker/bootstrap-datepicker.js" %}"></script>
+    <!-- javaScript Libs -->
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery-migrate.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.animate-colors.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.clippy.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.cookie.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.flot.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.flot.dashes.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.flot.resize.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.flot.time.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.flot.tooltip.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.timeago.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.countdown.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/moment.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/simple-slider.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/json2.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/underscore.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/backbone.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/Chart.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/select2/select2.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/bootstrap-switch.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.jSelectDate.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.maskloading.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/fileinput.js" %}"></script>
+    <!-- Globle -->
+    <script type="text/javascript" src="{% static "cobra/scripts/global/core.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/conf.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/models.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/templates.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/utils.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/modals.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/forms.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/collections.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/charts.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/waveline.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/views.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/app.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/communication.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/messages.js" %}"></script>
+    <!-- Legacy -->
+    <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.core.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.charts.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.stream.js" %}"></script>
+  {% endcompress %}
+  <script type="text/javascript">
+    {% if request.LANGUAGE_CODE %}
+      moment.lang('{{ request.LANGUAGE_CODE }}');
+    {% endif %}
+    app.config.clippyPath = '{% static "cobra/clippy.swf" %}';
+    app.config.popupCss = '{% static "cobra/styles/popup.css" %}';
+    app.config.mediaUrl = '';
+    app.config.urlPrefix = {{ URL_PREFIX|to_json|safe }};
+    app.config.jsonDataRoot = '{{ json_data_root }}';
+    app.config.auto_fade_alerts = {
+      delay: {{ COBRA_CONFIG.auto_fade_alerts.delay|default:"3000" }},
+      fade_duration: {{ COBRA_CONFIG.auto_fade_alerts.fade_duration|default:"1500" }},
+      types: {{ COBRA_CONFIG.auto_fade_alerts.types|default:"[]"|safe }}
+    };
+    {% if project %}
+      app.config.projectId = {{ project.slug|to_json|safe }};
+      app.config.teamId = {{ project.team.slug|to_json|safe }};
+      app.config.organizationId = {{ project.organization.slug|to_json|safe }};
+    {% elif team %}
+      app.config.projectId = null;
+      app.config.teamId = {{ team.slug|to_json|safe }};
+      app.config.organizationId = {{ team.organization.slug|to_json|safe }};
+    {% elif organization %}
+      app.config.projectId = null;
+      app.config.teamId = null;
+      app.config.organizationId = {{ organization.slug|to_json|safe }};
+    {% else %}
+      app.config.projectId = null;
+      app.config.teamId = null;
+      app.config.organizationId = null;
+    {% endif %}
+  </script>
 {% endblock %}
 
 {% block extrascripts %}
@@ -97,5 +171,5 @@
 
 {% block onbodyload %}
     {{ block.super }}
-{#    cobra.init();#}
+    app.init();
 {% endblock %}

@@ -253,6 +253,10 @@ COBRA_USE_BIG_INTS = False
 # Allow access to Cobra without authentication.
 COBRA_PUBLIC = False
 
+COBRA_CAN_REGISTER = True
+
+COBRA_JSON_DATA_ROOT = 'data_root'
+
 # SMTP Service
 COBRA_ENABLE_EMAIL_REPLIES = False
 COBRA_SMTP_HOSTNAME = 'localhost'

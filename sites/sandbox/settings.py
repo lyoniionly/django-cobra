@@ -146,6 +146,10 @@ MIDDLEWARE_CLASSES = (
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ('127.0.0.1',)
+DEBUG_TOOLBAR_CONFIG = {
+    # Toolbar options
+    'JQUERY_URL': '//ajax.useso.com/ajax/libs/jquery/2.1.3/jquery.min.js',
+}
 
 
 ROOT_URLCONF = 'urls'
@@ -306,6 +310,14 @@ AUTH_PROFILE_MODULE = 'user.Profile'
 # but, cobra has custom the User model in cobra.accounts app
 # so, We must set it for django-allauth
 AUTH_USER_MODEL = 'accounts.User'
+
+#allath settings
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'#'mandatory'
+ACCOUNT_USERNAME_BLACKLIST = ['cobra', 'admin', 'case', 'test']
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_SIGNUP_FORM_CLASS = 'cobra.apps.accounts.forms.SignupForm'
+
 
 # Cobra settings
 from cobra.defaults import *

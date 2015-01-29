@@ -2,7 +2,7 @@
 {% load permissions_tags %}
 {% load organization_tags %}
 
-<ul class="nav pull-right">
+<ul class="nav navbar-nav navbar-right">
   {% block account_nav %}
     {% if request.user.is_authenticated %}
       <li><a href="">{% trans "Docs" %}</a></li>
@@ -55,5 +55,6 @@
     {% else %}
       <li><a href="{% comment %}{% url 'sentry-login' %}{% endcomment %}">{% trans "Login" %}</a></li>
     {% endif %}
+    <li><a href="mailto:beihua_445566@126.com" class="support-link">{% trans 'Support' %}</a></li>
   {% endblock %}
 </ul>

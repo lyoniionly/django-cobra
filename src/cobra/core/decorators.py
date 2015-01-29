@@ -1,4 +1,9 @@
+from __future__ import absolute_import, print_function
+
+from functools import wraps
+import logging
 import warnings
+from django.db import OperationalError
 
 
 def deprecated(f):
@@ -9,3 +14,14 @@ def deprecated(f):
         warnings.warn(message, DeprecationWarning, stacklevel=2)
         return f(*args, **kwargs)
     return _deprecated
+
+
+def ignore_db_failure(func):
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except OperationalError:
+            logging.exception('Failed processing signal %s', func.__name__)
+            return
+    return wrapped

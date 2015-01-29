@@ -51,6 +51,8 @@ def metadata(request):
             'system_tagline': settings.COBRA_SYSTEM_TAGLINE,
             'homepage_url': settings.COBRA_HOMEPAGE,
             'use_less': getattr(settings, 'USE_LESS', False),
+            'json_data_root': settings.COBRA_JSON_DATA_ROOT,
+            'can_register': settings.COBRA_CAN_REGISTER,
             'call_home': usage_statistics_string(),
             'language_neutral_url_path': strip_language_code(request),
             'google_analytics_id': getattr(settings,
