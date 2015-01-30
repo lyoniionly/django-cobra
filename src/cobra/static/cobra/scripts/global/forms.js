@@ -129,10 +129,8 @@
     // Disable multiple submissions when launching a form.
     var $form = $(el).find("form");
     $form.submit(function (event) {
-      var button = $(this).find('[type="submit"]');
-      //alert(event.originalEvent.explicitOriginalTarget.name);
-      //alert(event.originalEvent.explicitOriginalTarget.value);
-      console.log('s', event)
+      var button = $(this).find('[type="submit"]:focus');
+
       var op_name = button.attr('name');
       // For some browsers, `attr` is undefined; for others,
       // `attr` is false.  Check for both.
@@ -145,7 +143,8 @@
             .appendTo($(this));
       }
 
-      if (button.hasClass('btn-primary') && !button.hasClass('always-enabled')){
+//      if (button.hasClass('btn-primary') && !button.hasClass('always-enabled')){
+      if (!button.hasClass('always-enabled')){
         $(this).submit(function () {
           return false;
         });

@@ -26,12 +26,12 @@
         <div class="actions">
           <div class="pull-left">
             {% if current_step != first_step %}
-              <button name="op" value="back" onclick="this.form.submit()"
+              <button name="op" value="back" type="submit" {% comment %}onclick="this.form.submit()"{% endcomment %}
                       class="btn back-step">{% trans "Back" %}</button>
             {% endif %}
           </div>
           {% if current_step != first_step %}
-            <button name="op" value="skip" onclick="this.form.submit()"
+            <button name="op" value="skip" type="submit" {% comment %}onclick="this.form.submit()"{% endcomment %}
                     class="btn btn-default">{% trans "Skip this step" %}</button>
           {% endif %}
           <button name="op" value="continue" type="submit"
