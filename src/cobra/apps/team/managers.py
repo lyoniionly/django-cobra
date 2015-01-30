@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from django.conf import settings
 
 from cobra.models import BaseManager
-from cobra.core.loading import get_model
+from cobra.core.loading import get_model, get_class
 from .utils import TeamStatus
 
 
@@ -18,8 +18,8 @@ class TeamManager(BaseManager):
         """
         AccessGroup = get_model('accessgroup', 'AccessGroup')
         OrganizationMember = get_model('organization', 'OrganizationMember')
-        OrganizationMemberType = get_model('organization','OrganizationMemberType')
         Project = get_model('project','Project')
+        OrganizationMemberType = get_class('organization.utils','OrganizationMemberType')
 
         if not user.is_authenticated():
             return []

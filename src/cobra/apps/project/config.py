@@ -6,3 +6,6 @@ class ProjectConfig(AppConfig):
     label = 'project'
     name = 'cobra.apps.project'
     verbose_name = _('Project')
+
+    def ready(self):
+        from . import receivers  # noqa

@@ -1,3 +1,4 @@
+{% load crispy_forms_tags %}
 {% load i18n %}
 
 {% if form.is_bound and not form.is_valid %}
@@ -14,6 +15,10 @@
     {% endfor %}
 {% endif %}
 
-{% for field in form %}
+{% comment %}{% for field in form %}
     {% include 'partials/form_field.html' with field=field style=style %}
+{% endfor %}{% endcomment %}
+
+{% for field in form %}
+    {{ field|as_crispy_field }}
 {% endfor %}

@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load helper_tags %}
+
+{% block title %}{% trans "Organization Settings" %} | {{ block.super }}{% endblock %}
+
+{% block content_class %}with-left-sidebar{% endblock %}
+
+{% block page_header_block %}
+    <section id="page-header" class="toolbar">
+      <div class="pull-right">
+        {% block actions %}
+        {% if ACCESS.is_admin %}
+          {% if ACCESS.is_global %}
+            <a href="{% url 'team:create' organization.slug %}"
+               class="btn btn-small btn-primary">{% trans "New Team" %}</a>
+          {% endif %}
+          <a href="{% url 'project:create' organization.slug %}"
+             class="btn btn-small btn-primary">{% trans "New Project" %}</a>
+          {% if ACCESS.is_global %}
+            <a href="{% comment %}{% url 'sentry-create-organization-member' organization.slug %}{% endcomment %}"
+               class="btn btn-small btn-primary">{% trans "New Member" %}</a>
+          {% endif %}
+        {% endif %}
+        {% endblock %}
+      </div>
+      <h3>{{ organization.name }} <small>Dashboard</small></h3>
+    </section>
+{% endblock %}
+
+{% block sidebar %}
+  <ul class="nav nav-list">
+    <!-- <li class="nav-header"><h6>{{ organization.name }}</h6></li> -->
+    <li class="{% block org_teams_nav %}{% endblock %}">
+      <a href="{% comment %}{% url 'sentry-organization-home' organization.slug %}{% endcomment %}">
+        {% trans "Teams" %}
+      </a>
+    </li>
+    {% if ACCESS.is_global and ACCESS.is_admin %}
+    <li class="{% block org_stats_nav %}{% endblock %}">
+      <a href="{% comment %}{% url 'sentry-organization-stats' organization.slug %}{% endcomment %}">
+        {% trans "Statistic" %}
+      </a>
+    </li>
+    <li class="{% block org_members_nav %}{% endblock %}">
+      <a href="{% comment %}{% url 'sentry-organization-members' organization.slug %}{% endcomment %}">
+        {% trans "Members" %}
+      </a>
+    </li>
+    <li class="{% block org_auditlog_nav %}{% endblock %}">
+      <a href="{% comment %}{% url 'sentry-organization-audit-log' organization.slug %}{% endcomment %}">
+        {% trans "Audit Log" %}
+      </a>
+    </li>
+    <li class="{% block org_settings_nav %}{% endblock %}">
+      <a href="{% comment %}{% url 'sentry-organization-settings' organization.slug %}{% endcomment %}">
+        {% trans "Settings" %}
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+  {% block org_sidebar_nav_extra %}
+    {% comment %}This block is used by getsentry.com{% endcomment %}
+  {% endblock %}
+{% endblock %}
+
+{% block main %}
+  <section class="body">
+    {% if request.user|needs_access_group_migration:organization %}
+      <div class="alert alert-block alert-info">
+        <p>You have access groups that need to be migrated into the new organization structure. <a href="{% comment %}{% url 'sentry-organization-access-group-migration' organization.slug %}{% endcomment %}">Get Started</a></p>
+      </div>
+    {% endif %}
+    {% block inner %}{% endblock %}
+  </section>
+{% endblock %}

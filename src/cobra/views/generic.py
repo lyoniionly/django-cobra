@@ -27,6 +27,8 @@ from cobra.core.utils import safe_referrer, get_login_url
 from cobra.core.phonenumber import PhoneNumber
 from cobra.core.loading import get_classes, get_model
 from cobra.core.render import render_to_response
+from cobra.core.plugins import plugins
+from cobra.core.plugins.base import Response
 
 OrganizationMemberType, OrganizationStatus = get_classes('organization.utils',
                                                          [ 'OrganizationMemberType', 'OrganizationStatus'])
@@ -563,3 +565,32 @@ class ProjectView(BaseView):
         kwargs['organization'] = active_organization
 
         return (args, kwargs)
+
+
+def missing_perm(request, perm, **kwargs):
+    """
+    Returns a generic response if you're missing permission to perform an
+    action.
+
+    Plugins may overwrite this with the ``missing_perm_response`` hook.
+    """
+    response = plugins.first('missing_perm_response', request, perm, **kwargs)
+
+    if response:
+        if isinstance(response, HttpResponseRedirect):
+            return response
+
+        if not isinstance(response, Response):
+            raise NotImplementedError('Use self.render() when returning responses.')
+
+        return response.respond(request, {
+            'perm': perm,
+        })
+
+    if perm.label:
+        return render_to_response('error.html', {
+            'title': _('Missing Permission'),
+            'message': _('You do not have the required permissions to %s.') % (perm.label,)
+        }, request)
+
+    return HttpResponseRedirect(reverse('home:home'))

@@ -128,8 +128,23 @@
   app.forms.prevent_multiple_submission = function (el) {
     // Disable multiple submissions when launching a form.
     var $form = $(el).find("form");
-    $form.submit(function () {
+    $form.submit(function (event) {
       var button = $(this).find('[type="submit"]');
+      //alert(event.originalEvent.explicitOriginalTarget.name);
+      //alert(event.originalEvent.explicitOriginalTarget.value);
+      console.log('s', event)
+      var op_name = button.attr('name');
+      // For some browsers, `attr` is undefined; for others,
+      // `attr` is false.  Check for both.
+      if (typeof op_name !== typeof undefined && op_name !== false) {
+        var op_input = $("<input type='hidden'/>");
+        // clone the important parts of the button used to submit the form.
+        op_input
+            .attr("name", op_name)
+            .val(button.attr('value'))
+            .appendTo($(this));
+      }
+
       if (button.hasClass('btn-primary') && !button.hasClass('always-enabled')){
         $(this).submit(function () {
           return false;
@@ -166,7 +181,6 @@
       $('<span>').addClass(
         "form-control-feedback fa fa-eye password-icon"
       ).insertAfter($input).click(function () {
-          alert('dddd');
         var $icon = $(this);
 
         if ($input.attr('type') === 'password') {
@@ -364,6 +378,6 @@
     });
 
     // Hide the help text for js-capable browsers
-    $('p.help-block').hide();
+    //$('p.help-block').hide();
   });
 }(app, jQuery, _));

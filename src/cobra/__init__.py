@@ -37,6 +37,7 @@ COBRA_CORE_APPS = [
     # 'cobra.apps.offer',
     # 'cobra.apps.order',
     'cobra.apps.accounts',
+    'cobra.apps.auditlog',
     'cobra.apps.home',
     'cobra.apps.option',
     'cobra.apps.project',

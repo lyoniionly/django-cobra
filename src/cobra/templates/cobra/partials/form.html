@@ -1,3 +1,4 @@
+{% load crispy_forms_tags %}
 {% load i18n %}
 
 <form {% if form_id %}id="{{ form_id }}"{% endif %} class="form-{{ style|default:"stacked" }} {{ class }}" method="{{ method|default:"post" }}"
@@ -6,8 +7,12 @@
 
     {% if not method == "get" %}{% csrf_token %}{% endif %}
     {% include 'partials/form_fields.html' %}
-    <div class="form-group form-actions">
-        <button class="btn btn-lg btn-primary" type="submit" data-loading-text="{% trans 'Saving...' %}">{% trans "Save" %}</button>
+
+    <fieldset class="form-actions">
+        <button type="submit" class="btn btn-primary" name="action_save">{{ submit_label|default:"Save Changes" }}</button>
+        {% if plugin.is_testable %}
+        <button type="submit" class="btn" name="action_test" {% if not plugin_is_configured %}disabled{% endif %}>{% trans "Test Configuration" %}</button>
+        {% endif %}
         {% trans "or" %} <a href="#" onclick="window.history.go(-1);return false" >{% trans "cancel" %}</a>.
-    </div>
+    </fieldset>
 </form>

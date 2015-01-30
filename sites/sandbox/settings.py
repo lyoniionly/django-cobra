@@ -140,6 +140,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    'cobra.middleware.ajax.AjaxMessagingMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     # 'cobra.apps.basket.middleware.BasketMiddleware',
 )
@@ -317,6 +318,8 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'#'mandatory'
 ACCOUNT_USERNAME_BLACKLIST = ['cobra', 'admin', 'case', 'test']
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_SIGNUP_FORM_CLASS = 'cobra.apps.accounts.forms.SignupForm'
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGOUT_REDIRECT_URL = '/auth/login/'
 
 
 # Cobra settings

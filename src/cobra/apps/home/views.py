@@ -20,5 +20,3 @@ class HomeView(AnonymousRequiredMixin, OrganizationMixin, TemplateView):
         else:
             url = reverse('organization:home', args=[organization.slug])
         return url
-
-

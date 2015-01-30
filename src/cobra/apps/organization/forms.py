@@ -1,30 +1,18 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 from django import forms
-from oscar.core.loading import get_model
-from django.forms.models import inlineformset_factory
+from django.utils.translation import ugettext_lazy as _
 
-WishList = get_model('wishlists', 'WishList')
-Line = get_model('wishlists', 'Line')
+from cobra.core.loading import get_model
+
+Organization = get_model('organization', 'Organization')
 
 
-class WishListForm(forms.ModelForm):
-
-    def __init__(self, user, *args, **kwargs):
-        super(WishListForm, self).__init__(*args, **kwargs)
-        self.instance.owner = user
+class OrganizationCreateForm(forms.ModelForm):
+    name = forms.CharField(label=_('Organization Name'), max_length=200,
+        widget=forms.TextInput(attrs={'placeholder': _('My Company')}))
 
     class Meta:
-        model = WishList
-        fields = ('name', )
-
-
-class WishListLineForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super(WishListLineForm, self).__init__(*args, **kwargs)
-        self.fields['quantity'].widget.attrs['class'] = 'input-mini'
-
-
-LineFormset = inlineformset_factory(
-    WishList, Line, fields=('quantity', ), form=WishListLineForm,
-    extra=0, can_delete=False)
+        fields = ('name',)
+        model = Organization

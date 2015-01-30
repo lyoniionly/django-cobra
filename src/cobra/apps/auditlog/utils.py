@@ -1,0 +1,19 @@
+class AuditLogEntryEvent(object):
+    MEMBER_INVITE = 1
+    MEMBER_ADD = 2
+    MEMBER_ACCEPT = 3
+    MEMBER_EDIT = 4
+    MEMBER_REMOVE = 5
+
+    ORG_ADD = 10
+    ORG_EDIT = 11
+
+    TEAM_ADD = 20
+    TEAM_EDIT = 21
+    TEAM_REMOVE = 22
+
+    PROJECT_ADD = 30
+    PROJECT_EDIT = 31
+    PROJECT_REMOVE = 32
+    PROJECT_SET_PUBLIC = 33
+    PROJECT_SET_PRIVATE = 34

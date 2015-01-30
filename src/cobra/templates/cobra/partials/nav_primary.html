@@ -19,7 +19,7 @@
           {% if request.user|can_create_organizations %}
             <li>
               <h6>
-                <a href="{% comment %}{% url 'sentry-create-organization' %}{% endcomment %}" class="new pull-right">
+                <a href="{% url 'organization:create' %}" class="new pull-right">
                   <span class="icon-plus"></span>
                 </a>
                 {% trans "Organizations" %}
@@ -28,7 +28,7 @@
           {% endif %}
           {% for o in request.user|list_organizations %}
             <li{% if o == organization %} class="active"{% endif %}>
-              <a href="{% comment %}{% url 'sentry-organization-home' o.slug %}{% endcomment %}">{{ o.name }}</a>
+              <a href="{% url 'organization:home' o.slug %}">{{ o.name }}</a>
               {% if request.user|can_manage_org:o %}
                 <a href="{% comment %}{% url 'sentry-organization-settings' o.slug %}{% endcomment %}" class="org-settings">
                   <span class="icon-cog"></span>
@@ -49,7 +49,7 @@
             <li><a href="{% comment %}{% url 'sentry-admin-status' %}{% endcomment %}">{% trans "Admin" %}</a></li>
           {% endif %}
           <li class="divider">
-          <li><a href="{% comment %}{% url 'sentry-logout' %}{% endcomment %}">{% trans "Logout" %}</a></li>
+          <li><a href="{% url 'account_logout' %}">{% trans "Logout" %}</a></li>
         </ul>
       </li>
     {% else %}
