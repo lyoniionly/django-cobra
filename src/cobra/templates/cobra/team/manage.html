@@ -1,0 +1,59 @@
+{% extends "layouts/modal.html" %}
+
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% trans "Team Settings" %} | {{ block.super }}{% endblock %}
+
+{% block inner %}
+  <div class="page-header">
+    <div class="pull-right">
+      <a href="{% url 'organization:home' organization.slug %}">{% trans 'Back to Organization Home' %}</a>
+    </div>
+    <h2>
+      Settings for {{ team.name }}
+    </h2>
+  </div>
+  <div class="row">
+    <div class="col-sm-5">
+      <form class="form-stacked" action="" method="post">
+        {% csrf_token %}
+
+        {% if form.errors %}
+          <div class="alert alert-error">{% trans "Please correct the errors below." %}</div>
+        {% endif %}
+
+        {{ form|as_crispy_errors }}
+
+        <fieldset>
+          {% for field in form %}
+            {% if field.name != 'owner' %}
+              {{ field|as_crispy_field }}
+            {% endif %}
+          {% endfor %}
+        </fieldset>
+
+        {% if form.owner %}
+          <fieldset>
+            <p>If you wish to transfer ownership of this project, enter the new owner's username:</p>
+              {{ form.owner|as_crispy_field }}
+          </fieldset>
+        {% endif %}
+
+        <fieldset class="form-actions">
+          <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
+          {% if can_remove_team %}
+              <a href="{% url 'team:remove' team.slug organization.slug %}" class="btn btn-danger">{% trans "Remove Team" %}</a>
+          {% endif %}
+        </fieldset>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block onbodyload %}
+  {{ block.super }}
+  new app.TeamDetailsPage();
+{% endblock %}
+

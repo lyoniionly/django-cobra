@@ -17,3 +17,5 @@ class AuditLogEntryEvent(object):
     PROJECT_REMOVE = 32
     PROJECT_SET_PUBLIC = 33
     PROJECT_SET_PRIVATE = 34
+
+    TAGKEY_REMOVE = 40

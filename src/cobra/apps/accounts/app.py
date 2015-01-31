@@ -18,6 +18,7 @@ class AccountsApplication(Application):
     # profile_delete_view = get_class('accounts.views', 'ProfileDeleteView')
     # change_password_view = get_class('accounts.views', 'ChangePasswordView')
 
+
     def get_urls(self):
         urls = [
             # Login, logout and register doesn't require login

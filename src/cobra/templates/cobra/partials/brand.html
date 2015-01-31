@@ -1,5 +1,5 @@
 {% if organization %}
-  <a id="logo" href="{% comment %}{% url 'cobra-organization-home' organization.slug %}{% endcomment %}">Cobra</a>
+  <a id="logo" href="{% url 'organization:home' organization.slug %}">Cobra</a>
 {% else %}
   <a id="logo" href="{% url 'home:home' %}">Cobra</a>
 {% endif %}

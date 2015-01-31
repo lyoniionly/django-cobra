@@ -75,7 +75,13 @@
       </section>
     {% endblock %}
 
-    {% include "partials/footer.html" %}
+    <footer>
+      <div class="container">
+        {% block footer %}
+          {% include "partials/footer.html" %}
+        {% endblock %}
+      </div>
+    </footer>
   </div>
 {% endblock %}
 

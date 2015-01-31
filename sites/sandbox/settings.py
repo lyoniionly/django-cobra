@@ -145,12 +145,21 @@ MIDDLEWARE_CLASSES = (
     # 'cobra.apps.basket.middleware.BasketMiddleware',
 )
 
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
-INTERNAL_IPS = ('127.0.0.1',)
-DEBUG_TOOLBAR_CONFIG = {
-    # Toolbar options
-    'JQUERY_URL': '//ajax.useso.com/ajax/libs/jquery/2.1.3/jquery.min.js',
-}
+if DEBUG:
+    DEBUG_TOOLBAR_PATCH_SETTINGS = False
+    INTERNAL_IPS = ('127.0.0.1',)
+    DEBUG_TOOLBAR_CONFIG = {
+        # Toolbar options
+        'JQUERY_URL': '//ajax.useso.com/ajax/libs/jquery/2.1.3/jquery.min.js',
+    }
+    DEBUG_TOOLBAR_PANELS = (
+         'django_statsd.panel.StatsdPanel',
+    )
+
+    # django-statsd
+    STATSD_CLIENT = 'django_statsd.clients.toolbar'
+else:
+    STATSD_CLIENT = 'django_statsd.clients.normal'
 
 
 ROOT_URLCONF = 'urls'

@@ -42,6 +42,8 @@ class AbstractAuditLogEntry(Model):
 
         (AuditLogEntryEvent.ORG_ADD, 'org.create'),
         (AuditLogEntryEvent.ORG_EDIT, 'org.edit'),
+
+        (AuditLogEntryEvent.TAGKEY_REMOVE, 'tagkey.remove'),
     ))
     ip_address = models.GenericIPAddressField(null=True, unpack_ipv4=True)
     data = fields.GzippedDictField()
@@ -84,5 +86,8 @@ class AbstractAuditLogEntry(Model):
             return 'edited project %s' % (self.data['slug'],)
         elif self.event == AuditLogEntryEvent.PROJECT_REMOVE:
             return 'removed project %s' % (self.data['slug'],)
+
+        elif self.event == AuditLogEntryEvent.TAGKEY_REMOVE:
+            return 'removed tags matching %s = *' % (self.data['key'],)
 
         return ''

@@ -1,16 +1,11 @@
 {% load i18n %}
-<footer>
-  <div class="container">
-    {% block footer %}
-      <div class="contribute">
-        Cobra is <a href="http://en.wikipedia.org/wiki/Open-source_software">Open Source Software</a>
-        <a href="https://github.com/lyoniionly/django-cobra" class="btn btn-small">{% trans "Contribute" %}</a>
-        <a href="" class="btn btn-small">{% trans "Translate" %}</a>
-      </div>
-      <div class="version">Cobra {% if display_version %}{{ version }}{% endif %} </div>
-      <div class="credits">Handcrafted by the <a href="">Cobra team</a> and its
-        <a href="">many contributors</a>
-      </div>
-    {% endblock %}
-  </div>
-</footer>
+
+<div class="contribute">
+  Cobra is <a href="http://en.wikipedia.org/wiki/Open-source_software">Open Source Software</a>
+  <a href="https://github.com/lyoniionly/django-cobra" class="btn btn-small">{% trans "Contribute" %}</a>
+  <a href="" class="btn btn-small">{% trans "Translate" %}</a>
+</div>
+<div class="version">Cobra {% if display_version %}{{ version }}{% endif %} </div>
+<div class="credits">Handcrafted by the <a href="">Cobra team</a> and its
+  <a href="">many contributors</a>
+</div>

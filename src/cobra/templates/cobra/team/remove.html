@@ -1,0 +1,30 @@
+{% extends "layouts/team.html" %}
+
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% trans "Remove Team" %} | {{ block.super }}{% endblock %}
+
+{% block inner %}
+  <div class="page-header">
+    <div class="pull-right">
+      <a href="{% url 'organization:home' organization.slug %}">Back to Organization Home</a>
+    </div>
+    <h2>
+      {% trans "Remove Team" %}
+      <small>{{ team.name }}</small>
+    </h2>
+  </div>
+  <form action="" method="post">
+    <p>{% trans "Are you sure you wish to remove this team? This change is permanent and cannot be undone!" %}</p>
+    {% csrf_token %}
+    {{ form|as_crispy_errors }}
+    {% for field in form %}
+      {{ field|as_crispy_field }}
+    {% endfor %}
+    <fieldset class="form-actions">
+      <button type="submit" class="btn btn-danger">{% trans "Confirm" %}</button>
+      <a href="{% url 'team:manage' team.slug organization.slug %}" class="btn">{% trans "Cancel" %}</a>
+    </fieldset>
+  </form>
+{% endblock %}

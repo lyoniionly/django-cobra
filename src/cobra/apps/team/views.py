@@ -1,17 +1,28 @@
 from __future__ import absolute_import
 
 import logging
+from django import forms
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.db.models import Q
+from django.forms.models import modelform_factory
+from django.http import HttpResponseRedirect
+from django.utils.translation import ugettext_lazy as _
 
-from cobra.views.generic import OrganizationView, missing_perm
-from cobra.core.loading import get_class
+from cobra.views.generic import OrganizationView, missing_perm, TeamView
+from cobra.core.loading import get_class, get_model
 from cobra.core.permissions import can_create_teams, Permissions
+from cobra.core.plugins import plugins
+
+Team = get_model('team', 'Team')
+OrganizationMember = get_model('organization', 'OrganizationMember')
+AuditLogEntry = get_model('auditlog', 'AuditLogEntry')
 
 OrganizationMemberType = get_class('organization.utils', 'OrganizationMemberType')
-
 AddProjectForm = get_class('project.forms', 'AddProjectForm')
 AddTeamForm = get_class('team.forms', 'AddTeamForm')
+AuditLogEntryEvent = get_class('auditlog.utils', 'AuditLogEntryEvent')
+TeamStatus = get_class('team.utils', 'TeamStatus')
 
 
 class Step(object):
@@ -171,3 +182,100 @@ class TeamCreateView(OrganizationView):
             url = reverse('organization:home', args=[organization.slug])
 
         return self.redirect(url)
+
+
+EditTeamForm = modelform_factory(Team, fields=('name', 'slug',))
+
+class TeamSettingsView(TeamView):
+    required_access = OrganizationMemberType.ADMIN
+
+    def get_form(self, request, team):
+        return EditTeamForm(request.POST or None, instance=team)
+
+    def handle(self, request, organization, team):
+        result = plugins.first('has_perm', request.user, 'edit_team', team)
+        if result is False and not request.user.is_superuser:
+            return HttpResponseRedirect(reverse('home:home'))
+
+        form = self.get_form(request, team)
+        if form.is_valid():
+            team = form.save()
+
+            AuditLogEntry.objects.create(
+                organization=organization,
+                actor=request.user,
+                ip_address=request.META['REMOTE_ADDR'],
+                target_object=team.id,
+                event=AuditLogEntryEvent.TEAM_EDIT,
+                data=team.get_audit_log_data(),
+            )
+
+            messages.add_message(request, messages.SUCCESS,
+                _('Changes to your team were saved.'))
+
+            return HttpResponseRedirect(reverse('team:manage', args=[team.slug, organization.slug]))
+
+        if request.user.is_superuser:
+            can_remove_team = True
+        else:
+            can_remove_team = OrganizationMember.objects.filter(
+                Q(has_global_access=True) | Q(teams=team),
+                user=request.user,
+                type__lte=OrganizationMemberType.OWNER,
+            ).exists()
+
+        context = {
+            'form': form,
+            'can_remove_team': can_remove_team,
+        }
+
+        return self.respond('team/manage.html', context)
+
+
+class TeamRemoveForm(forms.Form):
+    pass
+
+def t(d):
+    import time
+    time.sleep(2.4)
+
+class TeamRemoveView(TeamView):
+    required_access = OrganizationMemberType.OWNER
+    sudo_required = True
+
+    def get_form(self, request):
+        if request.method == 'POST':
+            return TeamRemoveForm(request.POST)
+        return TeamRemoveForm(None)
+
+    def handle(self, request, organization, team):
+        form = self.get_form(request)
+        from django_statsd.clients import statsd
+        with statsd.timer('sdfsss.asdf'):
+            result = t('df')
+
+        if form.is_valid():
+            if team.status == TeamStatus.VISIBLE:
+                team.update(status=TeamStatus.PENDING_DELETION)
+                delete_team.delay(object_id=team.id, countdown=60 * 5)
+
+                AuditLogEntry.objects.create(
+                    organization=organization,
+                    actor=request.user,
+                    ip_address=request.META['REMOTE_ADDR'],
+                    target_object=team.id,
+                    event=AuditLogEntryEvent.TEAM_REMOVE,
+                    data=team.get_audit_log_data(),
+                )
+
+            messages.add_message(
+                request, messages.SUCCESS,
+                _(u'The team %r was scheduled for deletion.') % (team.name.encode('utf-8'),))
+
+            return HttpResponseRedirect(reverse('home:home'))
+
+        context = {
+            'form': form,
+        }
+
+        return self.respond('team/remove.html', context)

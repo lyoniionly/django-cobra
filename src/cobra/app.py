@@ -50,9 +50,10 @@ class Frame(Application):
             #     {'password_reset_form': self.password_reset_form,
             #      'post_reset_redirect': reverse_lazy('password-reset-done')},
             #     name='password-reset'),
-            url(r'^password-reset/done/$',
-                login_forbidden(auth_views.password_reset_done),
-                name='password-reset-done')]
+            # url(r'^password-reset/done/$',
+            #     login_forbidden(auth_views.password_reset_done),
+            #     name='password-reset-done')
+        ]
 
         # Django <=1.5: uses uidb36 to encode the user's primary key (support
         #               has been removed)
@@ -68,22 +69,25 @@ class Frame(Application):
         #             'set_password_form': self.set_password_form,
         #         },
         #         name='password-reset-confirm'))
-        if django.VERSION < (1, 7):
-            urls.append(
-                url(r'^password-reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-                    login_forbidden(auth_views.password_reset_confirm_uidb36),
-                    {
-                        'post_reset_redirect': reverse_lazy('password-reset-complete'),
-                        'set_password_form': self.set_password_form,
-                    }))
+        # if django.VERSION < (1, 7):
+        #     urls.append(
+        #         url(r'^password-reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        #             login_forbidden(auth_views.password_reset_confirm_uidb36),
+        #             {
+        #                 'post_reset_redirect': reverse_lazy('password-reset-complete'),
+        #                 'set_password_form': self.set_password_form,
+        #             }))
 
         urls += [
-            url(r'^password-reset/complete/$',
-                login_forbidden(auth_views.password_reset_complete),
-                name='password-reset-complete'),
+            # url(r'^password-reset/complete/$',
+            #     login_forbidden(auth_views.password_reset_complete),
+            #     name='password-reset-complete'),
             # url(r'', include(self.promotions_app.urls)),
             url(r'', include(self.home_app.urls)),
             url(r'^auth/', include('allauth.urls')),
+            url(r'^accounts/sudo/$', 'sudo.views.sudo',
+                {'template_name': 'accounts/sudo.html'},
+                name='sudo'),
         ]
         return urls
 
