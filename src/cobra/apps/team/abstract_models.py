@@ -29,7 +29,7 @@ class AbstractTeam(Model):
     """
     A team represents a group of individuals which maintain ownership of projects.
     """
-    organization = fields.FlexibleForeignKey('organization.Organization', related_name='+')
+    organization = fields.FlexibleForeignKey('organization.Organization')
     slug = models.SlugField()
     name = models.CharField(max_length=64)
     owner = fields.FlexibleForeignKey(AUTH_USER_MODEL)

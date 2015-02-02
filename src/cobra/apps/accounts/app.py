@@ -18,9 +18,14 @@ class AccountsApplication(Application):
     # profile_delete_view = get_class('accounts.views', 'ProfileDeleteView')
     # change_password_view = get_class('accounts.views', 'ChangePasswordView')
 
+    profile_update_view = get_class('accounts.views', 'ProfileUpdateView')
+
 
     def get_urls(self):
         urls = [
+
+            url(r'^settings/profile/$', login_required(self.profile_update_view.as_view()), name='profile-update'),
+
             # Login, logout and register doesn't require login
             # url(r'^login/$', self.login_view.as_view(), name='login'),
             # url(r'^logout/$', self.logout_view.as_view(), name='logout'),

@@ -187,3 +187,10 @@ class UnicodeCSVWriter:
     def writerows(self, rows):
         for row in rows:
             self.writerow(row)
+
+
+# old fallback to django hashcompat
+try:
+    from hashlib import sha1 as sha_constructor, md5 as md5_constructor
+except ImportError:  # pragma: no cover
+    from django.utils.hashcompat import sha_constructor, md5_constructor

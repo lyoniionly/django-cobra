@@ -50,12 +50,12 @@
       </a>
     </li>
     <li class="{% block org_auditlog_nav %}{% endblock %}">
-      <a href="{% comment %}{% url 'sentry-organization-audit-log' organization.slug %}{% endcomment %}">
+      <a href="{% url 'auditlog:for-organization' organization.slug %}">
         {% trans "Audit Log" %}
       </a>
     </li>
     <li class="{% block org_settings_nav %}{% endblock %}">
-      <a href="{% comment %}{% url 'sentry-organization-settings' organization.slug %}{% endcomment %}">
+      <a href="{% url 'organization:settings' organization.slug %}">
         {% trans "Settings" %}
       </a>
     </li>

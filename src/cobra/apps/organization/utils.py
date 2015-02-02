@@ -1,3 +1,8 @@
+class OrganizationStatus(object):
+    VISIBLE = 0
+    PENDING_DELETION = 1
+    DELETION_IN_PROGRESS = 2
+
 
 class OrganizationMemberType(object):
     OWNER = 0
@@ -6,7 +11,3 @@ class OrganizationMemberType(object):
     BOT = 100
 
 
-class OrganizationStatus(object):
-    VISIBLE = 0
-    PENDING_DELETION = 1
-    DELETION_IN_PROGRESS = 2

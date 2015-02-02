@@ -25,6 +25,7 @@ from cobra.core.compat import AUTH_USER_MODEL
 from .utils import ProjectStatus
 
 ProjectManager = get_class('project.managers', 'ProjectManager')
+ProjectKeyStatus = get_class('project.utils', 'ProjectKeyStatus')
 
 
 @python_2_unicode_compatible
@@ -77,7 +78,7 @@ class AbstractProject(Model):
             self.organization.slug, self.slug]))
 
     def merge_to(self, project):
-        from sentry.models import (
+        from cobra.models import (
             Group, GroupTagValue, Event, TagValue
         )
 
@@ -120,7 +121,7 @@ class AbstractProject(Model):
         return False
 
     def get_tags(self, with_internal=True):
-        from sentry.models import TagKey
+        from cobra.models import TagKey
 
         if not hasattr(self, '_tag_cache'):
             tags = self.get_option('tags', None)
@@ -187,6 +188,11 @@ class AbstractProjectKey(Model):
         ('api', 'Web API access'),
     ), default=['store'])
 
+    status = fields.BoundedPositiveIntegerField(default=0, choices=(
+        (ProjectKeyStatus.ACTIVE, _('Active')),
+        (ProjectKeyStatus.INACTIVE, _('Inactive')),
+    ), db_index=True)
+
     # For audits
     user_added = fields.FlexibleForeignKey(AUTH_USER_MODEL, null=True, related_name='keys_added_set')
     date_added = models.DateTimeField(default=timezone.now, null=True)
@@ -209,6 +215,10 @@ class AbstractProjectKey(Model):
     @classmethod
     def generate_api_key(cls):
         return uuid4().hex
+
+    @property
+    def is_active(self):
+        return self.status == ProjectKeyStatus.ACTIVE
 
     def save(self, *args, **kwargs):
         if not self.public_key:
@@ -241,3 +251,13 @@ class AbstractProjectKey(Model):
     @property
     def dsn_public(self):
         return self.get_dsn(public=True)
+
+    def get_audit_log_data(self):
+        return {
+            'label': self.label,
+            'user_id': self.user_id,
+            'public_key': self.public_key,
+            'secret_key': self.secret_key,
+            'roles': int(self.roles),
+            'status': self.status,
+        }

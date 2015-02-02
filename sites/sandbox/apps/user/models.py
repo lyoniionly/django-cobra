@@ -1,16 +1,11 @@
 from django.db import models
-from cobra.core import compat
+from django.utils.translation import ugettext_lazy as _
+
+from cobra.apps.accounts.abstract_models import AbstractProfile
 
 
-class Profile(models.Model):
+class Profile(AbstractProfile):
     """
-    Dummy profile model used for testing
+    Real profile model used
     """
-    user = models.OneToOneField(compat.AUTH_USER_MODEL, related_name="profile")
-    MALE, FEMALE = 'M', 'F'
-    choices = (
-        (MALE, 'Male'),
-        (FEMALE, 'Female'))
-    gender = models.CharField(max_length=1, choices=choices,
-                              verbose_name='Gender')
-    age = models.PositiveIntegerField(verbose_name='Age')
+    location = models.CharField(_('Location'), max_length=255, blank=True)

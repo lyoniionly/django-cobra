@@ -2,6 +2,7 @@ from __future__ import absolute_import, print_function
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.datastructures import SortedDict
 from django.utils.translation import ugettext_lazy as _
 
 from cobra.core.loading import get_profile_class, get_model
@@ -21,6 +22,10 @@ class SignupForm(forms.Form):
     def signup(self, request, user):
         user.first_name = self.cleaned_data['first_name']
         user.save()
+
+        # Create a profile for new User
+        Profile = get_profile_class()
+        instance, create = Profile.objects.get_or_create(user=user)
 
         # Create a new organization for the new user.
         org = Organization.objects.create(
@@ -78,11 +83,13 @@ if Profile:
 
             # Get user field names (we look for core user fields first)
             core_field_names = set([f.name for f in User._meta.fields])
-            user_field_names = ['email']
-            for field_name in ('first_name', 'last_name'):
+            user_field_names = []
+            # user_field_names = ['email']
+            # for field_name in ('first_name', 'last_name'):
+            for field_name in ('first_name',):
                 if field_name in core_field_names:
                     user_field_names.append(field_name)
-            user_field_names.extend(User._meta.additional_fields)
+            # user_field_names.extend(User._meta.additional_fields)
 
             # Store user fields so we know what to save later
             self.user_field_names = user_field_names
@@ -93,7 +100,10 @@ if Profile:
             self.fields.update(additional_fields)
 
             # Ensure email is required and initialised correctly
-            self.fields['email'].required = True
+            # self.fields['email'].required = True
+
+            # hack for first name, rename "First Name" to "Name"
+            self.fields['first_name'].label = _('Name')
 
             # Set initial values
             for field_name in user_field_names:
@@ -101,6 +111,9 @@ if Profile:
 
             # Ensure order of fields is email, user fields then profile fields
             self.fields.keyOrder = user_field_names + profile_field_names
+
+            # If django.version >= 1.7
+            self.fields = SortedDict([(key, self.fields[key]) for key in self.fields.keyOrder])
 
         class Meta:
             model = Profile

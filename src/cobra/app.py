@@ -19,6 +19,7 @@ class Frame(Application):
     organization_app = get_class('organization.app', 'application')
     team_app = get_class('team.app', 'application')
     project_app = get_class('project.app', 'application')
+    auditlog_app = get_class('auditlog.app', 'application')
     # basket_app = get_class('basket.app', 'application')
     # checkout_app = get_class('checkout.app', 'application')
     # promotions_app = get_class('promotions.app', 'application')
@@ -38,6 +39,7 @@ class Frame(Application):
             url(r'^organizations/', include(self.organization_app.urls)),
             url(r'^teams/', include(self.team_app.urls)),
             url(r'^projects/', include(self.project_app.urls)),
+            url(r'^audit-log/', include(self.auditlog_app.urls)),
             # url(r'^search/', include(self.search_app.urls)),
             # url(r'^dashboard/', include(self.dashboard_app.urls)),
             # url(r'^offers/', include(self.offer_app.urls)),

@@ -1,5 +1,7 @@
 from __future__ import absolute_import  # for logging import below
 import logging
+import random
+
 from django.core.urlresolvers import resolve, reverse
 
 from django.shortcuts import redirect, resolve_url
@@ -11,6 +13,7 @@ from django.template.defaultfilters import (date as date_filter,
                                             slugify as django_slugify)
 from unidecode import unidecode
 
+from cobra.core.compat import sha_constructor
 from cobra.core.loading import import_string
 
 
@@ -142,3 +145,29 @@ def get_login_url(reset=False):
         if _LOGIN_URL is None:
             _LOGIN_URL = reverse('account_login')
     return _LOGIN_URL
+
+
+def generate_sha1(string, salt=None):
+    """
+    Generates a sha1 hash for supplied string. Doesn't need to be very secure
+    because it's not used for password checking. We got Django for that.
+
+    :param string:
+        The string that needs to be encrypted.
+
+    :param salt:
+        Optionally define your own salt. If none is supplied, will use a random
+        string of 5 characters.
+
+    :return: Tuple containing the salt and hash.
+
+    """
+    if not isinstance(string, (str, unicode)):
+        string = str(string)
+    if isinstance(string, unicode):
+        string = string.encode("utf-8")
+    if not salt:
+        salt = sha_constructor(str(random.random())).hexdigest()[:5]
+    hash = sha_constructor(salt+string).hexdigest()
+
+    return (salt, hash)

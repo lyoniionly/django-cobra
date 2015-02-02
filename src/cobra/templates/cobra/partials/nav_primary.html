@@ -30,7 +30,7 @@
             <li{% if o == organization %} class="active"{% endif %}>
               <a href="{% url 'organization:home' o.slug %}">{{ o.name }}</a>
               {% if request.user|can_manage_org:o %}
-                <a href="{% comment %}{% url 'sentry-organization-settings' o.slug %}{% endcomment %}" class="org-settings">
+                <a href="{% url 'organization:settings' o.slug %}" class="org-settings">
                   <span class="icon-cog"></span>
                 </a>
               {% endif %}

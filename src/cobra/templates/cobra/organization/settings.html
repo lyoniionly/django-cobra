@@ -1,0 +1,39 @@
+{% extends "layouts/organization.html" %}
+
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block org_settings_nav %}active{% endblock %}
+
+{% block inner %}
+  <div class="page-header">
+    <h2>{% trans 'Settings' %}</h2>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-5">
+      <form class="form-stacked" action="" method="post">
+        {% csrf_token %}
+
+        {% if form.errors %}
+          <div class="alert alert-error">{% trans "Please correct the errors below." %}</div>
+        {% endif %}
+
+        {{ form|as_crispy_errors }}
+
+        <fieldset>
+          {% for field in form %}
+            {{ field|as_crispy_field }}
+          {% endfor %}
+        </fieldset>
+
+        <fieldset class="form-actions">
+          <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
+          {% if ACCESS.is_owner and ACCESS.is_global %}
+            <a href="{% url 'organization:remove' organization.slug %}" class="btn btn-danger">{% trans "Remove Organization" %}</a>
+          {% endif %}
+        </fieldset>
+      </form>
+    </div>
+  </div>
+{% endblock %}

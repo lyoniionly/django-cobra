@@ -1,5 +1,5 @@
 from django import template
-from oscar.core.loading import feature_hidden
+from cobra.core.loading import feature_hidden
 
 register = template.Library()
 

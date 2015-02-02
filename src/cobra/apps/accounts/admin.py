@@ -12,7 +12,7 @@ from django.template.response import TemplateResponse
 from django.utils.html import escape
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-from cobra.core.loading import get_model, get_class
+from cobra.core.loading import get_model, get_class, get_profile_class
 
 User = get_model('accounts', 'User')
 OrganizationMemberInline = get_class('organization.admin', 'OrganizationMemberInline')
@@ -159,3 +159,4 @@ class UserAdmin(admin.ModelAdmin):
                                                    post_url_continue)
 
 admin.site.register(User, UserAdmin)
+admin.site.register(get_profile_class())

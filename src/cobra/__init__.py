@@ -67,6 +67,7 @@ COBRA_CORE_APPS = [
     # 'treebeard',
     # 'sorl.thumbnail',
     'django_statsd',
+    'easy_thumbnails',
     'sudo',
     'django_tables2',
     'crispy_forms',
