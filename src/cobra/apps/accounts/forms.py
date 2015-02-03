@@ -1,5 +1,8 @@
 from __future__ import absolute_import, print_function
 
+import pytz
+from datetime import datetime
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.datastructures import SortedDict
@@ -7,11 +10,13 @@ from django.utils.translation import ugettext_lazy as _
 
 from cobra.core.loading import get_profile_class, get_model
 from cobra.core.compat import get_user_model, existing_user_fields
+from cobra.core.constants import LANGUAGES
 from .utils import normalise_email
 
 
 User = get_user_model()
 Organization = get_model('organization', 'Organization')
+UserOption = get_model('option', 'UserOption')
 
 
 class SignupForm(forms.Form):
@@ -142,3 +147,49 @@ if Profile:
     ProfileForm = UserAndProfileForm
 else:
     ProfileForm = UserForm
+
+
+def _get_timezone_choices():
+    results = []
+    for tz in pytz.common_timezones:
+        now = datetime.now(pytz.timezone(tz))
+        offset = now.strftime('%z')
+        results.append((int(offset), tz, '(GMT%s) %s' % (offset, tz)))
+    results.sort()
+
+    for i in range(len(results)):
+        results[i] = results[i][1:]
+    return results
+
+TIMEZONE_CHOICES = _get_timezone_choices()
+
+class AppearanceSettingsForm(forms.Form):
+    language = forms.ChoiceField(
+        label=_('Language'), choices=LANGUAGES, required=False,
+        widget=forms.Select(attrs={'class': 'input-xlarge'}))
+    timezone = forms.ChoiceField(
+        label=_('Time zone'), choices=TIMEZONE_CHOICES, required=False,
+        widget=forms.Select(attrs={'class': 'input-xxlarge'}))
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(AppearanceSettingsForm, self).__init__(*args, **kwargs)
+
+    def save(self):
+        # Save user language
+        UserOption.objects.set_value(
+            user=self.user,
+            project=None,
+            key='language',
+            value=self.cleaned_data['language'],
+        )
+
+        # Save time zone options
+        UserOption.objects.set_value(
+            user=self.user,
+            project=None,
+            key='timezone',
+            value=self.cleaned_data['timezone'],
+        )
+
+        return self.user

@@ -10,7 +10,7 @@ from templatetag_sugar.register import tag
 from templatetag_sugar.parser import Name, Variable, Constant, Optional
 
 from cobra.core.javascript import to_json
-from cobra.core.loading import get_model, get_class
+from cobra.core.loading import get_model, get_class, get_profile_class
 from cobra.core.constants import EVENTS_PER_PAGE
 
 register = template.Library()
@@ -71,3 +71,14 @@ def paginator(context, queryset_or_list, request, asvar=None, per_page=EVENTS_PE
         context[asvar] = result
         return ''
     return result
+
+
+@register.simple_tag
+def get_avatar_url(user):
+    Profile = get_profile_class()
+    try:
+        instance = Profile.objects.get(user=user)
+    except Profile.DoesNotExist:
+        # User has no profile, try a blank one
+        instance = Profile(user=user)
+    return instance.get_avatar_url()

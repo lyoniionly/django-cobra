@@ -9,25 +9,32 @@
 {% block content_class %} with-left-sidebar{% endblock %}
 
 {% block page_header_block %}
-    <section id="page-header" class="toolbar" style="height:5px;">
-    </section>
+  <section id="page-header" class="toolbar" style="height:5px;"></section>
 {% endblock %}
 
 {% block main %}
-    <section class="body">
-        {% block inner %}
-        {% endblock %}
-    </section>
+  <section class="body">
+    {% block inner %}{% endblock %}
+  </section>
 {% endblock %}
 
 {% block sidebar %}
-    <ul class="nav nav-list">
-        <li class="nav-header">{% trans "Personal settings" %}</li>
-        <li{% if active_tab == 'profile' %} class="active"{% endif %}><a href="{% comment %}{% url 'sentry-account-settings' %}{% endcomment %}">{% trans "Profile" %}</a></li>
-        <li{% if active_tab == 'appearance' %} class="active"{% endif %}><a href="{% comment %}{% url 'sentry-account-settings-appearance' %}{% endcomment %}">{% trans "Appearance" %}</a></li>
-        <li{% if active_tab == 'notifications' %} class="active"{% endif %}><a href="{% comment %}{% url 'sentry-account-settings-notifications' %}{% endcomment %}">{% trans "Notifications" %}</a></li>
-    {% if AUTH_PROVIDERS %}
-        <li{% if active_tab == 'identities' %} class="active"{% endif %}><a href="{% comment %}{% url 'sentry-account-settings-identities' %}{% endcomment %}">{% trans "Identities" %}</a></li>
-    {% endif %}
-    </ul>
+  <ul class="nav nav-list">
+    <li class="nav-header">{% trans "Personal settings" %}</li>
+    <li{% if active_tab == 'profile' %} class="active"{% endif %}>
+      <a href="{% url 'accounts:profile-settings' %}">{% trans "Profile" %}</a>
+    </li>
+    <li{% if active_tab == 'password' %} class="active"{% endif %} {% block password_settings %}{% endblock %}>
+      <a href="{% url 'accounts:password-settings' %}">{% trans "Password" %}</a>
+    </li>
+    <li{% if active_tab == 'emails' %} class="active"{% endif %} {% block emails_settings %}{% endblock %}>
+      <a href="{% url 'accounts:emails-settings' %}">{% trans "Emails" %}</a>
+    </li>
+    <li{% if active_tab == 'appearance' %} class="active"{% endif %}>
+      <a href="{% url 'accounts:appearance-settings' %}">{% trans "Appearance" %}</a>
+    </li>
+    <li{% if active_tab == 'notifications' %} class="active"{% endif %}>
+      <a href="{% comment %}{% url 'sentry-account-settings-notifications' %}{% endcomment %}">{% trans "Notifications" %}</a>
+    </li>
+  </ul>
 {% endblock %}

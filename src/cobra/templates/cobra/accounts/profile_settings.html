@@ -1,0 +1,48 @@
+{% extends "layouts/accounts.html" %}
+
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{{ page_title }} | {{ block.super }}{% endblock %}
+
+{% block inner %}
+  <div class="row">
+    <div class="col-sm-7">
+      <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|as_crispy_errors }}
+
+        {% for field in form %}
+          {% if field.name == 'avatar' %}
+            <div class="form-group">
+{#              {% bootstrap_label content=field.label label_class='control-label' %}#}
+              <label class="control-label ">{{ field.label }}</label>
+              <div class="fileinput fileinput-new" data-provides="fileinput">
+                <div class="fileinput-new thumbnail" style="width: 80px; height: 80px;">
+                  <img src="{{ request.user.profile.get_avatar_url }}" alt="...">
+                </div>
+                <div class="fileinput-preview fileinput-exists thumbnail"
+                     style="max-width: 80px; max-height: 80px;"></div>
+                <div>
+                  <span class="btn btn-info btn-file">
+                    <span class="fileinput-new">{% trans 'Choose avatar' %}</span>
+                    <span class="fileinput-exists">{% trans 'Change avatar' %}</span>
+                    <input id="id_avatar" name="avatar" type="file">
+{#                    {{ field }}#}
+                  </span>
+                  <a href="#" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">{% trans 'Clear' %}</a>
+                </div>
+              </div>
+            </div>
+            <hr>
+          {% else %}
+            {{ field|as_crispy_field }}
+          {% endif %}
+        {% endfor %}
+        <fieldset class="form-actions">
+            <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+{% endblock %}

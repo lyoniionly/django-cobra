@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load permissions_tags %}
 {% load organization_tags %}
+{% load helper_tags %}
 
 <ul class="nav navbar-nav navbar-right">
   {% block account_nav %}
@@ -40,11 +41,11 @@
       </li>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-          <img class="avatar" src="{% comment %}{% gravatar_url user.email size 20 %}{% endcomment %}">
+          <img class="avatar" src="{% get_avatar_url user %}">
           <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
-          <li><a href="{% comment %}{% url 'sentry-account-settings' %}{% endcomment %}">{% trans "Account" %}</a></li>
+          <li><a href="{% url 'accounts:profile-settings' %}">{% trans "Account" %}</a></li>
           {% if request.user.is_staff %}
             <li><a href="{% comment %}{% url 'sentry-admin-status' %}{% endcomment %}">{% trans "Admin" %}</a></li>
           {% endif %}
@@ -53,7 +54,7 @@
         </ul>
       </li>
     {% else %}
-      <li><a href="{% comment %}{% url 'sentry-login' %}{% endcomment %}">{% trans "Login" %}</a></li>
+      <li><a href="{% url 'account_login' %}">{% trans "Login" %}</a></li>
     {% endif %}
     <li><a href="mailto:beihua_445566@126.com" class="support-link">{% trans 'Support' %}</a></li>
   {% endblock %}

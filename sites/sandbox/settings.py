@@ -19,6 +19,9 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 SQL_DEBUG = True
 
+# The entry of maintaince mode
+MAINTENANCE = False
+
 if DEBUG:
     BASE_DIR = os.path.dirname(os.path.dirname(__file__))
     sys.path.append(os.path.join(BASE_DIR, '../src'))
@@ -61,17 +64,18 @@ SILENCED_SYSTEM_CHECKS = ['1_6.W001', ]
 # system time zone.
 TIME_ZONE = 'Asia/Shanghai'
 
-# Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-gb'
-
-LANGUAGES = (
-    ('en-gb', 'English'),
-)
-
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
+
+LANGUAGE_CODE = 'en'
+
+# Languages we provide translations for, out of the box.
+gettext_noop = lambda s: s
+LANGUAGES = (
+    ('en', gettext_noop('English')),
+    ('zh_Hans', gettext_noop('Simplified Chinese')),
+)
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
@@ -118,9 +122,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.contrib.messages.context_processors.messages",
     # Cobra specific
-    # 'cobra.apps.search.context_processors.search_form',
-    # 'cobra.apps.promotions.context_processors.promotions',
-    # 'cobra.apps.checkout.context_processors.checkout',
     'cobra.core.context_processors.metadata',
 
     # allauth specific context processors
@@ -137,6 +138,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cobra.middleware.sudo.SudoMiddleware',
+    'cobra.middleware.locale.CobraLocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
@@ -313,6 +316,9 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/auth/login/'
+LOGOUT_URL = '/auth/logout/'
+
 APPEND_SLASH = True
 
 # Haystack settings - we use a local Solr instance running on the default port

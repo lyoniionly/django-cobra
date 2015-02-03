@@ -12,7 +12,7 @@ COBRA_MAX_BASKET_QUANTITY_THRESHOLD = 10000
 
 # Accounts settings
 COBRA_ACCOUNTS_AVATAR_PATH = 'avatars/'
-COBRA_ACCOUNTS_AVATAR_SIZE = 80
+COBRA_ACCOUNTS_AVATAR_SIZE = 120
 COBRA_ACCOUNTS_AVATAR_CROP_TYPE = 'smart'
 COBRA_ACCOUNTS_AVATAR_DEFAULT = 'mm'
 COBRA_ACCOUNTS_AVATAR_GRAVATAR = True
@@ -293,9 +293,6 @@ COBRA_PROJECT = 1
 
 # Login url (defaults to LOGIN_URL)
 COBRA_LOGIN_URL = None
-
-# The entry of maintaince mode
-COBRA_MAINTENANCE = False
 
 # See cobra/core/options/__init__.py for more information
 COBRA_OPTIONS = {}

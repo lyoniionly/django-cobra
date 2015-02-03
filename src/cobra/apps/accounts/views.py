@@ -15,59 +15,65 @@ from cobra.core.loading import (
     get_class, get_profile_class, get_classes, get_model)
 from cobra.core.compat import get_user_model
 
-ProfileForm = get_class(
-    'accounts.forms', 'ProfileForm')
+ProfileForm, AppearanceSettingsForm = get_classes(
+    'accounts.forms', ['ProfileForm', 'AppearanceSettingsForm'])
 
 User = get_user_model()
+UserOption = get_model('option', 'UserOption')
 
 
 # =============
 # Profile
 # =============
 
-class ProfileUpdateView(PageTitleMixin, generic.FormView):
+class ProfileSettingsView(PageTitleMixin, generic.FormView):
     form_class = ProfileForm
-    template_name = 'accounts/profile_form.html'
+    template_name = 'accounts/profile_settings.html'
     page_title = _('Your Profile')
     active_tab = 'profile'
-    success_url = reverse_lazy('accounts:profile-update')
+    success_url = reverse_lazy('accounts:profile-settings')
 
     def get_form_kwargs(self):
-        kwargs = super(ProfileUpdateView, self).get_form_kwargs()
+        kwargs = super(ProfileSettingsView, self).get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
 
     def form_valid(self, form):
         # Grab current user instance before we save form.  We may need this to
         # send a warning email if the email address is changed.
-        try:
-            old_user = User.objects.get(id=self.request.user.id)
-        except User.DoesNotExist:
-            old_user = None
+        # try:
+        #     old_user = User.objects.get(id=self.request.user.id)
+        # except User.DoesNotExist:
+        #     old_user = None
 
         form.save()
 
-        # We have to look up the email address from the form's
-        # cleaned data because the object created by form.save() can
-        # either be a user or profile instance depending whether a profile
-        # class has been specified by the AUTH_PROFILE_MODULE setting.
-        new_email = form.cleaned_data['email']
-        if old_user and new_email != old_user.email:
-            # Email address has changed - send a confirmation email to the old
-            # address including a password reset link in case this is a
-            # suspicious change.
-            # ctx = {
-            #     'user': self.request.user,
-            #     'site': get_current_site(self.request),
-            #     'reset_url': get_password_reset_url(old_user),
-            #     'new_email': new_email,
-            # }
-            # msgs = CommunicationEventType.objects.get_and_render(
-            #     code=self.communication_type_code, context=ctx)
-            # Dispatcher().dispatch_user_messages(old_user, msgs)
-            pass
-
-        messages.success(self.request, _("Profile updated"))
+        messages.success(self.request, _("Profile updated successfully"))
         return redirect(self.get_success_url())
 
 
+# =============
+# Appearance
+# =============
+
+class AppearanceSettingsView(PageTitleMixin, generic.FormView):
+    form_class = AppearanceSettingsForm
+    template_name = 'accounts/appearance_settings.html'
+    page_title = _('Appearance')
+    active_tab = 'appearance'
+    success_url = reverse_lazy('accounts:appearance-settings')
+
+    def get_form_kwargs(self):
+        kwargs = super(AppearanceSettingsView, self).get_form_kwargs()
+        options = UserOption.objects.get_all_values(user=self.request.user, project=None)
+        kwargs['user'] = self.request.user
+        kwargs['initial'] = {
+            'language': options.get('language') or self.request.LANGUAGE_CODE,
+            'timezone': options.get('timezone') or settings.TIME_ZONE
+        }
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, _("Appearance updated successfully"))
+        return redirect(self.get_success_url())

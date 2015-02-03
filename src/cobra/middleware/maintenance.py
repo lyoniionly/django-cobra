@@ -30,7 +30,7 @@ DB_ERRORS = tuple(DB_ERRORS)
 
 class ServicesUnavailableMiddleware(object):
     def process_request(self, request):
-        if settings.COBRA_MAINTENANCE:
+        if settings.MAINTENANCE:
             return HttpResponse('Cobra is currently in maintenance mode', status=503)
 
     def process_exception(self, request, exception):

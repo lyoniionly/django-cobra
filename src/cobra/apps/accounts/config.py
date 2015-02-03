@@ -6,3 +6,6 @@ class AccountsConfig(AppConfig):
     label = 'accounts'
     name = 'cobra.apps.accounts'
     verbose_name = _('Accounts')
+
+    def ready(self):
+        from . import receivers  # noqa

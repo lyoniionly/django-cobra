@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import django
 from cobra.core.loading import is_model_registered
 
 from .abstract_models import *  # noqa
@@ -20,4 +21,6 @@ if not is_model_registered('accounts', 'User'):
     __all__.append('User')
 
 
+if django.VERSION < (1, 7):
+    from .receivers import *  # noqa
 
