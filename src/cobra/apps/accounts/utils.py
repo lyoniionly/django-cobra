@@ -49,7 +49,7 @@ def get_gravatar(email, size=80, default='identicon'):
     :return: The URI pointing to the Gravatar.
 
     """
-    if settings.cobra_accounts_avatar_gravatar_secure:
+    if settings.COBRA_ACCOUNTS_AVATAR_GRAVATAR_SECURE:
         base_url = 'https://secure.gravatar.com/avatar/'
     else:
         base_url = '//www.gravatar.com/avatar/'

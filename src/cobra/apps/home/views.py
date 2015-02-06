@@ -16,7 +16,11 @@ class HomeView(AnonymousRequiredMixin, OrganizationMixin, TemplateView):
         # TODO(dcramer): deal with case when the user cannot create orgs
         organization = self.get_active_organization(self.request)
         if organization is None:
-            url = reverse('organization:create')
+            url = reverse('home:help')
         else:
             url = reverse('organization:home', args=[organization.slug])
         return url
+
+
+class HelpView(TemplateView):
+    template_name = 'home/help.html'

@@ -2516,7 +2516,7 @@ img.avatar32 {
       transition: all .3s ease-in-out 0s;
       &:hover {
         color: #fff;
-        background-color: #4593de;
+        background-color: @linkColor;
       }
     }
   }
@@ -2578,7 +2578,7 @@ table.table td .select2-container {
 .nav-list > .active > a:focus {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
-  background-color: #4593de;
+  background-color: @linkColor;
 }
 
 .btn-group.open .dropdown-toggle {
@@ -3553,7 +3553,7 @@ pre {
   -webkit-border-radius: 3px;
   border-radius: 3px;
   font-size: 0.9em;
-  background-color: #4593de;
+  background-color: @linkColor;
   position: relative;
   overflow: hidden;
 }
@@ -4823,4 +4823,95 @@ h2 {
 
 .profile-info-panel .box ul.list li.blue {
   background: #458ac6//#4ea6f1
+}
+
+#help-blank-slate {
+  margin: 60px auto 80px;
+  padding: 40px 20px 20px;
+  position: relative;
+  text-align: center;
+  width: 600px;
+
+  &:after {
+    background: #bfc2c7 no-repeat center center;
+    background-image: url('@{img-url}/logo/logo_white.png');
+    background-size: 32px;
+    border-radius: 27px;
+    content: '';
+    height: 54px;
+    left: 273px;
+    position: absolute;
+    top: -27px;
+    width: 54px;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: normal;
+    margin-bottom: 5px;
+  }
+}
+
+#help-get-started {
+  .get-started-links {
+    margin-top: 20px;
+  }
+
+  .get-started-link {
+    background-position: top center;
+    background-repeat: no-repeat;
+    display: block;
+    padding: 50px 15px 0;
+    position: relative;
+
+    &.document {
+      background-image: url('https://d3oaxc4q5k2d6q.cloudfront.net/m/fc0cb8a00976/img/ads/book.svg?10c6dd6762b9');
+      background-size: 50px;
+    }
+
+    &.getting-git {
+      background-image: url('https://d3oaxc4q5k2d6q.cloudfront.net/m/fc0cb8a00976/img/logos/git.svg?69d197d2785c');
+      background-size: 45px;
+    }
+
+    &.sourcetree {
+      background-image: url('https://d3oaxc4q5k2d6q.cloudfront.net/m/fc0cb8a00976/img/logos/sourcetree.svg?aa44312d9dab');
+      background-size: 45px;
+    }
+
+    .title {
+      font-size: 16px;
+    }
+
+    .description {
+      color: #707070;
+      display: block;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+  }
+}
+
+#help-create-first-org {
+  border-top: 1px solid #ddd;
+  margin-top: 20px;
+  padding-top: 20px;
+
+  p {
+    color: #707070;
+  }
+
+  .buttons {
+    margin: 20px 0;
+  }
+
+  #create-org+#join-org {
+    margin-left: 35px;
+    position: relative;
+    &:before {
+      content: 'or';
+      position: absolute;
+      left: -25px;
+    }
+  }
 }

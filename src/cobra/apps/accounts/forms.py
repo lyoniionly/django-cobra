@@ -21,8 +21,8 @@ UserOption = get_model('option', 'UserOption')
 
 class SignupForm(forms.Form):
     first_name = forms.CharField(max_length=30, label=_('Name'))
-    organization_name = forms.CharField(max_length=30, label=_('Organization name'),
-                                        widget=forms.TextInput(attrs={'placeholder': _("Your Company's Name")}))
+    # organization_name = forms.CharField(max_length=30, label=_('Organization name'),
+    #                                     widget=forms.TextInput(attrs={'placeholder': _("Your Company's Name")}))
 
     def signup(self, request, user):
         user.first_name = self.cleaned_data['first_name']
@@ -33,11 +33,11 @@ class SignupForm(forms.Form):
         instance, create = Profile.objects.get_or_create(user=user)
 
         # Create a new organization for the new user.
-        org = Organization.objects.create(
-            name=self.cleaned_data['organization_name'],
-            owner=user
-        )
-        return org
+        # org = Organization.objects.create(
+        #     name=self.cleaned_data['organization_name'],
+        #     owner=user
+        # )
+        # return org
 
 class UserForm(forms.ModelForm):
 

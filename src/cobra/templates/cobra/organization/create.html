@@ -17,15 +17,19 @@
 
     <form class="form-stacked" action="" method="post">
       {% csrf_token %}
-      <fieldset>
-        {{ form|as_crispy_errors }}
-        {% for field in form %}
-            {{ field|as_crispy_field }}
-        {% endfor %}
-      </fieldset>
-      <div class="actions">
-        <button type="submit" class="btn btn-primary">{% trans "Create Organization" %}</button>
+      {{ form|as_crispy_errors }}
+      <div class="row">
+        <div class="col-sm-6">
+          <fieldset>
+            {% for field in form %}
+              {{ field|as_crispy_field }}
+            {% endfor %}
+          </fieldset>
+        </div>
       </div>
+      <fieldset class="form-actions">
+          <button type="submit" class="btn btn-primary">{% trans "Create Organization" %}</button>
+      </fieldset>
     </form>
   </section>
 {% endblock %}
