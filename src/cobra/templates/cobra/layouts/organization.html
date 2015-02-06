@@ -45,7 +45,7 @@
       </a>
     </li>
     <li class="{% block org_members_nav %}{% endblock %}">
-      <a href="{% comment %}{% url 'sentry-organization-members' organization.slug %}{% endcomment %}">
+      <a href="{% url 'organization:members' organization.slug %}">
         {% trans "Members" %}
       </a>
     </li>

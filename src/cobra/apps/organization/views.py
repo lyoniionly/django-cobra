@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from collections import defaultdict
 
 from django import forms
 from django.contrib import messages
@@ -12,6 +13,7 @@ from cobra.views.generic import OrganizationView, BaseView
 from cobra.core.permissions import can_create_organizations
 
 Organization = get_model('organization', 'Organization')
+OrganizationMember = get_model('organization', 'OrganizationMember')
 Team = get_model('team', 'Team')
 AuditLogEntry = get_model('auditlog', 'AuditLogEntry')
 
@@ -144,3 +146,127 @@ class OrganizationRemoveView(OrganizationView):
         }
 
         return self.respond('organization/remove.html', context)
+
+
+class OrganizationMembersView(OrganizationView):
+    def handle(self, request, organization):
+        if request.user.is_superuser:
+            authorizing_access = OrganizationMemberType.OWNER
+        else:
+            authorizing_access = OrganizationMember.objects.get(
+                user=request.user,
+                organization=organization,
+            ).type
+
+        queryset = OrganizationMember.teams.through.objects.filter(
+            organizationmember__organization=organization,
+        ).select_related('team')
+
+        team_map = defaultdict(list)
+        for omt in queryset:
+            team_map[omt.organizationmember_id].append(omt.team)
+
+        queryset = OrganizationMember.objects.filter(
+            organization=organization,
+        ).select_related('user')
+
+        queryset = sorted(queryset, key=lambda x: x.email or x.user.get_display_name())
+
+        member_list = []
+        for om in queryset:
+            member_list.append((om, team_map[om.id]))
+
+        # if the member is not the only owner we allow them to leave the org
+        member_can_leave = any(
+            1 for om, _ in member_list
+            if om.type == OrganizationMemberType.OWNER and om.user != request.user
+        )
+
+        context = {
+            'member_list': member_list,
+            'authorizing_access': authorizing_access,
+            'member_can_leave': member_can_leave,
+        }
+
+        return self.respond('organization/members.html', context)
+
+
+class OrganizationMemberSettingsView(OrganizationView):
+    required_access = OrganizationMemberType.ADMIN
+
+    def get_form(self, request, member, authorizing_access):
+        return EditOrganizationMemberForm(
+            authorizing_access=authorizing_access,
+            data=request.POST or None,
+            instance=member,
+            initial={
+                'type': member.type,
+                'has_global_access': member.has_global_access,
+                'teams': member.teams.all(),
+            }
+        )
+
+    def resend_invite(self, request, organization, member):
+        messages.success(request, ugettext('An invitation to join %(organization)s has been sent to %(email)s') % {
+            'organization': organization.name,
+            'email': member.email,
+        })
+
+        member.send_invite_email()
+
+        redirect = reverse('sentry-organization-member-settings',
+                           args=[organization.slug, member.id])
+
+        return self.redirect(redirect)
+
+    def view_member(self, request, organization, member):
+        context = {
+            'member': member,
+            'enabled_teams': set(member.teams.all()),
+            'all_teams': Team.objects.filter(
+                organization=organization,
+            ),
+        }
+
+        return self.respond('sentry/organization-member-details.html', context)
+
+    def handle(self, request, organization, member_id):
+        try:
+            member = OrganizationMember.objects.get(id=member_id)
+        except OrganizationMember.DoesNotExist:
+            print("cannot find member id")
+            return self.redirect(reverse('sentry'))
+
+        if request.POST.get('op') == 'reinvite' and member.is_pending:
+            return self.resend_invite(request, organization, member)
+
+        if request.user.is_superuser:
+            authorizing_access = OrganizationMemberType.OWNER
+        else:
+            membership = OrganizationMember.objects.get(
+                user=request.user,
+                organization=organization,
+            )
+            authorizing_access = membership.type
+
+        if member.user == request.user or authorizing_access > member.type:
+            return self.view_member(request, organization, member)
+
+        form = self.get_form(request, member, authorizing_access)
+        if form.is_valid():
+            member = form.save(request.user, organization, request.META['REMOTE_ADDR'])
+
+            messages.add_message(request, messages.SUCCESS,
+                _('Your changes were saved.'))
+
+            redirect = reverse('sentry-organization-member-settings',
+                               args=[organization.slug, member.id])
+
+            return self.redirect(redirect)
+
+        context = {
+            'member': member,
+            'form': form,
+        }
+
+        return self.respond('sentry/organization-member-settings.html', context)
