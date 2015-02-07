@@ -20,7 +20,7 @@
           <a href="{% url 'project:create' organization.slug %}"
              class="btn btn-small btn-primary">{% trans "New Project" %}</a>
           {% if ACCESS.is_global %}
-            <a href="{% comment %}{% url 'sentry-create-organization-member' organization.slug %}{% endcomment %}"
+            <a href="{% url 'organization:member-create' organization.slug %}"
                class="btn btn-small btn-primary">{% trans "New Member" %}</a>
           {% endif %}
         {% endif %}

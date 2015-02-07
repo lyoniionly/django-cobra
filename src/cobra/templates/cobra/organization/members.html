@@ -40,10 +40,10 @@
       {% for member, team_list in member_list %}
         <tr>
           <td>
-            <img class="avatar" src="{% get_avatar_url member.user %}">
+            <img class="avatar" src="{% get_avatar_url member.user member.get_email %}">
           </td>
           <td>
-            <a href="{% comment %}{% url 'sentry-organization-member-settings' organization.slug member.id %}{% endcomment %}">
+            <a href="{% url 'organization:member-settings' organization.slug member.id %}">
               {{ member.get_display_name }}
             </a>
             {% if member.is_pending %}

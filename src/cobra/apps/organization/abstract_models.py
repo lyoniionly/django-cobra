@@ -130,7 +130,7 @@ class AbstractOrganizationMember(Model):
         context = {
             'email': self.email,
             'organization': self.organization,
-            'url': absolute_uri(reverse('cobra-accept-invite', kwargs={
+            'url': absolute_uri(reverse('organization:member-accept', kwargs={
                 'member_id': self.id,
                 'token': self.token,
             })),

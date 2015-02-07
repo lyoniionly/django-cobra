@@ -10,7 +10,7 @@ from django.utils.functional import cached_property
 from email.utils import parseaddr
 import toronado
 
-from cobra.core.web import render_to_string
+from cobra.core.render import render_to_string
 from cobra.core.compat import get_user_model
 from cobra.core.loading import get_model
 

@@ -2,24 +2,29 @@ from __future__ import absolute_import
 from collections import defaultdict
 
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.forms.models import modelform_factory
 from django.http import HttpResponseRedirect
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from cobra.core.loading import get_model, get_class, get_classes
 from cobra.views.generic import OrganizationView, BaseView
-from cobra.core.permissions import can_create_organizations
+from cobra.core.permissions import can_create_organizations, can_add_organization_member
 
 Organization = get_model('organization', 'Organization')
 OrganizationMember = get_model('organization', 'OrganizationMember')
 Team = get_model('team', 'Team')
+Project = get_model('project', 'Project')
 AuditLogEntry = get_model('auditlog', 'AuditLogEntry')
 
 OrganizationStatus, OrganizationMemberType = get_classes('organization.utils',
                                                        ['OrganizationStatus', 'OrganizationMemberType'])
 OrganizationCreateForm = get_class('organization.forms', 'OrganizationCreateForm')
+OrganizationMemberEditForm = get_class('organization.forms', 'OrganizationMemberEditForm')
+OrganizationMemberInviteForm = get_class('organization.forms', 'OrganizationMemberInviteForm')
+OrganizationMemberCreateForm = get_class('organization.forms', 'OrganizationMemberCreateForm')
 AuditLogEntryEvent = get_class('auditlog.utils', 'AuditLogEntryEvent')
 
 
@@ -191,11 +196,54 @@ class OrganizationMembersView(OrganizationView):
         return self.respond('organization/members.html', context)
 
 
+class OrganizationMemberCreateView(OrganizationView):
+    required_access = OrganizationMemberType.ADMIN
+
+    def get_form(self, request):
+        initial = {
+            'type': OrganizationMemberType.MEMBER,
+        }
+
+        if settings.COBRA_ENABLE_INVITES:
+            form_cls = OrganizationMemberInviteForm
+        else:
+            form_cls = OrganizationMemberCreateForm
+
+        return form_cls(request.POST or None, initial=initial)
+
+    def handle(self, request, organization):
+        if not can_add_organization_member(request.user, organization):
+            return HttpResponseRedirect(reverse('home:home'))
+
+        form = self.get_form(request)
+        if form.is_valid():
+            om, created = form.save(request.user, organization, request.META['REMOTE_ADDR'])
+
+            if created:
+                messages.add_message(request, messages.SUCCESS,
+                    _('The organization member was added.'))
+            else:
+                messages.add_message(request, messages.INFO,
+                    _('The organization member already exists.'))
+
+            redirect = reverse('organization:member-settings',
+                               args=[organization.slug, om.id])
+
+            return HttpResponseRedirect(redirect)
+
+        context = {
+            'form': form,
+            'is_invite': settings.COBRA_ENABLE_INVITES,
+        }
+
+        return self.respond('organization/member-create.html', context)
+
+
 class OrganizationMemberSettingsView(OrganizationView):
     required_access = OrganizationMemberType.ADMIN
 
     def get_form(self, request, member, authorizing_access):
-        return EditOrganizationMemberForm(
+        return OrganizationMemberEditForm(
             authorizing_access=authorizing_access,
             data=request.POST or None,
             instance=member,
@@ -214,7 +262,7 @@ class OrganizationMemberSettingsView(OrganizationView):
 
         member.send_invite_email()
 
-        redirect = reverse('sentry-organization-member-settings',
+        redirect = reverse('organization:member-settings',
                            args=[organization.slug, member.id])
 
         return self.redirect(redirect)
@@ -228,14 +276,14 @@ class OrganizationMemberSettingsView(OrganizationView):
             ),
         }
 
-        return self.respond('sentry/organization-member-details.html', context)
+        return self.respond('organization/member-details.html', context)
 
     def handle(self, request, organization, member_id):
         try:
             member = OrganizationMember.objects.get(id=member_id)
         except OrganizationMember.DoesNotExist:
             print("cannot find member id")
-            return self.redirect(reverse('sentry'))
+            return self.redirect(reverse('home:home'))
 
         if request.POST.get('op') == 'reinvite' and member.is_pending:
             return self.resend_invite(request, organization, member)
@@ -259,7 +307,7 @@ class OrganizationMemberSettingsView(OrganizationView):
             messages.add_message(request, messages.SUCCESS,
                 _('Your changes were saved.'))
 
-            redirect = reverse('sentry-organization-member-settings',
+            redirect = reverse('organization:member-settings',
                                args=[organization.slug, member.id])
 
             return self.redirect(redirect)
@@ -269,4 +317,113 @@ class OrganizationMemberSettingsView(OrganizationView):
             'form': form,
         }
 
-        return self.respond('sentry/organization-member-settings.html', context)
+        return self.respond('organization/member-settings.html', context)
+
+
+class AcceptInviteForm(forms.Form):
+    pass
+
+class OrganizationMemberAcceptView(BaseView):
+    auth_required = False
+
+    def get_form(self, request):
+        if request.method == 'POST':
+            return AcceptInviteForm(request.POST)
+        return AcceptInviteForm()
+
+    def handle(self, request, member_id, token):
+        assert request.method in ['POST', 'GET']
+
+        try:
+            om = OrganizationMember.objects.get(pk=member_id)
+        except OrganizationMember.DoesNotExist:
+            messages.add_message(
+                request, messages.ERROR,
+                _('The invite link you followed is no longer valid.')
+            )
+
+            return self.redirect(reverse('home:home'))
+
+        if not om.is_pending:
+            messages.add_message(
+                request, messages.ERROR,
+                _('The invite link you followed is no longer valid.')
+            )
+
+            return self.redirect(reverse('home:home'))
+
+        if om.token != token:
+            messages.add_message(
+                request, messages.ERROR,
+                _('The invite link you followed is no longer valid.')
+            )
+            return self.redirect(reverse('home:home'))
+
+        organization = om.organization
+
+        if om.has_global_access:
+            qs = Project.objects.filter(
+                team__organization=organization,
+            )
+        else:
+            qs = Project.objects.filter(
+                team__in=om.teams.all(),
+            )
+
+        qs = qs.select_related('team')
+
+        project_list = list(qs)
+
+        context = {
+            'organization': om.organization,
+            'project_list': project_list,
+            'needs_authentication': not request.user.is_authenticated(),
+        }
+
+        if not request.user.is_authenticated():
+            # Show login or register form
+            request.session['_next'] = request.get_full_path()
+            request.session['can_register'] = True
+
+            return self.respond('organization/member-accept-invite.html', context)
+
+        form = self.get_form(request)
+        if form.is_valid():
+            if OrganizationMember.objects.filter(organization=organization, user=request.user).exists():
+                messages.add_message(
+                    request, messages.SUCCESS,
+                    _('You are already a member of the %r organization.') % (
+                        organization.name.encode('utf-8'),
+                    )
+                )
+
+                om.delete()
+            else:
+                om.user = request.user
+                om.email = None
+                om.save()
+
+                AuditLogEntry.objects.create(
+                    organization=organization,
+                    actor=request.user,
+                    ip_address=request.META['REMOTE_ADDR'],
+                    target_object=om.id,
+                    target_user=request.user,
+                    event=AuditLogEntryEvent.MEMBER_ACCEPT,
+                    data=om.get_audit_log_data(),
+                )
+
+                messages.add_message(
+                    request, messages.SUCCESS,
+                    _('You have been added to the %r organization.') % (
+                        organization.name.encode('utf-8'),
+                    )
+                )
+
+            request.session.pop('can_register', None)
+
+            return self.redirect(reverse('organization:home', args=[organization.slug]))
+
+        context['form'] = form
+
+        return self.respond('organization/member-accept-invite.html', context)

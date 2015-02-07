@@ -12,7 +12,9 @@ class OrganizationApplication(Application):
     organization_remove_view = get_class('organization.views', 'OrganizationRemoveView')
 
     organization_members_view = get_class('organization.views', 'OrganizationMembersView')
+    organization_member_create_view = get_class('organization.views', 'OrganizationMemberCreateView')
     organization_member_settings_view = get_class('organization.views', 'OrganizationMemberSettingsView')
+    organization_member_accept_view = get_class('organization.views', 'OrganizationMemberAcceptView')
     # organization_member_create_view = get_class('organization.views', 'OrganizationMemberCreateView')
 
     def get_urls(self):
@@ -30,8 +32,13 @@ class OrganizationApplication(Application):
 
             url(r'^(?P<organization_slug>[\w_-]+)/members/$', self.organization_members_view.as_view(),
                 name='members'),
+            url(r'^(?P<organization_slug>[\w_-]+)/members/create/$', self.organization_member_create_view.as_view(),
+                name='member-create'),
             url(r'^(?P<organization_slug>[\w_-]+)/members/(?P<member_id>\d+)/$', self.organization_member_settings_view.as_view(),
                 name='member-settings'),
+
+            url(r'^accept/(?P<member_id>\d+)/(?P<token>\w+)/$', self.organization_member_accept_view.as_view(),
+                name='member-accept'),
             # url(r'^(?P<organization_slug>[\w_-]+)/members/new/$', self.organization_member_create_view.as_view(),
             #     name='member-create'),
         ]

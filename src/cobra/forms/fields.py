@@ -1,7 +1,11 @@
-from django.forms import fields, TextInput
+import six
+
+from django.core.exceptions import ValidationError
+from django.forms import fields, TextInput, CharField
+from django.utils.translation import ugettext_lazy as _
 
 from cobra.core import validators
-
+from cobra.core.compat import get_user_model
 
 class ExtendedURLField(fields.URLField):
     """
@@ -36,3 +40,26 @@ class ExtendedURLField(fields.URLField):
         if value and value.startswith('/'):
             return value
         return super(ExtendedURLField, self).to_python(value)
+
+
+class UserField(CharField):
+    class widget(TextInput):
+        def render(self, name, value, attrs=None):
+            User = get_user_model()
+            if not attrs:
+                attrs = {}
+            if 'placeholder' not in attrs:
+                attrs['placeholder'] = 'username'
+            if isinstance(value, six.integer_types):
+                value = User.objects.get(id=value).username
+            return super(UserField.widget, self).render(name, value, attrs)
+
+    def clean(self, value):
+        User = get_user_model()
+        value = super(UserField, self).clean(value)
+        if not value:
+            return None
+        try:
+            return User.objects.get(username=value)
+        except User.DoesNotExist:
+            raise ValidationError(_('Invalid username'))

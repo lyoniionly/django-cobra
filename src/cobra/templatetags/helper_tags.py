@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from django import template
+from django.conf import settings
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -9,6 +10,7 @@ from paging.helpers import paginate as paginate_func
 from templatetag_sugar.register import tag
 from templatetag_sugar.parser import Name, Variable, Constant, Optional
 
+from cobra.apps.accounts.utils import get_gravatar
 from cobra.core.javascript import to_json
 from cobra.core.loading import get_model, get_class, get_profile_class
 from cobra.core.constants import EVENTS_PER_PAGE
@@ -74,7 +76,30 @@ def paginator(context, queryset_or_list, request, asvar=None, per_page=EVENTS_PE
 
 
 @register.simple_tag
-def get_avatar_url(user):
+def get_avatar_url(user, email=''):
+    if user is None:
+        # This situation is really exist.
+        # When we invite the member to join the organization,
+        # the organization member DB only store the email, but not the user instance.
+        # If the invited member do not accept the invitation yet, the organization member list page
+        # will contain all member include invited member, so, we should deal the user(none) avatar
+
+        # Use Gravatar if the user wants to.
+        if settings.COBRA_ACCOUNTS_AVATAR_GRAVATAR:
+            return get_gravatar(email,
+                                settings.COBRA_ACCOUNTS_AVATAR_SIZE,
+                                settings.COBRA_ACCOUNTS_AVATAR_DEFAULT)
+
+        # Gravatar not used, check for a default image.
+        else:
+            if settings.COBRA_ACCOUNTS_AVATAR_DEFAULT not in ['404', 'mm',
+                                                                'identicon',
+                                                                'monsterid',
+                                                                'wavatar']:
+                return settings.COBRA_ACCOUNTS_AVATAR_DEFAULT
+            else:
+                return None
+
     Profile = get_profile_class()
     try:
         instance = Profile.objects.get(user=user)
