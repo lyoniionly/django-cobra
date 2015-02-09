@@ -344,6 +344,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'#'mandatory'
 ACCOUNT_USERNAME_BLACKLIST = ['cobra', 'admin', 'case', 'test']
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_SIGNUP_FORM_CLASS = 'cobra.apps.accounts.forms.SignupForm'
+ACCOUNT_ADAPTER = 'cobra.apps.accounts.adapter.AccountAdapter'
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_LOGOUT_REDIRECT_URL = '/auth/login/'
 

@@ -25,17 +25,6 @@ def get_version():
 # Eg: the template 'cobra/templates/cobra/base.html' can be accessed via both
 COBRA_CORE_APPS = [
     'cobra',
-    # 'cobra.apps.analytics',
-    # 'cobra.apps.checkout',
-    # 'cobra.apps.address',
-    # 'cobra.apps.shipping',
-    # 'cobra.apps.catalogue',
-    # 'cobra.apps.catalogue.reviews',
-    # 'cobra.apps.partner',
-    # 'cobra.apps.basket',
-    # 'cobra.apps.payment',
-    # 'cobra.apps.offer',
-    # 'cobra.apps.order',
     'cobra.apps.accounts',
     'cobra.apps.auditlog',
     'cobra.apps.home',
@@ -45,23 +34,6 @@ COBRA_CORE_APPS = [
     'cobra.apps.nodestore',
     'cobra.apps.organization',
     'cobra.apps.team',
-    # 'cobra.apps.promotions',
-    # 'cobra.apps.search',
-    # 'cobra.apps.voucher',
-    # 'cobra.apps.wishlists',
-    # 'cobra.apps.dashboard',
-    # 'cobra.apps.dashboard.reports',
-    # 'cobra.apps.dashboard.users',
-    # 'cobra.apps.dashboard.orders',
-    # 'cobra.apps.dashboard.promotions',
-    # 'cobra.apps.dashboard.catalogue',
-    # 'cobra.apps.dashboard.offers',
-    # 'cobra.apps.dashboard.partners',
-    # 'cobra.apps.dashboard.pages',
-    # 'cobra.apps.dashboard.ranges',
-    # 'cobra.apps.dashboard.reviews',
-    # 'cobra.apps.dashboard.vouchers',
-    # 'cobra.apps.dashboard.communications',
     # 3rd-party apps that cobra depends on
     # 'haystack',
     # 'treebeard',
@@ -83,7 +55,6 @@ COBRA_CORE_APPS = [
 # extended by templates with the same filename
 COBRA_MAIN_TEMPLATE_DIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), 'templates/cobra')
-
 
 
 def get_core_apps(overrides=None):

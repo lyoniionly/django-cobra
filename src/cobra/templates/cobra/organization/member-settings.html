@@ -27,25 +27,24 @@
     {{ form|as_crispy_errors }}
 
     <fieldset>
-      <div class="control-group">
+      <div class="form-group">
         <label>{% trans "Email" %}</label>
-        <div class="controls">
-          <a href="mailto:{{ member.get_email }}">{{ member.get_email }}</a>
-        </div>
+        <a href="mailto:{{ member.get_email }}">{{ member.get_email }}</a>
       </div>
 
-      <div class="control-group">
+      <div class="form-group">
         <label>{% trans "Status" %}</label>
-        <div class="controls">
-          {% if member.is_pending %}
-            Invited
-          {% else %}
-            Active
-          {% endif %}
+        {% if member.is_pending %}
+          Invited
+        {% else %}
+          Active
+        {% endif %}
+      </div>
+      <div class="row">
+        <div class="col-sm-4">
+          {{ form.type|as_crispy_field }}
         </div>
       </div>
-
-      {{ form.type|as_crispy_field }}
     </fieldset>
 
     <fieldset>
@@ -55,15 +54,13 @@
 
       <fieldset class="team-choices">
         {% for team_id, team_name in form.teams.field.choices %}
-          <div class="control-group">
-            <div class="controls">
-              <label class="checkbox">
+            <div class="checkbox">
+              <label class="">
                 <input type="checkbox" name="teams" value="{{ team_id }}"
                        class="checkboxinput"{% if team_id in form.teams.value %} checked="checked"{% endif %}>
                   {{ team_name }}
                 </label>
             </div>
-          </div>
         {% endfor %}
       </fieldset>
     </fieldset>
@@ -75,26 +72,23 @@
   </form>
 {% endblock %}
 
-{% block content_after %}
-  <script>
-  $(function(){
-    var selector = $('.team-choices input[type=checkbox]');
-    var selectedTeams = $('.team-choices input[type=checkbox]:checked').slice(0);
-    $('#id_has_global_access').change(function(){
-      var $this = $(this);
-      var checked = $this.is(':checked');
+{% block onbodyload %}
+  {{ block.super }}
+  var selector = $('.team-choices input[type=checkbox]');
+  var selectedTeams = $('.team-choices input[type=checkbox]:checked').slice(0);
+  $('#id_has_global_access').change(function(){
+    var $this = $(this);
+    var checked = $this.is(':checked');
 
-      if (checked) {
-        selectedTeams = $('.team-choices input[type=checkbox]:checked').slice(0);
-        selector.prop('checked', true);
-      } else {
-        selector.prop('checked', false);
-        $(selectedTeams).prop('checked', true);
-        selectedTeams = [];
-      }
+    if (checked) {
+      selectedTeams = $('.team-choices input[type=checkbox]:checked').slice(0);
+      selector.prop('checked', true);
+    } else {
+      selector.prop('checked', false);
+      $(selectedTeams).prop('checked', true);
+      selectedTeams = [];
+    }
 
-      $('.team-choices').prop('disabled', checked);
-    }).change();
-  });
-  </script>
+    $('.team-choices').prop('disabled', checked);
+  }).change();
 {% endblock %}

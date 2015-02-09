@@ -235,10 +235,6 @@ class TeamSettingsView(TeamView):
 class TeamRemoveForm(forms.Form):
     pass
 
-def t(d):
-    import time
-    time.sleep(2.4)
-
 class TeamRemoveView(TeamView):
     required_access = OrganizationMemberType.OWNER
     sudo_required = True
@@ -250,13 +246,13 @@ class TeamRemoveView(TeamView):
 
     def handle(self, request, organization, team):
         form = self.get_form(request)
-        from django_statsd.clients import statsd
-        with statsd.timer('sdfsss.asdf'):
-            result = t('df')
 
         if form.is_valid():
-            if team.status == TeamStatus.VISIBLE:
-                team.update(status=TeamStatus.PENDING_DELETION)
+            updated = Team.objects.filter(
+                id=team.id,
+                status=TeamStatus.VISIBLE,
+            ).update(status=TeamStatus.PENDING_DELETION)
+            if updated:
                 delete_team.delay(object_id=team.id, countdown=60 * 5)
 
                 AuditLogEntry.objects.create(
