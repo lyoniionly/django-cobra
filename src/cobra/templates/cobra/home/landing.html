@@ -1,9 +1,43 @@
-<h2>Welcome to Cobra website.</h2>
-<h3>Cobra is a service of managing project for you.</h3>
-<p>what we want to do:</p>
-<ol>
-  <li>项目代码管理</li>
-  <li>项目打包</li>
-</ol>
-<p><a href="{% url 'account_login' %}">login</a></p>
-<p><a href="{% url 'account_signup' %}">sign up</a></p>
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% load compress %}
+
+{% block mainstyles %}
+  {% block styles %}
+    <link rel="stylesheet" type="text/css" href="http://fonts.useso.com/css?family=Lato">
+    <link rel="stylesheet" type="text/css" href="http://fonts.useso.com/css?family=Helvetica+Neue">
+    {% compress css %}
+      {% if use_less %}
+        <link rel="stylesheet" type="text/less" href="{% static "cobra/less/landing.less" %}"/>
+      {% else %}
+        <link rel="stylesheet" type="text/css" href="{% static "cobra/css/landing.css" %}"/>
+      {% endif %}
+    {% endcompress %}
+  {% endblock %}
+{% endblock %}
+
+{% block layout %}
+  <div class="content">
+    <div class="container">
+      <div class="row landing fadeIn">
+        <div class="col-sm-12 col-centered text-center">
+
+          <img class="logo" src="{% static 'cobra/img/logo/logo_white.png' %}"/>
+
+          <h1>{% trans 'Welcome To Cobra world' %}</h1>
+
+          <p>{% trans 'It is a tool of managing the projects, enjoy yourself.' %}</p>
+          <a href="{% url 'account_login' %}" class="btn btn-lg btn-primary">Start to Login</a>
+          <a href="{% url 'account_signup' %}" class="btn btn-lg btn-primary red-button">Signup</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="text-center">
+    <p>Cobra is a open source system. <a target="_blank" href="https://github.com/lyoniionly/django-cobra">Fork it on Github</a></p>
+      <p>Designed by IDEAL TEAM</p>
+      </div>
+  </div>
+{% endblock %}

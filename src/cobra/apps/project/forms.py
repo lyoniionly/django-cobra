@@ -19,17 +19,23 @@ class AddProjectForm(forms.ModelForm):
             'placeholder': _('e.g. Backend, Frontend, iOS, Android'),
         }),
     )
-    platform = forms.ChoiceField(
-        choices=Project._meta.get_field('platform').get_choices(blank_choice=BLANK_CHOICE),
-        widget=forms.Select(attrs={
-            'data-placeholder': _('Select a platform'),
-        }),
-        help_text='Your platform choice helps us setup some defaults for this project.',
-    )
+
+    # platform = forms.ChoiceField(
+    #     choices=Project._meta.get_field('platform').get_choices(blank_choice=BLANK_CHOICE),
+    #     widget=forms.Select(attrs={
+    #         'data-placeholder': _('Select a platform'),
+    #     }),
+    #     help_text='Your platform choice helps us setup some defaults for this project.',
+    # )
 
     class Meta:
-        fields = ('name', 'platform')
+        # fields = ('name', 'platform')
+        fields = ('name', 'svn_url', 'svn_username', 'svn_password')
         model = Project
+        widgets = {
+            'svn_url': forms.URLInput(attrs={'placeholder': _('The url of checkout the project.'),}),
+            'svn_password': forms.PasswordInput()
+        }
 
     def save(self, actor, team, ip_address):
         project = super(AddProjectForm, self).save(commit=False)
@@ -54,9 +60,9 @@ class AddProjectForm(forms.ModelForm):
 class AddProjectWithTeamForm(AddProjectForm):
     team = forms.ChoiceField(choices=(), required=True)
 
-    class Meta:
-        fields = ('name', 'team', 'platform')
-        model = Project
+    class Meta(AddProjectForm.Meta):
+        # fields = ('name', 'team', 'platform')
+        fields = ('name', 'team', 'svn_url', 'svn_username', 'svn_password')
 
     def __init__(self, user, team_list, *args, **kwargs):
         super(AddProjectWithTeamForm, self).__init__(*args, **kwargs)

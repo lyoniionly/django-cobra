@@ -1,11 +1,12 @@
 {% extends "layouts/modal.html" %}
 
 {% load i18n %}
+{% load crispy_forms_tags %}
 
 {% block title %}{% trans "New Project" %} | {{ block.super }}{% endblock %}
 
 {% block inner %}
-<div class="create-flow">
+  <div class="create-flow">
   <div class="page-header">
     <div class="pull-right">
       <a href="{% url 'organization:home' organization.slug %}">{% trans 'Back to Organization Home' %}</a>
@@ -15,10 +16,50 @@
     </h2>
   </div>
 
-  <p>{% blocktrans %}Projects allow you to scope events to a specific application in your organization. For example, you might have separate projects for production vs development instances, or separate projects for your web app and mobile app.{% endblocktrans %}</p>
+  <p>{% blocktrans %}Project is the final workspace for you, and we suggest that you should choose a good name for it.
+    The project will be create after some minutes, how long will take is depended on the code size of your
+    project.{% endblocktrans %}</p>
 
   <br>
 
-  {% include "partials/form.html" %}
+  <form class="form-stacked" action="" method="post">
+    {% csrf_token %}
+
+    {% if form.is_bound and not form.is_valid %}
+      <div class="alert alert-error">
+        <strong>{% trans "Oops! We found some errors" %}</strong>
+        - {% trans "please check the error messages below and try again" %}
+      </div>
+    {% endif %}
+
+    <fieldset>
+      {{ form.name|as_crispy_field }}
+      <div class="row">
+        <div class="col-sm-6">
+          {{ form.team|as_crispy_field }}
+        </div>
+      </div>
+
+    </fieldset>
+
+    <fieldset id="svn">
+      <div>
+        <legend>{% trans "SVN Configs" %}</legend>
+      </div>
+      {{ form.svn_url|as_crispy_field }}
+      <div class="row">
+        <div class="col-sm-6">
+          {{ form.svn_username|as_crispy_field }}
+        </div>
+        <div class="col-sm-6">
+          {{ form.svn_password|as_crispy_field }}
+        </div>
+      </div>
+    </fieldset>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">{% trans "Create Now" %}</button>
+    </div>
+  </form>
+  {#  {% include "partials/form.html" %}#}
 {% endblock %}
 </div>

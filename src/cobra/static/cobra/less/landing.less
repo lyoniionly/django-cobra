@@ -1,0 +1,156 @@
+@import url("@{vendor-url}/bootstrap3/less/bootstrap.less");
+@import url("variables.less");
+
+body {
+  background-color: #efeeed;
+  color: #465262;
+  font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.col-centered {
+  float: none;
+  margin: 0 auto
+}
+
+.content {
+  position: absolute;
+  width: 100%;
+  top: 30%;
+  .logo {
+    background: #ddd;
+    width: 80px;
+    border-radius: 40px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  .content {
+
+  }
+}
+
+@media (min-width: 1200px) {
+  .content {
+
+  }
+}
+
+.landing {
+  text-align: center;
+  transition: all .2s
+}
+
+.landing .lander {
+  max-width: 100%;
+  width: 70%;
+  margin-bottom: .8em
+}
+
+@media (min-width: 768px) {
+  .landing .lander {
+    margin-bottom: 1.2em
+  }
+}
+
+@media (min-width: 992px) {
+  .landing .lander {
+    width: 50%;
+    margin-bottom: 1.5em
+  }
+}
+
+.landing h1 {
+  //    font-family: "Lato","Helvetica Neue",sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  //    text-transform: uppercase;
+  //    letter-spacing: 1px;
+  margin-top: 10px
+}
+
+@media (min-width: 768px) {
+  .landing h1 {
+    font-size: 38px
+  }
+}
+
+@media (min-width: 992px) {
+  .landing h1 {
+    font-size: 48px
+  }
+}
+
+.landing p {
+  font-size: .9em;
+  margin: auto
+}
+
+@media (min-width: 768px) {
+  .landing p {
+    font-size: 1em
+  }
+}
+
+@media (min-width: 992px) {
+  .landing p {
+    font-size: 1.2em
+  }
+}
+
+.landing button,
+.landing .btn
+{
+  font-size: 16px;
+  margin: 30px 0;
+  padding: 15px 30px !important
+}
+
+.device-container {
+  margin: 0 auto 3em;
+  position: relative;
+  overflow: hidden;
+  max-width: 632px;
+  min-height: 194px
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1abc9c;
+  border: 0;
+  border-radius: 3px;
+}
+
+.btn-primary:hover, .btn-primary.hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+  color: #fff;
+  background-color: #48c9b0;
+  border-color: #48c9b0;
+}
+
+.red-button {
+  background: #e74c3c !important;
+  margin-left: 15px !important;
+}
+
+.red-button:hover {
+  background: #ea6153 !important;
+}
+
+.btn-info {
+  color: #fff;
+  background-color: #e2276f;
+  border-color: #d31c63;
+}
+
+.btn-info.active, .btn-info:active, .btn-info:focus, .btn-info:hover, .open > .dropdown-toggle.btn-info {
+  color: #fff;
+  background-color: #bd1958;
+  border-color: #9d154a;
+}
+
+.footer {
+  position: absolute;
+width: 100%;
+bottom: 0;
+}
