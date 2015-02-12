@@ -28,6 +28,9 @@ from cobra.core.loading import get_class, get_model
 
 from . import choices
 from .exceptions import map_svn_exceptions
+from .markup.hightlighter import make_html, get_lexer
+from .utils.binaryornot import get_starting_chunk
+from .utils.binaryornot import is_binary_string
 
 NodeManager = get_class('svnkit.managers', 'NodeManager')
 

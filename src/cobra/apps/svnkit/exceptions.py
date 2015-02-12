@@ -26,7 +26,7 @@ def map_svn_exceptions(func):
     return new_func
 
 
-# map of common svn errors encountered by svnlit
+# map of common svn errors encountered by svnkit
 svn_error_map = {
     160013: InvalidNode,
     210005: RepositoryNotFound,
