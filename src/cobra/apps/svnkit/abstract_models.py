@@ -3,6 +3,8 @@ from __future__ import absolute_import, print_function
 from hashlib import md5
 import logging
 import datetime
+import mimetypes
+import posixpath
 from django.conf import settings
 
 from django.core.exceptions import ImproperlyConfigured
@@ -24,8 +26,10 @@ from cobra.core.http import absolute_uri
 from cobra.core.constants import MEMBER_TYPES, MEMBER_USER
 from cobra.core.loading import get_class, get_model
 
+from . import choices
 from .exceptions import map_svn_exceptions
 
+NodeManager = get_class('svnkit.managers', 'NodeManager')
 
 
 @python_2_unicode_compatible
@@ -218,9 +222,9 @@ class AbstractChangeset(Model):
     def __str__(self):
         return 'r%s' % self.revision
 
+    @models.permalink
     def get_absolute_url(self):
-        return ('svnlit_changeset', (self.repository.label, self.revision))
-    get_absolute_url = models.permalink(get_absolute_url)
+        return ('svnkit:changeset', (self.repository.label, self.revision))
 
     def get_previous(self):
         """Get the previous changeset in the repository."""
@@ -235,3 +239,302 @@ class AbstractChangeset(Model):
             return self.repository.changesets.get(revision=self.revision + 1)
         except self.__class__.DoesNotExist:
             return None
+
+
+@python_2_unicode_compatible
+class AbstractChange(Model):
+    """
+    A changed path in a changeset, including the action taken.
+    """
+    changeset = fields.FlexibleForeignKey('svnkit.Changeset', related_name='changes')
+    path = models.CharField(max_length=2048, db_index=True)
+    action = models.CharField(max_length=1)
+
+    copied_from_path = models.CharField(max_length=2048, null=True)
+    copied_from_revision = models.PositiveIntegerField(null=True)
+
+    class Meta:
+        abstract = True
+        app_label = 'svnkit'
+        db_table = 'cobra_svn_change'
+        unique_together = (('changeset', 'path'),)
+        ordering = ('changeset', 'path')
+
+    __repr__ = sane_repr('action', 'path')
+
+    def __str__(self):
+        return '%s %s' % (self.action, self.path)
+
+    def _get_base_change(self):
+        if hasattr(self, '_base_change'):
+            return self._base_change
+        if self.copied_from_revision is not None:
+            self._base_change = self.__class__.objects.get(
+                changeset__repository=self.changeset.repository,
+                revision=self.copied_from_revision
+            )
+            return self._base_change
+
+    def is_addition(self):
+        return self.action == 'A'
+
+    def is_modification(self):
+        return self.action == 'M'
+
+    def is_deletion(self):
+        return self.action == 'D'
+
+
+@python_2_unicode_compatible
+class AbstractNode(Model):
+    """
+    The meta data for a path at a revision in a repository.
+    Nodes can be understood as 'views' of a particular path in a
+    repository at a particular revision number (a revision that may or
+    may not have made changes at that path/revision). A node's actual
+    content is stored in a separate model object, since the content
+    may remain unchanged across a number of revisions at a particular
+    path. The `get_last_changeset` method can be used to obtain the
+    changeset and revision in which the node's path was last changed.
+    This model largely reflects the information available through the
+    subversion api. The field `cached` indicates when the data was
+    retrieved from the api, and `cached_indirectly` indicates whether
+    or not the node was generated from an api call for the node or
+    from a related node (parent or one of its possible
+    children). Indirectly cached nodes (which are usually nodes
+    created as placeholders for heirarchical connections instead of
+    through a direct api call) require another api call to collect the
+    remaining missing information. Nodes can be optionally be included
+    in a regular cleanup.
+    """
+    repository = fields.FlexibleForeignKey('svnkit.Repository', related_name='nodes')
+    parent = fields.FlexibleForeignKey('svnkit.Node', related_name='children', null=True)
+    path = models.CharField(max_length=2048, db_index=True)
+    node_type = models.CharField(max_length=1)
+    size = models.PositiveIntegerField(default=0)
+    last_changed = models.DateTimeField(null=True)
+
+    revision = models.PositiveIntegerField()
+    cached = models.DateTimeField(default=datetime.datetime.now)
+    cached_indirectly = models.BooleanField(default=True)
+
+    content = fields.FlexibleForeignKey('svnkit.Content', related_name='nodes', null=True)
+
+    objects = NodeManager(cache_fields=(
+        'pk',
+    ))
+
+    class Meta:
+        abstract = True
+        app_label = 'svnkit'
+        db_table = 'cobra_svn_node'
+        unique_together = (('repository', 'path', 'revision'),)
+        ordering = ('node_type', 'path')
+
+    __repr__ = sane_repr('path', 'revision')
+
+    def __str__(self):
+        return '%s@%s' % (self.path, self.revision)
+
+    def iter_path(self):
+        """
+        Returns a generator that 'walks` up the node hierarchy,
+        yielding each parent path until the root node is reached ('/').
+        """
+        path = self.path
+        yield path
+        while path != posixpath.sep:
+            path = posixpath.split(path)[0]
+            yield path
+
+    def iter_path_basename(self):
+        """
+        Returns a generator that 'walks' up the node hierarchy,
+        yielding a tuple of the path, and the basename of the path for
+        each parent node until the root node is reached ('/').
+        """
+        for path in self.iter_path():
+            basename = posixpath.basename(path)
+            if not basename:
+                basename = self.repository.label
+            yield (path, basename)
+
+    def get_last_changeset(self):
+        """Get the latest `Changeset` object that affected this node."""
+        c = self.repository.changesets.filter(
+            date__lte=self.last_changed)#.exclude(revision=self.revision)
+        if c.count():
+            return c[0]
+        else:
+            return self.repository.changesets.get(date=self.last_changed)
+
+    @models.permalink
+    def get_absolute_url(self):
+        repository = self.repository
+        if self.revision != repository.get_latest_revision():
+            return (
+                'svnkit:node-revision', (
+                repository.label, self.revision, self.path))
+        else:
+            return ('svnkit:node', (repository.label, self.path))
+
+    def get_basename(self):
+        """
+        The basename of the node, either a file name or a directory
+        name.
+        """
+        basename = posixpath.basename(self.path)
+        return basename
+
+    def is_directory(self):
+        """Whether the node is a directory."""
+        return self.node_type == choices.NODE_TYPE_DIR
+
+    def is_file(self):
+        """Whether the node is a file."""
+        return self.node_type == choices.NODE_TYPE_FILE
+
+    def is_root(self):
+        """Whether the node is the root node ('/')."""
+        return self.is_directory() and self.path == posixpath.sep
+
+    def has_properties(self):
+        """Whether the node has subversion properties set."""
+        if self.properties.count():
+            return True
+        return False
+
+
+@python_2_unicode_compatible
+class AbstractProperty(Model):
+    """
+    A property that has been set on a node.
+    """
+    node = fields.FlexibleForeignKey('svnkit.Node', related_name='properties')
+    key = models.CharField(max_length=512, db_index=True)
+    value = models.TextField()
+
+    class Meta:
+        abstract = True
+        app_label = 'svnkit'
+        db_table = 'cobra_svn_property'
+        unique_together = (('node', 'key'),)
+        verbose_name_plural = 'properties'
+
+    __repr__ = sane_repr('path', 'revision')
+
+    def __str__(self):
+        return '%s: %s' % (self.key, self.value)
+
+
+@python_2_unicode_compatible
+class AbstractContent(Model):
+    """
+    The contents of a node at a revision.
+    The data is base64 encoded in the database to allow storage of
+    binary data. The `set_data` and `get_data` methods should be used
+    to manipulate a node's data. `cached` indicates when the contents
+    were retrieved from the api. Content objects can optionally be
+    part of a regular cleanup.
+    """
+    repository = fields.FlexibleForeignKey('svnkit.Repository', related_name='content')
+    path = models.CharField(max_length=2048)
+    last_changed = models.DateTimeField()
+    cached = models.DateTimeField(default=datetime.datetime.now)
+    size = models.PositiveIntegerField(default=0)
+    data = models.TextField()
+
+    class Meta:
+        abstract = True
+        app_label = 'svnkit'
+        db_table = 'cobra_svn_content'
+        unique_together = (('repository', 'path', 'last_changed'),)
+
+    __repr__ = sane_repr('path', 'repository_id')
+
+    def __str__(self):
+        return '%s@%s' % (self.path, self.get_last_changeset())
+
+    def set_data(self, data):
+        self.size = len(data)
+        self.data = data.encode('base64')
+
+    def get_data(self):
+        if hasattr(self, '_decoded_data'):
+            return self._decoded_data
+        self._decoded_data = self.data.decode('base64')
+        return self._decoded_data
+
+    def get_last_changeset(self):
+        """Get the changeset in which this content was committed."""
+        return self.repository.changesets.get(date=self.last_changed)
+
+    def get_mimetype(self):
+        """
+        Get the mimetype of the content. This is determined by the
+        extension of the basename of the path. Defaults to
+        application/octet-stream if the mimetype cannot be determined.
+        """
+        mtype = mimetypes.guess_type(self.path)[0]
+        if mtype is None:
+            return 'application/octet-stream'
+        return mtype
+
+    def get_maintype(self):
+        """
+        Get the maintype of the mimetype, i.e. 'image' in 'image/png'.
+        """
+        return self.get_mimetype().split('/')[0]
+
+    def get_subtype(self):
+        """
+        Get the subtype of the mimetype, i.e. 'png' in 'image/png'.
+        """
+        return self.get_mimetype().split('/')[-1]
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('svnkit:content', (
+                self.repository.label, self.pk, self.get_basename()))
+
+    def is_binary(self):
+        """
+        Whether or not the content is binary. This is determined in
+        part by the mimetype, but if the mimetype is not available,
+        then if the data cannot be decoded into ascii it will be
+        presumed a binary format.
+        """
+        # mtype = mimetypes.guess_type(self.path)[0]
+        # if mtype is None:
+            # try:
+            #     self.get_data().decode('gbk')
+            # except UnicodeDecodeError:
+            #     return True
+            # return False
+        chunk = get_starting_chunk(self.get_data())
+        return is_binary_string(chunk)
+        # if not mtype.startswith('text'):
+        #     return True
+        # return False
+
+    def get_basename(self):
+        """Get the basename of the node's full path (the filename)."""
+        basename = posixpath.basename(self.path)
+        return basename
+
+    def get_data_display(self):
+        """
+        Get the content for display in text. Binary formats are just
+        shown as '(binary)'. Plain text formats get run through the
+        appropriate pygments lexer if the package is available.
+        """
+        if self.is_binary():
+            return _('<pre>(binary)</pre>')
+
+        try:
+            txt = self.get_data().decode('utf-8')
+        except UnicodeDecodeError:
+            txt = self.get_data().decode('gbk')
+
+        lexer = get_lexer(self.get_basename(), txt)
+        return make_html(txt, lexer.name)
