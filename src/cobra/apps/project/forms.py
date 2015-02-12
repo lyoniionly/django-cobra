@@ -16,7 +16,7 @@ BLANK_CHOICE = [("", "")]
 class AddProjectForm(forms.ModelForm):
     name = forms.CharField(label=_('Name'), max_length=200,
         widget=forms.TextInput(attrs={
-            'placeholder': _('e.g. Backend, Frontend, iOS, Android'),
+            'placeholder': _('Good project name will be nice'),
         }),
     )
 
@@ -28,13 +28,24 @@ class AddProjectForm(forms.ModelForm):
     #     help_text='Your platform choice helps us setup some defaults for this project.',
     # )
 
+    svn_url = forms.URLField(label=_('SVN URL'), max_length=512,
+                             help_text=_('Example: svn://example.com or file:///svn/ or http://host:port'))
+    svn_repo_prefix = forms.CharField(label=_('SVN Repository Prefix'), max_length=200, required=False,
+                                      help_text=_('<strong class="text-danger">Important!</strong> You maybe meet this situation, the svn url you supply is not the '
+                                                  'root of the repository, and you do not have the right permission '
+                                                  'to access the real root of repository, input a right prefix of '
+                                                  'repository, we will replace it for you automatic.<br><strong class="text-danger">If you do not have this problem, please ignore the attention.</strong>'))
+    svn_username = forms.CharField(label=_('SVN Username'), max_length=512, required=False)
+    svn_password = forms.CharField(label=_('SVN Password'), max_length=512, required=False,
+                                   widget=forms.PasswordInput())
+
     class Meta:
         # fields = ('name', 'platform')
-        fields = ('name', 'svn_url', 'svn_username', 'svn_password')
+        fields = ('name', 'svn_url', 'svn_repo_prefix', 'svn_username', 'svn_password')
         model = Project
         widgets = {
-            'svn_url': forms.URLInput(attrs={'placeholder': _('The url of checkout the project.'),}),
-            'svn_password': forms.PasswordInput()
+            # 'svn_url': forms.URLInput(attrs={'placeholder': _(''),}),
+            # 'svn_password': forms.PasswordInput()
         }
 
     def save(self, actor, team, ip_address):

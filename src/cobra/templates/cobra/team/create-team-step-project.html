@@ -12,8 +12,26 @@
       {% endblocktrans %}
     </div>
 
-    {% for field in form %}
-      {{ field|as_crispy_field }}
-    {% endfor %}
+    <fieldset>
+      {{ form.name|as_crispy_field }}
+    </fieldset>
+
+    <fieldset id="svn">
+      <div>
+        <legend>{% trans "SVN Configs" %}</legend>
+      </div>
+      {{ form.svn_url|as_crispy_field }}
+      {{ form.svn_repo_prefix|as_crispy_field }}
+
+      <div class="row">
+        <div class="col-sm-6">
+          {{ form.svn_username|as_crispy_field }}
+        </div>
+        <div class="col-sm-6">
+          {{ form.svn_password|as_crispy_field }}
+        </div>
+      </div>
+    </fieldset>
+
   </fieldset>
 {% endblock %}

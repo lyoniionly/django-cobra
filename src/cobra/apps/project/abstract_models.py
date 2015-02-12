@@ -53,9 +53,9 @@ class AbstractProject(Model):
     platform = models.CharField(max_length=32, choices=PLATFORM_CHOICES, null=True)
 
     #svn settings
-    svn_url = models.URLField(_("SVN URL"))
-    svn_username = models.CharField(_("SVN Username"), max_length=30)
-    svn_password = models.CharField(_('SVN Password'), max_length=128)
+    # svn_url = models.URLField(_("SVN URL"))
+    # svn_username = models.CharField(_("SVN Username"), max_length=30)
+    # svn_password = models.CharField(_('SVN Password'), max_length=128)
 
     objects = ProjectManager(cache_fields=[
         'pk',
