@@ -60,7 +60,8 @@ class AbstractRepository(Model):
     password = models.CharField(max_length=512, blank=True)
 
     last_synced = models.DateTimeField(
-        default=datetime.datetime.fromtimestamp(0, timezone.utc),
+        # default=datetime.datetime.fromtimestamp(0, timezone.utc),
+        default=datetime.datetime.fromtimestamp(0),
         editable=False)
 
     class Meta:
