@@ -1,0 +1,35 @@
+{% extends "svnkit/base.html" %}
+
+{% load helper_tags %}
+
+{% block title %}{{ repository.label }}:{{ changeset }}{% endblock %}
+
+{% block content %}
+<div class="changeset">
+
+<h1>
+  <a href="{% url svnlit_node_revision repository.label,changeset.revision,"/" %}">
+    {{ repository.label }}:{{ changeset }}</a>
+</h1>
+
+<h2>Last changed by {{ changeset.author }} {{ changeset.date|timesince }}</h2>
+
+<pre>{{ changeset.message }}</pre>
+
+<ul class="change-list">
+  {% for change in changeset.changes.all %}
+  <li class="change change-{{ change.action }}">
+    <span class="change-action">{{ change.action }}</span>
+    {% if not change.is_deletion %}
+    <a class="change-path"
+       href="{% url svnlit_node_revision repository.label,revision,change.path %}">
+      {{ change.path }}</a>
+    {% else %}
+    {{ change.path }}
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+
+</div>
+{% endblock %}

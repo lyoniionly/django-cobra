@@ -16,6 +16,7 @@
 @import url("fileinput.less");
 @import url("select2.less");
 @import url("pygments.less");
+@import url("breadcrumb.less");
 @import url("simple-slider.less");
 
 /* =============================  Global  ============================== */
@@ -4927,4 +4928,194 @@ h2 {
       left: -25px;
     }
   }
+}
+
+.zeroclipboard-link {
+color: #4183c4;
+cursor: pointer;
+background: none;
+border: 0;
+padding: 0;
+margin: 0;
+}
+
+.commit-tease {
+  padding: 8px 8px 0;
+  background: #f1f2f3;
+  border: 1px solid #e7e7e7;
+  border-bottom-color: #eaeaea;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.commit .commit-title, .commit .commit-title a {
+color: #4e575b;
+}
+
+.commit-tease p.commit-title {
+margin: 0 0 6px;
+}
+
+.commit .commit-title, .commit .commit-title a {
+color: #4e575b;
+}
+
+.commit-tease .commit-meta {
+padding: 8px;
+margin-right: -8px;
+margin-left: -8px;
+background: #fff;
+border-top: 1px solid #d8e6ec;
+}
+
+.commit-tease .zeroclipboard-link {
+float: right;
+margin-top: -2px;
+margin-left: 5px;
+}
+.commit .sha-block, .commit .sha {
+font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+font-size: 12px;
+}
+
+.commit-tease .sha-block {
+float: right;
+color: #888;
+}
+
+.commit-tease .sha-block>.sha {
+color: #444;
+}
+
+.commit-tease .authorship {
+margin: -2px 0 -4px -4px;
+font-size: 12px;
+color: #999;
+}
+
+.commit-tease .authorship .avatar {
+margin: -2px 3px 0 0;
+}
+
+.commit-tease .authorship .author-name {
+color: #444;
+}
+
+.commit-tease .authorship a {
+font-weight: bold;
+color: #444;
+text-decoration: none;
+}
+
+.file-wrap {
+margin-bottom: 10px;
+border: 1px solid #ddd;
+border-top: 0;
+border-bottom-right-radius: 3px;
+border-bottom-left-radius: 3px;
+}
+
+table.files {
+width: 100%;
+background: #f8f8f8;
+border-radius: 2px;
+  border-collapse: collapse;
+border-spacing: 0;
+}
+
+table.files tr.up-tree {
+border-bottom: 1px solid #eee;
+}
+
+table.files tr.up-tree a:hover {
+background-color: #eee;
+}
+
+table.files td {
+padding: 6px 3px;
+line-height: 20px;
+border-top: 1px solid #eee;
+}
+
+table.files tbody tr:first-child td {
+border-top: 0;
+}
+
+table.files tr.up-tree a {
+padding: 3px 6px;
+margin-left: -3px;
+font-weight: bold;
+border-radius: 2px;
+}
+
+.file-wrap .include-fragment-error {
+display: none;
+}
+
+table.files td.icon {
+width: 17px;
+padding-right: 2px;
+padding-left: 10px;
+color: #777;
+}
+
+table.files td.icon .spinner {
+position: relative;
+top: 3px;
+display: none;
+margin-top: -3px;
+margin-left: -2px;
+}
+
+table.files td.icon .fa-folder {
+color: #80a6cd;
+}
+
+table.files td.content-title {
+max-width: 180px;
+}
+
+.css-truncate.css-truncate-target, .css-truncate .css-truncate-target {
+display: inline-block;
+max-width: 125px;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+vertical-align: top;
+}
+
+table.files td .css-truncate {
+max-width: 100%;
+}
+
+table.files td.message {
+max-width: 442px;
+padding-left: 10px;
+overflow: hidden;
+color: #888;
+}
+
+table.files td.message a {
+color: #888;
+}
+
+table.files td.age {
+max-width: 140px;
+padding-right: 10px;
+color: #888;
+text-align: right;
+white-space: nowrap;
+}
+
+.octicon {
+font: normal normal 16px octicons;
+line-height: 1;
+display: inline-block;
+text-decoration: none;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
 }

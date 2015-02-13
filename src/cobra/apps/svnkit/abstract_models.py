@@ -14,8 +14,8 @@ from django.db.models import Q
 from django.db import transaction
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from django.utils import functional
 from django.utils import timezone
+import pysvn
 
 from cobra.core.compat import AUTH_USER_MODEL
 from cobra.models import Model
@@ -60,7 +60,7 @@ class AbstractRepository(Model):
     password = models.CharField(max_length=512, blank=True)
 
     last_synced = models.DateTimeField(
-        default=functional.curry(datetime.datetime.fromtimestamp, 0),
+        default=datetime.datetime.fromtimestamp(0, timezone.utc),
         editable=False)
 
     class Meta:
@@ -227,7 +227,7 @@ class AbstractChangeset(Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('svnkit:changeset', (self.repository.label, self.revision))
+        return ('svnkit:changeset', (self.repository.project.organization.slug, self.repository.project.slug, self.revision))
 
     def get_previous(self):
         """Get the previous changeset in the repository."""
@@ -359,7 +359,8 @@ class AbstractNode(Model):
         for path in self.iter_path():
             basename = posixpath.basename(path)
             if not basename:
-                basename = self.repository.label
+                # basename = self.repository.label
+                basename = self.repository.project.slug
             yield (path, basename)
 
     def get_last_changeset(self):
@@ -377,9 +378,9 @@ class AbstractNode(Model):
         if self.revision != repository.get_latest_revision():
             return (
                 'svnkit:node-revision', (
-                repository.label, self.revision, self.path))
+                repository.project.organization.slug, repository.project.slug, self.revision, self.path))
         else:
-            return ('svnkit:node', (repository.label, self.path))
+            return ('svnkit:node', (repository.project.organization.slug, repository.project.slug, self.path))
 
     def get_basename(self):
         """
@@ -498,7 +499,7 @@ class AbstractContent(Model):
     @models.permalink
     def get_absolute_url(self):
         return ('svnkit:content', (
-                self.repository.label, self.pk, self.get_basename()))
+                self.repository.project.organization.slug, self.repository.project.slug, self.pk, self.get_basename()))
 
     def is_binary(self):
         """

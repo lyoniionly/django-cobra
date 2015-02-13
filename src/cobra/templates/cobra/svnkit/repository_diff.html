@@ -1,0 +1,36 @@
+{% extends "svnlit/base.html" %}
+
+{% block title %}Compare{% endblock %}
+
+{% block content %}
+<h1>View changes in
+  <a href="{% url svnlit_node repository_label,"/" %}">{{ repository.label }}</a>
+</h1>
+
+<form action="{% url svnlit_repository_diff repository_label %}" method="post">{% csrf_token %}
+<div class="repository-diff-form">
+
+{{ form.non_field_errors }}
+
+<div class="field">
+<label>from:</label>
+{{ form.from_path }}
+r {{ form.from_revision }}
+</div>
+
+<div class="field">
+<label>to:</label>
+{{ form.to_path }}
+r {{ form.to_revision }}
+</div>
+
+<button type="submit">Compare</button>
+
+</div>
+</form>
+
+{% if diff_data %}
+{% include "svnlit/node_diff_data.html" %}
+{% endif %}
+
+{% endblock %}

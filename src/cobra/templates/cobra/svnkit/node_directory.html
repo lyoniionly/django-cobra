@@ -1,0 +1,67 @@
+{% extends "svnkit/node_base.html" %}
+{% load helper_tags %}
+
+{% block node_content %}
+{% with node.get_last_changeset as last_changeset %}
+  <div class="commit commit-tease js-details-container">
+    <p class="commit-title ">
+        <a href="" class="message" data-pjax="true" title="{{ last_changeset.message}}">{{ last_changeset.message|truncatechars:80 }}</a>
+    </p>
+    <div class="commit-meta">
+      <button aria-label="Copy SHA" class="js-zeroclipboard zeroclipboard-link" data-clipboard-text="e" data-copied-hint="Copied!" type="button"><span class="octicon octicon-clippy"></span></button>
+      <a href="{% comment %}{{ last_changeset.get_absolute_url }}{% endcomment %}" class="sha-block" data-pjax="">latest change on revision <span class="sha">{{ last_changeset }}</span></a>
+
+      <div class="authorship">
+        <img alt="Vasily A." class="avatar" data-user="3757319" height="20" src="https://avatars0.githubusercontent.com/u/3757319?v=3&amp;s=40" width="20">
+        <span class="author-name"><a href="/vsn4ik" rel="contributor">{{ last_changeset.author }}</a></span>
+        authored <time class="updated" datetime="" is="relative-time" title="{{ last_changeset.date }}">{{ last_changeset.date|timesince }}</time>
+
+      </div>
+    </div>
+  </div>
+{% endwith %}
+
+  <div class="file-wrap">
+
+  <table class="files" data-pjax="">
+    {% if not node.is_root %}
+      <tbody>
+      <tr class="up-tree">
+        <td></td>
+        <td><a href="{{ node.parent.get_absolute_url }}" title="Go to parent directory">..</a></td>
+        <td></td>
+        <td></td>
+      </tr>
+
+    </tbody>
+      {% endif %}
+    <tbody>
+      <tr class="warning include-fragment-error">
+        <td class="icon"><span class="octicon octicon-alert"></span></td>
+        <td class="content-title" colspan="3">Failed to load latest log information.</td>
+      </tr>
+{% for child in node.children.all %}
+        <tr>
+          <td class="icon">
+            <span class="fa fa-{% if child.is_directory %}folder{% else %}file-text-o{% endif %}"></span>
+            <img alt="" class="spinner" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16">
+          </td>
+          <td class="content-title">
+            <span class="css-truncate css-truncate-target">
+              <a href="{{ child.get_absolute_url }}" class="js-directory-link" id="" title="{{ child.get_basename }}">{{ child.get_basename }}</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+              <a href="" class="message" data-pjax="true" title="{{ child.get_last_changeset.message }}">{{ child.get_last_changeset.message }}</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time datetime="{{ child.last_changed }}" is="time-ago" title="{{ child.last_changed }}">{{ child.last_changed|timesince }}</time></span>
+          </td>
+        </tr>  {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+{% endblock %}

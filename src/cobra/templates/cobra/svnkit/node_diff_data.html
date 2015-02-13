@@ -1,0 +1,21 @@
+{% load cache %}
+
+{% cache 500 from_node.id to_node.id %}
+
+<div class="diff-legend">
+  <span class="swatch diff-nil">&nbsp;</span> Unmodified
+  <span class="swatch diff-chg">&nbsp;</span> Modified
+  <span class="swatch diff-add">&nbsp;</span> Added
+  <span class="swatch diff-sub">&nbsp;</span> Removed
+</div>
+
+<div class="diff">
+  {% for line in diff_data %}
+  <div class="diff-{{ line.type }}">
+    <span class="diff-line-no">{{ line.number_b }}</span><span class="diff-line-no">{{ line.number_a }}</span>
+    {% for slice in line.slices %}<span class="diff-{{ slice.type }}">{{ slice.text }}</span>{% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+{% endcache %}

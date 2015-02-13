@@ -1,0 +1,21 @@
+{% extends "svnlit/base.html" %}
+
+{% block content %}
+<div class="repositories">
+
+<h1>Repositories</h1>
+
+{% if repository_list %}
+<ul class="repository-list">
+  {% for repository in repository_list %}
+  <li class="repository">
+    <a href="{% url svnlit_node repository.label,"/" %}">{{ repository.label }}</a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>There are no repositories configured.</p>
+{% endif %}
+
+</div>
+{% endblock %}

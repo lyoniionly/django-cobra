@@ -1,0 +1,105 @@
+{% extends "svnkit/base.html" %}
+{% load i18n %}
+{% load helper_tags %}
+
+{% block title %}
+  {% ifequal node.path '/' %}
+    {{ organization.name }}/{{ project.name }}
+  {% else %}
+    {{ project.name }}{{ node.path }}
+  {% endifequal %}
+  | {{ block.super }}
+{% endblock %}
+
+{% block main %}
+  <div class="btn-toolbar">
+        <div class="btn-group">
+            <a class="btn" onclick=""><i class="glyphicon glyphicon-download-alt"></i> {% trans "Download Snapshot" %}</a>
+        </div>
+        <div class="btn-group">
+            <a class="btn" href="#"><i class="glyphicon glyphicon-time"></i>
+                {% trans "History" %}
+            </a>
+        </div>
+
+
+
+    </div>
+  <section class="body" style="padding-top: 0">
+<div class="svn-node">
+<p class="revision-panel">
+
+  </p>
+<div class="breadcrumb">
+  <a class="revision-number" href="{% comment %}{{ changeset.get_absolute_url }}{% endcomment %}">{{ changeset }}</a> | {% include "svnkit/node_path.html" %}
+</div>
+
+
+{% block node_content %}{% endblock %}
+
+{% if node.has_properties %}
+<ul class="svn-properties">
+{% for property in node.properties.all %}
+<li>
+  <span class="property-name">{{ property.key }}:</span>
+  <span class="property-value">{{ property.value }}</span>
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% if node.is_file %}
+<div class="node-download">
+<a href="{{ node.content.get_absolute_url }}">download</a>
+<span class="node-size">({{ node.size|filesizeformat }})</span>
+</div>
+{% endif %}
+
+<div class="node-details">
+  <p class="revision-panel">
+    <a class="revision-number"
+       href="{% comment %}{{ changeset.get_absolute_url }}{% endcomment %}">{{ changeset }}</a>
+  </p>
+
+  <form action="" method="post">{% csrf_token %}
+  <p class="revision-details">
+    <span class="revision-form">
+      <input name="revision" type="text" size="4" />
+      <button type="submit">View revision</button>
+    </span> |
+    {% with node.get_last_changeset as last_changeset %}
+    {% with last_changeset.get_previous as previous_changeset %}
+    {% if node.is_file and previous_changeset %}
+    <a href="{% comment %}{% url svnlit_node_diff repository_label,previous_changeset.revision,changeset.revision,path %}{% endcomment %}">
+      diff</a> |
+    {% endif %}
+    {% endwith %}
+
+    <a href="{% comment %}{% url svnlit_changeset_list repository_label %}{% endcomment %}">Revision list</a> |
+
+    Last changed in
+    <a href="{% comment %}{{ last_changeset.get_absolute_url }}{% endcomment %}">{{ last_changeset }}</a>
+    by {{ last_changeset.author }}
+    {{ last_changeset.date|timesince }}
+    {% endwith %}
+  </p>
+  </form>
+
+  {% if repository.uri %}
+  <p class="checkout">
+    <tt>
+      svn
+      {% if node.is_directory %}co{% else %}cat{% endif %}
+      {% ifnotequal repository.get_latest_revision revision %}
+      -r {{ revision }}
+      {% endifnotequal %}
+      {{ repository.uri }}{{ node.path }}
+      {% if node.is_file %}&gt; {{ node.get_basename }}{% endif %}
+    </tt>
+  </p>
+  {% endif %}
+</div>
+
+</div>
+  </section>
+{% endblock %}

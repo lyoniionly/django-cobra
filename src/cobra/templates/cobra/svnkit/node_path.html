@@ -1,0 +1,17 @@
+<span class="node-path">
+  {% for path, basename in node.iter_path_basename reversed %}
+      <span class="node">
+        {% if forloop.last %}
+            {{ basename }}
+        {% else %}
+            {% ifnotequal repository.get_latest_revision revision %}
+                <a href="{% url 'svnkit:node-revision' repository.project.organization.slug repository.project.slug revision path %}">
+                  {{ basename }}</a>
+            {% else %}
+                <a href="{% url 'svnkit:node' repository.project.organization.slug repository.project.slug path %}">{{ basename }}</a>
+            {% endifnotequal %}
+        {% endif %}
+      </span>
+      {% if not forloop.last %}<span class="sep">/</span>{% endif %}
+  {% endfor %}
+</span>

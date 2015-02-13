@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% load i18n %}
+{% load permissions_tags %}
+
+{% block title %}{{ project.name }} | {{ block.super }}{% endblock %}
+
+{% block page_header %}
+    <div class="pull-right">
+        <form action="{% comment %}{% url 'sentry-stream' project.organization.slug project.slug %}{% endcomment %}" id="search">
+            <input type="text" name="query" value="{% if query %}{{ query }}{% endif %}" placeholder="{% trans "Search query or event ID" %}" />
+        </form>
+    </div>
+
+    {{ block.super }}
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="{% comment %}{% url 'sentry-stream' project.organization.slug project.slug %}{% endcomment %}">{% trans "Source Code" %}</a>
+        </li>
+        <li>
+            <a href="{% comment %}{% url 'sentry-explore' project.organization.slug project.slug %}{% endcomment %}">{% trans "Explore" %}</a>
+        </li>
+        {% if request.user|can_manage_project:project %}
+        <li>
+            <a href="{% comment %}{% url 'sentry-manage-project' project.organization.slug project.slug %}{% endcomment %}">
+                {% trans "Settings" %}
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "svnlit/node_base.html" %}
+
+{% block node_content %}
+
+{% if not node.content.is_binary and node.size %}
+<div class="node-source">
+{{ node.content.get_data_display }}
+</div>
+{% endif %}
+
+{% ifequal node.content.get_maintype "image" %}
+<img class="node-image"
+     src="{{ node.content.get_absolute_url }}"
+     alt="{{ node.get_basename }}" />
+{% endifequal %}
+
+{% endblock %}

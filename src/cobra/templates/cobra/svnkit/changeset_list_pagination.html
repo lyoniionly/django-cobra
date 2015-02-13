@@ -1,0 +1,24 @@
+{% if has_next or has_previous %}
+<div class="pagination">
+  {% if has_previous %}
+  <a class="previous"
+     href="{% url svnlit_changeset_list repository.label %}?page={{ previous }}{% if qs %}&{{ qs }}{% endif %}">
+    &#8592; Previous
+  </a>
+  {% endif %}
+
+  {% for p in page_range %}
+  <a class="page-no{% ifequal p page %} current{% endifequal %}"
+     href="{% url svnlit_changeset_list repository.label %}?page={{ p }}{% if qs %}&{{ qs }}{% endif %}">
+    {{ p }}
+  </a>
+  {% endfor %}
+  
+  {% if has_next %}
+  <a class="next"
+     href="{% url svnlit_changeset_list repository.label %}?page={{ next }}{% if qs %}&{{ qs }}{% endif %}">
+    Next &#8594;
+  </a>
+  {% endif %}
+</div>
+{% endif %}

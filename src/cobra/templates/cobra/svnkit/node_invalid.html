@@ -1,0 +1,8 @@
+{% extends "svnlit/base.html" %}
+
+{% block title %}Invalid node{% endblock %}
+
+{% block content %}
+<h1>Invalid node</h1>
+<p>Non-existant node at '{{ repository_label }}{{ path }}' at revision {{ revision }}.</p>
+{% endblock %}

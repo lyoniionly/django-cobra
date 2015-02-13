@@ -1,0 +1,30 @@
+{% extends "svnlit/base.html" %}
+
+{% load timesince %}
+
+{% block title %}{{ repository.label }}{% endblock %}
+
+{% block content %}
+<h1>
+  <a href="{% url svnlit_node repository.label,"/" %}">{{ repository.label }}</a>
+</h1>
+
+{% if is_paginated %}
+{% include "svnlit/changeset_list_pagination.html" %}
+{% endif %}
+
+<ul class="changeset-list">
+  {% for changeset in changeset_list %}
+  <li>
+    <span class="changeset-number"><a href="{{ changeset.get_absolute_url }}">{{ changeset }}</a></span>
+    <span class="changeset-info"> - {{ changeset.date|timesince }} by {{ changeset.author }}</span><br />
+    <span class="changeset-message">{{ changeset.message }}</span>
+  </li>
+  {% endfor %}
+</ul>
+
+{% if is_paginated %}
+{% include "svnlit/changeset_list_pagination.html" %}
+{% endif %}
+
+{% endblock %}

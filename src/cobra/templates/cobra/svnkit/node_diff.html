@@ -1,0 +1,50 @@
+{% extends "svnlit/base.html" %}
+
+{% load timesince %}
+
+{% block title %}{{ repository.label }}{{ node.path }}{% endblock %}
+
+{% block content %}
+<div class="svn-node-diff">
+
+{% with to_node as node %}{% with to_revision as revision %}
+<h1 class="node-path">{% include "svnlit/node_path.html" %}</h1>
+{% endwith %}{% endwith %}
+
+<h2>
+  from <a href="{% url svnlit_node_revision repository_label,from_changeset.revision,path %}">
+    {{ from_changeset }}</a>
+  to <a href="{% url svnlit_node_revision repository_label,to_changeset.revision,path %}">
+    {{ to_changeset }}</a>
+</h2>
+
+{% include "svnlit/node_diff_data.html" %}
+
+{{ diff_html }}
+
+<br /><br />
+
+<form action="{% url svnlit_repository_diff repository_label %}" method="post">
+<div class="repository-diff-form">
+
+{{ form.non_field_errors }}
+
+<div class="field">
+<label>from:</label>
+{{ form.from_path }}
+r {{ form.from_revision }}
+</div>
+
+<div class="field">
+<label>to:</label>
+{{ form.to_path }}
+r {{ form.to_revision }}
+</div>
+
+<button type="submit">Compare</button>
+
+</div>
+</form>
+
+</div>
+{% endblock %}

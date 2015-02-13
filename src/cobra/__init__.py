@@ -34,6 +34,7 @@ COBRA_CORE_APPS = [
     'cobra.apps.nodestore',
     'cobra.apps.organization',
     'cobra.apps.team',
+    'cobra.apps.svnkit',
     # 3rd-party apps that cobra depends on
     # 'haystack',
     # 'treebeard',

@@ -38,7 +38,7 @@
           {% block page_header %}
             {% if team %}
               <div class="dashboard-btn">
-                <a href="{% url 'sentry-team-dashboard' organization.slug team.slug %}" title="{% trans "Dashboard" %}">
+                <a href="{% comment %}{% url 'team:dashboard' organization.slug team.slug %}{% endcomment %}" title="{% trans "Dashboard" %}">
                   <i aria-hidden="true" class="icon-list"></i>
                 </a>
               </div>

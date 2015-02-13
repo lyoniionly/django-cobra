@@ -1,10 +1,14 @@
 from __future__ import absolute_import
 
+from datetime import timedelta
+
 from django import template
 from django.conf import settings
 from django.template import RequestContext
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
 
 from paging.helpers import paginate as paginate_func
 from templatetag_sugar.register import tag
@@ -107,3 +111,20 @@ def get_avatar_url(user, email=''):
         # User has no profile, try a blank one
         instance = Profile(user=user)
     return instance.get_avatar_url()
+
+
+@register.filter
+def timesince(value, now=None):
+    from django.template.defaultfilters import timesince
+    if now is None:
+        now = timezone.now()
+    if not value:
+        return _('never')
+    if value < (now - timedelta(days=5)):
+        return value.date()
+    value = (' '.join(timesince(value, now).split(' ')[0:2])).strip(',')
+    if value == _('0 minutes'):
+        return _('just now')
+    if value == _('1 day'):
+        return _('yesterday')
+    return value + _(' ago')
