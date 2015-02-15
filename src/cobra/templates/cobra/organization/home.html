@@ -13,7 +13,7 @@
         <li>
           <h3>
             <div class="pull-right actions">
-              <a href="{% url 'team:manage' team.slug organization.slug %}"><span class="icon-cog"></span>Team Settings</a>
+              <a href="{% url 'team:manage' team.slug organization.slug %}"><span class="icon-cog"></span>{% trans 'Team Settings' %}</a>
             </div>
             <a href="{% comment %}{% url 'sentry-team-dashboard' organization.slug team.slug %}{% endcomment %}">{{ team.name }}</a>
           </h3>
@@ -22,7 +22,7 @@
           {% else %}
             <ul>
               {% for project in project_list %}
-                <li><a href="{% comment %}{% url 'sentry-stream' organization.slug project.slug %}{% endcomment %}">{{ project.name }}</a></li>
+                <li><a href="{% url 'svnkit:node' organization.slug project.slug '/' %}">{{ project.name }}</a></li>
               {% endfor %}
             </ul>
           {% endif %}

@@ -186,5 +186,5 @@ class NodeManager(BaseManager):
 
         return primary_node
 
-    get_or_sync = transaction.commit_on_success(
+    get_or_sync = transaction.atomic(
         exceptions.map_svn_exceptions(get_or_sync))

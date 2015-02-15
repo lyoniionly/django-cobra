@@ -4981,6 +4981,9 @@ font-size: 12px;
 .commit-tease .sha-block {
 float: right;
 color: #888;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .commit-tease .sha-block>.sha {
@@ -5118,4 +5121,40 @@ text-decoration: none;
 -moz-user-select: none;
 -ms-user-select: none;
 user-select: none;
+}
+
+.file-navigation {
+  padding: 2px 0;
+  .revision-panel {
+    margin: 5px 0;
+  }
+}
+
+.co-url {
+  width: 600px;
+  padding: 15px 20px 15px 30px;
+  .form-control[disabled], .form-control[readonly] {
+    cursor: auto;
+    background-color: #fff;
+    opacity: 1;
+  }
+}
+.svn-toolbar {
+  border-bottom: 2px solid #f2f4f7;
+
+}
+
+table.bb-list td {
+  &>div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  }
+  a {
+    word-break: normal !important;
+  }
+}
+
+table.commit-list td>div {
+  width: 530px;
 }

@@ -13,6 +13,7 @@ class RepositoryForm(forms.ModelForm):
 
     class Meta:
         model = Repository
+        exclude = ('uuid', 'last_synced')
 
 
 class RepositoryAdmin(admin.ModelAdmin):

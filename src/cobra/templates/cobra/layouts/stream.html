@@ -15,7 +15,7 @@
     {{ block.super }}
     <ul class="nav nav-tabs">
         <li class="active">
-            <a href="{% comment %}{% url 'sentry-stream' project.organization.slug project.slug %}{% endcomment %}">{% trans "Source Code" %}</a>
+            <a href="{% comment %}{% url 'sentry-stream' project.organization.slug project.slug %}{% endcomment %}">{% trans "Code" %}</a>
         </li>
         <li>
             <a href="{% comment %}{% url 'sentry-explore' project.organization.slug project.slug %}{% endcomment %}">{% trans "Explore" %}</a>

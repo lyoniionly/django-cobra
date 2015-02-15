@@ -12,28 +12,39 @@
 {% endblock %}
 
 {% block main %}
-  <div class="btn-toolbar">
+  <div class="svn-toolbar clearfix">
+  <div class="co-url pull-left">
+    <div class="input-group">
+      <span class="input-group-addon" id="sizing-addon1">Http access</span>
+      <input type="text" class="form-control" readonly="readonly" value="svn checkout {{ repository.root }}">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button">Copy!</button>
+      </span>
+    </div>
+  </div>
+  <div class="btn-toolbar pull-right">
         <div class="btn-group">
             <a class="btn" onclick=""><i class="glyphicon glyphicon-download-alt"></i> {% trans "Download Snapshot" %}</a>
         </div>
         <div class="btn-group">
-            <a class="btn" href="#"><i class="glyphicon glyphicon-time"></i>
+            <a class="btn" href="{% url 'svnkit:changeset-list' organization.slug project.slug %}"><i class="glyphicon glyphicon-time"></i>
                 {% trans "History" %}
             </a>
         </div>
 
 
-
     </div>
+  </div>
   <section class="body" style="padding-top: 0">
 <div class="svn-node">
-<p class="revision-panel">
-
+<div class="file-navigation clearfix">
+<p class="revision-panel pull-right">
+    Tree on <a class="revision-number" href="{% comment %}{{ changeset.get_absolute_url }}{% endcomment %}">{{ changeset }}</a>
   </p>
-<div class="breadcrumb">
-  <a class="revision-number" href="{% comment %}{{ changeset.get_absolute_url }}{% endcomment %}">{{ changeset }}</a> | {% include "svnkit/node_path.html" %}
+<div class="breadcrumb pull-left">
+  {% include "svnkit/node_path.html" %}
 </div>
-
+</div>
 
 {% block node_content %}{% endblock %}
 
@@ -56,34 +67,34 @@
 {% endif %}
 
 <div class="node-details">
-  <p class="revision-panel">
-    <a class="revision-number"
-       href="{% comment %}{{ changeset.get_absolute_url }}{% endcomment %}">{{ changeset }}</a>
-  </p>
-
-  <form action="" method="post">{% csrf_token %}
-  <p class="revision-details">
-    <span class="revision-form">
-      <input name="revision" type="text" size="4" />
-      <button type="submit">View revision</button>
-    </span> |
-    {% with node.get_last_changeset as last_changeset %}
-    {% with last_changeset.get_previous as previous_changeset %}
-    {% if node.is_file and previous_changeset %}
-    <a href="{% comment %}{% url svnlit_node_diff repository_label,previous_changeset.revision,changeset.revision,path %}{% endcomment %}">
-      diff</a> |
-    {% endif %}
-    {% endwith %}
-
-    <a href="{% comment %}{% url svnlit_changeset_list repository_label %}{% endcomment %}">Revision list</a> |
-
-    Last changed in
-    <a href="{% comment %}{{ last_changeset.get_absolute_url }}{% endcomment %}">{{ last_changeset }}</a>
-    by {{ last_changeset.author }}
-    {{ last_changeset.date|timesince }}
-    {% endwith %}
-  </p>
-  </form>
+{#  <p class="revision-panel">#}
+{#    <a class="revision-number"#}
+{#       href="{% comment %}{{ changeset.get_absolute_url }}{% endcomment %}">{{ changeset }}</a>#}
+{#  </p>#}
+{##}
+{#  <form action="" method="post">{% csrf_token %}#}
+{#  <p class="revision-details">#}
+{#    <span class="revision-form">#}
+{#      <input name="revision" type="text" size="4" />#}
+{#      <button type="submit">View revision</button>#}
+{#    </span> |#}
+{#    {% with node.get_last_changeset as last_changeset %}#}
+{#    {% with last_changeset.get_previous as previous_changeset %}#}
+{#    {% if node.is_file and previous_changeset %}#}
+{#    <a href="{% comment %}{% url svnlit_node_diff repository_label,previous_changeset.revision,changeset.revision,path %}{% endcomment %}">#}
+{#      diff</a> |#}
+{#    {% endif %}#}
+{#    {% endwith %}#}
+{##}
+{#    <a href="{% comment %}{% url svnlit_changeset_list repository_label %}{% endcomment %}">Revision list</a> |#}
+{##}
+{#    Last changed in#}
+{#    <a href="{% comment %}{{ last_changeset.get_absolute_url }}{% endcomment %}">{{ last_changeset }}</a>#}
+{#    by {{ last_changeset.author }}#}
+{#    {{ last_changeset.date|timesince }}#}
+{#    {% endwith %}#}
+{#  </p>#}
+{#  </form>#}
 
   {% if repository.uri %}
   <p class="checkout">

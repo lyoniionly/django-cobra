@@ -8,6 +8,7 @@ class SvnkitApplication(Application):
     name = 'svnkit'
 
     svn_node_view = get_class('svnkit.views', 'SvnNodeView')
+    svn_changeset_list_view = get_class('svnkit.views', 'SvnChangesetListView')
 
     def get_urls(self):
         urls = [
@@ -16,10 +17,10 @@ class SvnkitApplication(Application):
 
             # url(r'^(?P<organization_slug>[\w_-]+)/(?P<project_id>[\w_-]+):c(?P<content_id>[0-9]+)/(?P<path>.+)$', self.svn_content_view.as_view(),
             #     name='content'),
-            #
-            # url(r'^(?P<organization_slug>[\w_-]+)/(?P<project_id>[\w_-]+)$', self.svn_changeset_list_view.as_view(),
-            #     name='changeset-list'),
-            #
+
+            url(r'^(?P<organization_slug>[\w_-]+)/(?P<project_id>[\w_-]+)$', self.svn_changeset_list_view.as_view(),
+                name='changeset-list'),
+
             # url(r'^(?P<organization_slug>[\w_-]+)/(?P<project_id>[\w_-]+):diff$', self.svn_repository_diff_view.as_view(),
             #     name='repository-diff'),
             #

@@ -114,7 +114,7 @@ def get_avatar_url(user, email=''):
 
 
 @register.filter
-def timesince(value, now=None):
+def timesince_ago(value, now=None):
     from django.template.defaultfilters import timesince
     if now is None:
         now = timezone.now()

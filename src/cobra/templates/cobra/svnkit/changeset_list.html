@@ -1,30 +1,70 @@
-{% extends "svnlit/base.html" %}
-
-{% load timesince %}
+{% extends "svnkit/base.html" %}
+{% load helper_tags %}
 
 {% block title %}{{ repository.label }}{% endblock %}
 
-{% block content %}
-<h1>
-  <a href="{% url svnlit_node repository.label,"/" %}">{{ repository.label }}</a>
-</h1>
+{% block main %}
+  <section class="body">
+
 
 {% if is_paginated %}
-{% include "svnlit/changeset_list_pagination.html" %}
+{% include 'partials/pagination.html' %}
 {% endif %}
+  <h2 style="
+    position: absolute;
+    top: 42px;
+">
+  Code Log
+</h2>
 
-<ul class="changeset-list">
-  {% for changeset in changeset_list %}
-  <li>
-    <span class="changeset-number"><a href="{{ changeset.get_absolute_url }}">{{ changeset }}</a></span>
-    <span class="changeset-info"> - {{ changeset.date|timesince }} by {{ changeset.author }}</span><br />
-    <span class="changeset-message">{{ changeset.message }}</span>
-  </li>
-  {% endfor %}
-</ul>
+<table class="table table-striped bb-list commit-list">
+    <colgroup>
+      <col width="50px">
+      <col width="50px">
+      <col width="400px">
+      <col width="100px">
+      <col width="20px">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>Author</th>
+        <th>Resivion</th>
+        <th>Message</th>
+        <th>Date</th>
+        <th>&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for changeset in changesets %}
+        <tr>
+          <td>
+              {{ changeset.author }}
+          </td>
+          <td><a href="#{% comment %}{{ changeset.get_absolute_url }}{% endcomment %}">{{ changeset }}</a></td>
+          <td><div title="{{ changeset.message }}">{{ changeset.message }}</div></td>
+          <td>
+              {{ changeset.date|timesince_ago }}
+          </td>
+          <td>
+              <a href="{% url 'svnkit:node-revision' repository.project.organization.slug repository.project.slug changeset.revision '/' %}">Tree</a>
+          </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{#<ul class="changeset-list">#}
+{#  {% for changeset in changesets %}#}
+{#  <li>#}
+{#    <span class="changeset-number"><a href="{% comment %}{{ changeset.get_absolute_url }}{% endcomment %}">{{ changeset }}</a></span>#}
+{#    <span class="changeset-info"> - {{ changeset.date|timesince }} by {{ changeset.author }}</span><br />#}
+{#    <span class="changeset-message">{{ changeset.message }}</span>#}
+{#  </li>#}
+{#  {% endfor %}#}
+{#</ul>#}
 
 {% if is_paginated %}
-{% include "svnlit/changeset_list_pagination.html" %}
+{% include 'partials/pagination.html' %}
 {% endif %}
 
 {% endblock %}

@@ -1,5 +1,5 @@
 {% extends "svnkit/node_base.html" %}
-{% load helper_tags %}
+{% load static %}
 
 {% block node_content %}
 {% with node.get_last_changeset as last_changeset %}
@@ -12,8 +12,8 @@
       <a href="{% comment %}{{ last_changeset.get_absolute_url }}{% endcomment %}" class="sha-block" data-pjax="">latest change on revision <span class="sha">{{ last_changeset }}</span></a>
 
       <div class="authorship">
-        <img alt="Vasily A." class="avatar" data-user="3757319" height="20" src="https://avatars0.githubusercontent.com/u/3757319?v=3&amp;s=40" width="20">
-        <span class="author-name"><a href="/vsn4ik" rel="contributor">{{ last_changeset.author }}</a></span>
+        <img alt="{{ last_changeset.author }}" class="avatar" height="20" src="{% static 'cobra/img/avatar/default_avatar.png'  %}" width="20">
+        <span class="author-name"><a href="#" rel="contributor">{{ last_changeset.author }}</a></span>
         authored <time class="updated" datetime="" is="relative-time" title="{{ last_changeset.date }}">{{ last_changeset.date|timesince }}</time>
 
       </div>
@@ -44,7 +44,6 @@
         <tr>
           <td class="icon">
             <span class="fa fa-{% if child.is_directory %}folder{% else %}file-text-o{% endif %}"></span>
-            <img alt="" class="spinner" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16">
           </td>
           <td class="content-title">
             <span class="css-truncate css-truncate-target">
@@ -56,7 +55,7 @@
             </span>
           </td>
           <td class="age">
-            <span class="css-truncate css-truncate-target"><time datetime="{{ child.last_changed }}" is="time-ago" title="{{ child.last_changed }}">{{ child.last_changed|timesince }}</time></span>
+            <span class="css-truncate css-truncate-target"><time datetime="{{ child.last_changed }}" is="time-ago" title="{{ child.last_changed }}">{{ child.last_changed|timesince }} ago</time></span>
           </td>
         </tr>  {% endfor %}
     </tbody>

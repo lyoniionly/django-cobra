@@ -182,7 +182,7 @@ class AbstractRepository(Model):
                     copied_from_path=changed_path['copyfrom_path'],
                     copied_from_revision=copyfrom_revision)
 
-    sync_changesets = transaction.commit_on_success(
+    sync_changesets = transaction.atomic(
         map_svn_exceptions(sync_changesets))
 
     def get_latest_revision(self):

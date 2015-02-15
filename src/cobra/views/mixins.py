@@ -15,17 +15,27 @@ class ExtraContextMixin(object):
             'ALLOWED_HOSTS': settings.ALLOWED_HOSTS,
         }
 
-        if kwargs and 'team' in kwargs:
-            team = kwargs['team']
-            context['organization'] = team.organization
-        else:
-            team = None
-
-        if (not kwargs or 'TEAM_LIST' not in kwargs) and team:
-            context['TEAM_LIST'] = Team.objects.get_for_user(
-                organization=team.organization,
+        # if kwargs and 'team' in kwargs:
+        #     team = kwargs['team']
+        #     context['organization'] = team.organization
+        # else:
+        #     team = None
+        #
+        # if (not kwargs or 'TEAM_LIST' not in kwargs) and team:
+        #     context['TEAM_LIST'] = Team.objects.get_for_user(
+        #         organization=team.organization,
+        #         user=self.request.user,
+        #         with_projects=True,
+        #     )
+        context['organization'] = self.organization
+        context['team'] = getattr(self, 'team', self.project.team)
+        context['project'] = self.project
+        context['repository'] = self.repository
+        context['TEAM_LIST'] = Team.objects.get_for_user(
+                organization=self.organization,
                 user=self.request.user,
                 with_projects=True,
-            )
+        )
+
         kwargs.update(context)
         return super(ExtraContextMixin, self).get_context_data(**kwargs)

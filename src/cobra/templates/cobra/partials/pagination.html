@@ -1,8 +1,21 @@
+{% load display_tags %}
 {% load i18n %}
 
-<div class="btn-toolbar">
-  <div class="btn-group pull-right">
-    <a class="btn prev{% if not paginator.has_previous %} disabled{% else %}" href="?{{ query_string|escape }}&amp;p={{ paginator.previous_page }}{% endif %}"><span>{% trans "Previous" %}</span></a>
-    <a class="btn next{% if not paginator.has_next %} disabled{% else %}" href="?{{ query_string|escape }}&amp;p={{ paginator.next_page }}{% endif %}"><span>{% trans "Next" %}</span></a>
+{#{% if paginator.num_pages > 1 %}#}
+  <div class="btn-toolbar">
+    <div class="btn-group pull-right">
+      {% if page_obj.has_previous %}
+        <a class="btn prev"
+           href="?{% get_parameters page %}page={{ page_obj.previous_page_number }}"><span>{% trans "Previous" %}</span></a>
+      {% else %}
+        <a class="btn prev disabled"><span>{% trans "Previous" %}</span></a>
+      {% endif %}
+      {% if page_obj.has_next %}
+        <a class="btn next"
+           href="?{% get_parameters page %}page={{ page_obj.next_page_number }}"><span>{% trans "Next" %}</span></a>
+      {% else %}
+        <a class="btn next disabled"><span>{% trans "Next" %}</span></a>
+      {% endif %}
+    </div>
   </div>
-</div>
+{#{% endif %}#}
