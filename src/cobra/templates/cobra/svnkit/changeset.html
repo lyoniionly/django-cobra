@@ -8,7 +8,7 @@
 <div class="changeset">
 
 <h1>
-  <a href="{% url svnlit_node_revision repository.label,changeset.revision,"/" %}">
+  <a href="{% comment %}{% url svnlit_node_revision repository.label,changeset.revision,"/" %}{% endcomment %}">
     {{ repository.label }}:{{ changeset }}</a>
 </h1>
 
@@ -22,7 +22,7 @@
     <span class="change-action">{{ change.action }}</span>
     {% if not change.is_deletion %}
     <a class="change-path"
-       href="{% url svnlit_node_revision repository.label,revision,change.path %}">
+       href="{% comment %}{% url svnlit_node_revision repository.label,revision,change.path %}{% endcomment %}">
       {{ change.path }}</a>
     {% else %}
     {{ change.path }}
@@ -32,4 +32,29 @@
 </ul>
 
 </div>
+<section class="body">
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">{{ changeset.message }}</div>
+  <div class="panel-body">
+    <p>...</p>
+  </div>
+
+  <!-- List group -->
+  <ul class="list-group">
+    {% for change in changeset.changes.all %}
+    <li class="list-group-item change change-{{ change.action }}">
+      <span class="change-action">{{ change.action }}</span>
+        {% if not change.is_deletion %}
+        <a class="change-path"
+           href="{% comment %}{% url svnlit_node_revision repository.label,revision,change.path %}{% endcomment %}">
+          {{ change.path }}</a>
+        {% else %}
+        {{ change.path }}
+        {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+  </section>
 {% endblock %}

@@ -42,6 +42,41 @@ class SvnChangesetListView(ExtraContextMixin, generic.ListView):
         return self.repository.changesets.all()
 
 
+class SvnChangesetView(ExtraContextMixin, generic.DetailView):
+
+    context_object_name = "changeset"
+    template_name = 'svnkit/changeset.html'
+
+    @method_decorator(has_access)
+    @method_decorator(autosync_repositories)
+    def dispatch(self, request, *args, **kwargs):
+        self.organization = kwargs.get('organization')
+        self.project = kwargs.get('project')
+        self.repository = self.get_repository()
+        return super(SvnChangesetView, self).dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        if hasattr(self, 'object'):
+            return self.object
+        else:
+            self.revision = self.kwargs.get('revision') or self.repository.get_latest_revision()
+            changeset = shortcuts.get_object_or_404(Changeset, repository=self.repository, revision=self.revision)
+            return changeset
+
+    def get_repository(self):
+        repository_lookup = {'project': self.project}
+        repository = shortcuts.get_object_or_404(
+            Repository, **repository_lookup)
+        return repository
+
+    def get_context_data(self, **kwargs):
+        ctx = {}
+        ctx.update(kwargs)
+        ctx['revision'] = self.revision
+        return super(SvnChangesetView, self).get_context_data(**ctx)
+
+
+
 
 
 class SvnNodeView(ExtraContextMixin, generic.TemplateView):

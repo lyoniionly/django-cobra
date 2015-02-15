@@ -39,7 +39,7 @@
 <div class="svn-node">
 <div class="file-navigation clearfix">
 <p class="revision-panel pull-right">
-    Tree on <a class="revision-number" href="{% comment %}{{ changeset.get_absolute_url }}{% endcomment %}">{{ changeset }}</a>
+    Tree on <a class="revision-number" href="{{ changeset.get_absolute_url }}">{{ changeset }}</a>
   </p>
 <div class="breadcrumb pull-left">
   {% include "svnkit/node_path.html" %}
