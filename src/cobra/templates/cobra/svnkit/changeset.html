@@ -33,9 +33,25 @@
 
 </div>
 <section class="body">
-<div class="panel panel-default">
+<div class="panel panel-default commit full-commit">
   <!-- Default panel contents -->
-  <div class="panel-heading">{{ changeset.message }}</div>
+  <div class="panel-heading">
+{#    {{ changeset.message }}#}
+    <a href="" class="btn btn-default pull-right" title="" rel="nofollow">Browse files</a>
+    <p class="commit-title">
+      To do some change about svnkit on code review.
+    </p>
+    <div class="commit-desc"><pre>Add new function of code log.
+Web Page.</pre></div>
+    <div class="commit-branches">
+
+    <span class="fa fa-key"></span>
+    <ul class="branches-list">
+        <li class="branch"><a href="/lyoniionly/django-cobra">{{ changeset }}</a></li>
+    </ul>
+  </div>
+
+  </div>
   <div class="panel-body">
     <p>...</p>
   </div>
