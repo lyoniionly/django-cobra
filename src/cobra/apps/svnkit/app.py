@@ -10,14 +10,15 @@ class SvnkitApplication(Application):
     svn_node_view = get_class('svnkit.views', 'SvnNodeView')
     svn_changeset_list_view = get_class('svnkit.views', 'SvnChangesetListView')
     svn_changeset_view = get_class('svnkit.views', 'SvnChangesetView')
+    svn_content_view = get_class('svnkit.views', 'SvnContentView')
 
     def get_urls(self):
         urls = [
             # url(r'^$', self.svn_repository_list_view.as_view(),
             #     name='repository_list'),
 
-            # url(r'^(?P<organization_slug>[\w_-]+)/(?P<project_id>[\w_-]+):c(?P<content_id>[0-9]+)/(?P<path>.+)$', self.svn_content_view.as_view(),
-            #     name='content'),
+            url(r'^(?P<organization_slug>[\w_-]+)/(?P<project_id>[\w_-]+):c(?P<content_id>[0-9]+)/(?P<path>.+)$', self.svn_content_view.as_view(),
+                name='content'),
 
             url(r'^(?P<organization_slug>[\w_-]+)/(?P<project_id>[\w_-]+)$', self.svn_changeset_list_view.as_view(),
                 name='changeset-list'),

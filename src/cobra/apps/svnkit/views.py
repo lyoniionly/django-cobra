@@ -76,9 +76,6 @@ class SvnChangesetView(ExtraContextMixin, generic.DetailView):
         return super(SvnChangesetView, self).get_context_data(**ctx)
 
 
-
-
-
 class SvnNodeView(ExtraContextMixin, generic.TemplateView):
 
     @method_decorator(has_access)
@@ -130,3 +127,7 @@ class SvnNodeView(ExtraContextMixin, generic.TemplateView):
             return 'svnkit/node_directory.html'
         else:
             return 'svnkit/node_file.html'
+
+
+class SvnContentView(generic.TemplateView):
+    pass

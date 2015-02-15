@@ -25,6 +25,7 @@ from cobra.models.utils import slugify_instance
 from cobra.core.http import absolute_uri
 from cobra.core.constants import MEMBER_TYPES, MEMBER_USER
 from cobra.core.loading import get_class, get_model
+from cobra.core.strings import strip, truncatechars
 
 from . import choices
 from .exceptions import map_svn_exceptions
@@ -226,6 +227,30 @@ class AbstractChangeset(Model):
     def __str__(self):
         return 'r%s' % self.revision
 
+    @property
+    def title(self):
+        message = strip(self.message)
+        if not message:
+            message = '<unlabeled message>'
+        else:
+            message = truncatechars(message.splitlines()[0], 50)
+        return message
+
+    @property
+    def rest_message(self):
+        message = strip(self.message)
+        if not message:
+            message = '<unlabeled message>'
+        else:
+            split_msgs = message.splitlines()
+            first_line_msg = split_msgs[0]
+            if len(first_line_msg) > 50:
+                split_msgs[0] = '...'+first_line_msg[47:]
+            else:
+                del split_msgs[0]
+            message = '\n'.join(split_msgs)
+        return message
+
     @models.permalink
     def get_absolute_url(self):
         return ('svnkit:changeset', (self.repository.project.organization.slug, self.repository.project.slug, self.revision))
@@ -278,6 +303,16 @@ class AbstractChange(Model):
                 revision=self.copied_from_revision
             )
             return self._base_change
+
+    @property
+    def relative_path(self):
+        if self.changeset.repository.prefix:
+            repo_prefix = self.changeset.repository.prefix
+            if repo_prefix.endswith(posixpath.sep):
+                repo_prefix = repo_prefix[:-1]
+            return self.path.replace(repo_prefix, '', 1)
+        else:
+            return self.path
 
     def is_addition(self):
         return self.action == 'A'

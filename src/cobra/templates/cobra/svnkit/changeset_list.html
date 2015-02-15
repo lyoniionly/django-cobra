@@ -40,7 +40,7 @@
           <td>
               {{ changeset.author }}
           </td>
-          <td><a href="#{% comment %}{{ changeset.get_absolute_url }}{% endcomment %}">{{ changeset }}</a></td>
+          <td><a href="{{ changeset.get_absolute_url }}">{{ changeset }}</a></td>
           <td><div title="{{ changeset.message }}">{{ changeset.message }}</div></td>
           <td>
               {{ changeset.date|timesince_ago }}

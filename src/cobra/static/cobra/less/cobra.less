@@ -5158,3 +5158,94 @@ table.bb-list td {
 table.commit-list td>div {
   width: 530px;
 }
+
+.commit-desc pre {
+max-width: 700px;
+margin: 10px 0;
+  padding: 0;
+font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+font-size: 13px;
+line-height: 1.45;
+color: #596063;
+white-space: pre-wrap;
+}
+
+.full-commit p.commit-title {
+margin: 0 0 8px;
+font-size: 18px;
+font-weight: bold;
+color: #213f4d;
+text-shadow: 0 1px rgba(255,255,255,0.5);
+}
+
+.full-commit .commit-desc, .commit-desc-container .commit-desc {
+display: block;
+margin: -5px 0 10px;
+}
+
+.full-commit .commit-desc pre, .commit-desc-container .commit-desc pre {
+max-width: 100%;
+overflow: visible;
+text-shadow: 0 1px rgba(255,255,255,0.5);
+word-wrap: break-word;
+}
+
+.commit-branches {
+min-height: 18px;
+margin-top: -6px;
+font-size: 12px;
+color: #818c90;
+vertical-align: middle;
+}
+
+.commit-desc+.commit-branches {
+padding-top: 8px;
+margin-top: 2px;
+border-top: solid 1px #d1e2eb;
+}
+
+.full-commit .branches-list {
+display: inline-block;
+margin-right: 10px;
+  margin-bottom: 0;
+  padding: 0;
+vertical-align: middle;
+list-style: none;
+}
+
+.full-commit .commit-meta {
+padding: 0 8px;
+margin-right: -8px;
+margin-left: -8px;
+background: #fff;
+}
+
+.full-commit .sha-block {
+float: right;
+margin-left: 15px;
+font-size: 12px;
+color: #888;
+}
+
+.full-commit .authorship {
+margin-top: -2px;
+margin-bottom: -4px;
+margin-left: -4px;
+font-size: 14px;
+color: #999;
+}
+
+.full-commit .authorship a {
+font-weight: bold;
+color: #444;
+text-decoration: none;
+}
+
+.full-commit .authorship a:hover {
+text-decoration: underline;
+}
+
+.full-commit .authorship .author-name {
+color: #444;
+}
+

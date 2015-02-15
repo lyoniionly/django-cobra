@@ -1,72 +1,72 @@
 {% extends "svnkit/base.html" %}
-
+{% load static %}
 {% load helper_tags %}
 
 {% block title %}{{ repository.label }}:{{ changeset }}{% endblock %}
 
 {% block content %}
-<div class="changeset">
-
-<h1>
-  <a href="{% comment %}{% url svnlit_node_revision repository.label,changeset.revision,"/" %}{% endcomment %}">
-    {{ repository.label }}:{{ changeset }}</a>
-</h1>
-
-<h2>Last changed by {{ changeset.author }} {{ changeset.date|timesince }}</h2>
-
-<pre>{{ changeset.message }}</pre>
-
-<ul class="change-list">
-  {% for change in changeset.changes.all %}
-  <li class="change change-{{ change.action }}">
-    <span class="change-action">{{ change.action }}</span>
-    {% if not change.is_deletion %}
-    <a class="change-path"
-       href="{% comment %}{% url svnlit_node_revision repository.label,revision,change.path %}{% endcomment %}">
-      {{ change.path }}</a>
-    {% else %}
-    {{ change.path }}
-    {% endif %}
-  </li>
-  {% endfor %}
-</ul>
-
-</div>
 <section class="body">
 <div class="panel panel-default commit full-commit">
   <!-- Default panel contents -->
   <div class="panel-heading">
 {#    {{ changeset.message }}#}
-    <a href="" class="btn btn-default pull-right" title="" rel="nofollow">Browse files</a>
+    <a href="{% url 'svnkit:node-revision' repository.project.organization.slug repository.project.slug changeset.revision "/" %}" class="btn btn-default pull-right" title="Browse files" rel="nofollow">Browse files</a>
     <p class="commit-title">
-      To do some change about svnkit on code review.
+      {{ changeset.title }}
     </p>
-    <div class="commit-desc"><pre>Add new function of code log.
-Web Page.</pre></div>
+    <div class="commit-desc"><pre>{{ changeset.rest_message }}</pre></div>
     <div class="commit-branches">
 
-    <span class="fa fa-key"></span>
+    <span class="fa fa-code-fork"></span>
     <ul class="branches-list">
-        <li class="branch"><a href="/lyoniionly/django-cobra">{{ changeset }}</a></li>
+        <li class="branch"><a href="{% url 'svnkit:node-revision' repository.project.organization.slug repository.project.slug changeset.revision "/" %}">{{ changeset }}</a></li>
     </ul>
   </div>
 
   </div>
   <div class="panel-body">
-    <p>...</p>
+    <div class="commit-meta clearfix">
+    {% with changeset.get_next as next_changeset %}
+        {% if next_changeset %}
+    <span class="sha-block">
+      child
+
+        <a href="#" class="sha" data-hotkey="p">{{ next_changeset }}</a>
+    </span>
+      {% endif %}
+    {% endwith %}
+
+      {% with changeset.get_previous as previous_changeset %}
+        {% if previous_changeset %}
+    <span class="sha-block">
+      parent
+
+        <a href="#" class="sha" data-hotkey="p">{{ previous_changeset }}</a>
+    </span>
+        {% endif %}
+      {% endwith %}
+
+    <div class="authorship">
+      <img alt="{{ changeset.author }}" class="avatar" height="24" src="{% static 'cobra/img/avatar/default_avatar.png' %}" width="24">
+      <span class="author-name"><a href="#" rel="author">{{ changeset.author }}</a></span>
+
+      last changed <time datetime="{{ changeset.date }}" title="{{ changeset.date }}">{{ changeset.date|timesince }} ago</time>
+
+    </div>
+  </div>
   </div>
 
   <!-- List group -->
   <ul class="list-group">
     {% for change in changeset.changes.all %}
     <li class="list-group-item change change-{{ change.action }}">
-      <span class="change-action">{{ change.action }}</span>
+      <span class="change-action"><strong>{{ change.action }}</strong></span>
         {% if not change.is_deletion %}
         <a class="change-path"
-           href="{% comment %}{% url svnlit_node_revision repository.label,revision,change.path %}{% endcomment %}">
-          {{ change.path }}</a>
+           href="{% url 'svnkit:node-revision' repository.project.organization.slug repository.project.slug revision change.relative_path %}">
+          {{ change.relative_path }}</a>
         {% else %}
-        {{ change.path }}
+        {{ change.relative_path }}
         {% endif %}
     </li>
     {% endfor %}
