@@ -28,8 +28,8 @@ HTML = (
 CSSCLASS = "codehilite"
 HIGHLIGHT_STYLE = 'emacs'
 
-def make_html(sourcecode, source_type, django_escape=False, use_html_frame=False, lineno=True):
-    code_html, lexer_name = pygmentize(sourcecode, source_type, lineno)
+def make_html(sourcecode, source_type, django_escape=False, use_html_frame=False, linenos='table'):
+    code_html, lexer_name = pygmentize(sourcecode, source_type, linenos)
     if use_html_frame:
         code = HTML % {"lexer_name": lexer_name, "code_html": code_html}
     else:
@@ -42,8 +42,8 @@ def no_hightlight(code):
     html = u'\n<pre><code>%s</code></pre>\n' % escape(code)
     return html
 
-def get_formatter(linenos=True):
-    formatter = HtmlFormatter(linenos=linenos, style=HIGHLIGHT_STYLE,
+def get_formatter(linenos='inline'):
+    formatter = HtmlFormatter(linenos=linenos, style=HIGHLIGHT_STYLE, anchorlinenos=True, lineanchors='cl',
                               encoding="utf-8", outencoding="utf-8",
                               cssclass=CSSCLASS, texcomments=False, mathescape=False)
     return formatter
@@ -72,7 +72,7 @@ def get_lexer(source_type, sourcecode):
     raise lexers.ClassNotFound(",\n ".join([str(err) for err in errors]))
 
 
-def pygmentize(sourcecode, source_type, lineno=True):
+def pygmentize(sourcecode, source_type, linenos='table'):
     """
     returned html-code and the lexer_name
     """
@@ -93,7 +93,7 @@ def pygmentize(sourcecode, source_type, lineno=True):
 
     lexer_name = lexer.name
 
-    formatter = get_formatter(lineno)
+    formatter = get_formatter(linenos)
 
     out_object = SimpleStringIO()
     try:
