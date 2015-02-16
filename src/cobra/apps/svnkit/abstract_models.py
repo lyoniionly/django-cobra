@@ -396,7 +396,7 @@ class AbstractNode(Model):
             basename = posixpath.basename(path)
             if not basename:
                 # basename = self.repository.label
-                basename = self.repository.project.slug
+                basename = self.repository.project.name
             yield (path, basename)
 
     def get_last_changeset(self):
@@ -505,6 +505,10 @@ class AbstractContent(Model):
         self._decoded_data = self.data.decode('base64')
         return self._decoded_data
 
+    @property
+    def lines(self):
+        return self.get_data().count('\n')
+
     def get_last_changeset(self):
         """Get the changeset in which this content was committed."""
         return self.repository.changesets.get(date=self.last_changed)
@@ -576,5 +580,4 @@ class AbstractContent(Model):
         except UnicodeDecodeError:
             txt = self.get_data().decode('gbk')
 
-        lexer = get_lexer(self.get_basename(), txt)
-        return make_html(txt, lexer.name)
+        return make_html(txt, self.get_basename())

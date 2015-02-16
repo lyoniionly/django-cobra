@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import re
 import difflib
 
-DIFF_OPTCODE_MAP = {' ': 'nil', '-': 'sub', '+': 'add', '^': 'chg', '\t':'tab'}
+DIFF_OPTCODE_MAP = {' ': 'common', '-': 'deletion', '+': 'addition', '^': 'chg', '\t':'tab'}
 
 
 def optcodes_to_slices(optcodes):
@@ -30,6 +30,9 @@ def diff_lines(content1, content2, source_type="diff"):
     line_padding = len(str(len(diff_lines)))
     line_no_a = line_no_b = 0
 
+    addition_num = 0
+    deletion_num = 0
+
     for line in diff_lines:
         if line.startswith('? '):
             pass
@@ -48,20 +51,24 @@ def diff_lines(content1, content2, source_type="diff"):
         else:
             if line[:1] == '+':
                 line_no_a += 1; number_a = line_no_a; number_b = ''
+                addition_num += 1
             elif line[:1] == '-':
                 line_no_b += 1; number_a = ''; number_b = line_no_b
+                deletion_num += 1
             elif line[:1] == ' ':
                 line_no_a += 1; line_no_b += 1
                 number_a = line_no_a; number_b = line_no_b
             data_lines.append({
                 'type': DIFF_OPTCODE_MAP[line[:1]],
-                'number_a': unicode(number_a).rjust(line_padding),
-                'number_b': unicode(number_b).rjust(line_padding),
-                'slices': [{'type': DIFF_OPTCODE_MAP[' '], 'text': make_html(line[2:], source_type, lineno=False)}]})
+                # 'number_a': unicode(number_a).rjust(line_padding),
+                # 'number_b': unicode(number_b).rjust(line_padding),
+                'number_a': unicode(number_a),
+                'number_b': unicode(number_b),
+                'slices': [{'type': DIFF_OPTCODE_MAP[' '], 'text': make_html(line[2:], source_type, linenos=False)}]})
 
         line_no += 1
 
-    return data_lines
+    return (data_lines, addition_num, deletion_num)
 
 
 

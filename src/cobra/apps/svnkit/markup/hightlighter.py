@@ -5,8 +5,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from cobra.apps.svnkit.utils.SimpleStringIO import SimpleStringIO
-from cobra.apps.svnkit.utils.escape import escape_django_tags
-from cobra.apps.svnkit.utils import escape
+from cobra.apps.svnkit.utils.escape import escape_django_tags, escape
 from cobra.apps.svnkit.utils.diff import make_diff
 
 
@@ -42,7 +41,7 @@ def no_hightlight(code):
     html = u'\n<pre><code>%s</code></pre>\n' % escape(code)
     return html
 
-def get_formatter(linenos='inline'):
+def get_formatter(linenos='table'):
     formatter = HtmlFormatter(linenos=linenos, style=HIGHLIGHT_STYLE, anchorlinenos=True, lineanchors='cl',
                               encoding="utf-8", outencoding="utf-8",
                               cssclass=CSSCLASS, texcomments=False, mathescape=False)

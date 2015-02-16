@@ -1,21 +1,41 @@
 {% load cache %}
 
 {% cache 500 from_node.id to_node.id %}
+  <div class="diff-container">
+      <div class="heading">
+        <div class="primary">
+          <h1 class="filename">
+            <span class="diffstat tooltipped" title="{{ addition_num }} additions & {{ deletion_num }} deletions">{{ addition_num|add:deletion_num }}
+              <span class="diffstat-bar">
+                {% for i in addition_stats %}
+                  <i class="fa fa-stop plus"></i>
+                {% endfor %}
+                {% for i in deletion_stats %}
+                  <i class="fa fa-stop minus"></i>
+                {% endfor %}
+                {% for i in nil_stats %}
+                  <i class="fa fa-stop"></i>
+                {% endfor %}
+              </span>
+            </span>
+            {{ path }}
+          </h1>
+        </div>
+        <div class="second">
 
-<div class="diff-legend">
-  <span class="swatch diff-nil">&nbsp;</span> Unmodified
-  <span class="swatch diff-chg">&nbsp;</span> Modified
-  <span class="swatch diff-add">&nbsp;</span> Added
-  <span class="swatch diff-sub">&nbsp;</span> Removed
-</div>
-
-<div class="diff">
-  {% for line in diff_data %}
-  <div class="diff-{{ line.type }}">
-    <span class="diff-line-no">{{ line.number_b }}</span><span class="diff-line-no">{{ line.number_a }}</span>
-    {% for slice in line.slices %}<span class="diff-{{ slice.type }}">{{ slice.text }}</span>{% endfor %}
-  </div>
-  {% endfor %}
-</div>
-
+        </div>
+      </div>
+      <div class="refract-container">
+        <div class="refract-content-container">
+          {% for line in diff_data %}
+            <div class="udiff-line {{ line.type }}">
+              <div class="gutter" id="{% if line.number_b %}F{{line.number_b}}{% endif %}{% if line.number_a %}T{{line.number_a}}{% endif %}">
+                <a class="line-numbers" data-fnum="{{ line.number_b }}" data-tnum="{{ line.number_a }}" href="#{% if line.number_b %}F{{ line.number_b }}{% endif %}{% if line.number_a %}T{{ line.number_a }}{% endif %}"></a>
+              </div>
+              <div class="source">{% for slice in line.slices %}<span class="{{ slice.type }}">{{ slice.text }}</span>{% endfor %}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
 {% endcache %}
