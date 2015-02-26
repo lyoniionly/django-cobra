@@ -5389,47 +5389,38 @@ body.safari .refract-container:hover {
   width: 100%;
 }
 
-.refract-container .gutter
-{
+.refract-container {
+  .gutter {
     position: absolute;
     left: 1px;
     height: 18px;
 //    background-color: #f5f5f5;
-    border-right: 1px solid #ccc
-}
+    border-right: 1px solid #ccc;
+    &:hover, &:target {
+      background: #e9e9e9;
+    }
+    &:target+.source {
+      background: #ebf2f9
+    }
+  }
+  .last .gutter {
+    .border-bottom-left-radius(5px);
+  }
 
-.refract-container .gutter:hover,.refract-container .gutter:target
-{
-    background: #e9e9e9
-}
-
-.refract-container .gutter:target+.source
-{
-    background: #ebf2f9
-}
-
-.refract-container .last .gutter
-{
-    border-bottom-left-radius: 5px
-}
-
-.refract-container .line-numbers,.refract-container .line-numbers-skipped
-{
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  .line-numbers {
+    .user-select(none);
     float: right;
-    width: 70px
-}
-
-.refract-container .line-numbers-skipped
-{
+    width: 70px;
+  }
+  .line-numbers-skipped {
+    .user-select(none);
+    float: right;
+    width: 70px;
     position: absolute;
     left: 1px;
-    width: 70px;
     background-color: #f5f5f5;
-    border-right: 1px solid #ccc
+    border-right: 1px solid #ccc;
+  }
 }
 
 .commentable-diff .refract-container .line-numbers-skipped
@@ -5442,12 +5433,14 @@ body.safari .refract-container:hover {
     width: 70px
 }
 
-.refract-container .last .line-numbers,.refract-container .last.line-numbers-skipped
+.refract-container .last .line-numbers,
+.refract-container .last.line-numbers-skipped
 {
     border-radius: 0 0 0 5px
 }
 
-.refract-container .line-numbers:before,.refract-container .line-numbers:after
+.refract-container .line-numbers:before,
+.refract-container .line-numbers:after
 {
     color: #707070;
     content: '';
@@ -5457,22 +5450,28 @@ body.safari .refract-container:hover {
     width: 35px
 }
 
-.refract-container .line-numbers.permalinked:before,.refract-container .line-numbers.permalinked:after,.refract-container .line-numbers:hover:before,.refract-container .line-numbers:hover:after
+.refract-container .line-numbers.permalinked:before,
+.refract-container .line-numbers.permalinked:after,
+.refract-container .line-numbers:hover:before,
+.refract-container .line-numbers:hover:after
 {
     color: #333
 }
 
-.refract-container .line-numbers:hover:before,.refract-container .line-numbers:hover:after
+.refract-container .line-numbers:hover:before,
+.refract-container .line-numbers:hover:after
 {
     text-decoration: underline
 }
 
-.refract-container .deletion .line-numbers:before,.refract-container .common .line-numbers:before
+.refract-container .deletion .line-numbers:before,
+.refract-container .common .line-numbers:before
 {
     content: attr(data-fnum)
 }
 
-.refract-container .addition .line-numbers:after,.refract-container .common .line-numbers:after
+.refract-container .addition .line-numbers:after,
+.refract-container .common .line-numbers:after
 {
     content: attr(data-tnum)
 }
@@ -5518,14 +5517,17 @@ body.safari .refract-container:hover {
     background-color: #97f295
 }
 
-.refract-container .addition .source ins,.refract-container .deletion .source del
+.refract-container .addition .source ins,
+.refract-container .deletion .source del
 {
     display: inline-block;
     margin-top: -1px;
     text-decoration: none
 }
 
-.refract-container .conflict .source,.refract-container .conflict .source ins,.refract-container .conflict .source del
+.refract-container .conflict .source,
+.refract-container .conflict .source ins,
+.refract-container .conflict .source del
 {
     background-color: #ffffdf
 }
@@ -5553,7 +5555,10 @@ body.safari .refract-container:hover {
     display: none
 }
 
-.deletion:hover .add-line-comment span,.addition:hover .add-line-comment span,.common:hover .add-line-comment span,.heading:hover .add-line-comment span
+.deletion:hover .add-line-comment span,
+.addition:hover .add-line-comment span,
+.common:hover .add-line-comment span,
+.heading:hover .add-line-comment span
 {
     display: inline-block
 }
