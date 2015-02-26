@@ -4944,183 +4944,170 @@ h2 {
   background: #f1f2f3;
   border: 1px solid #e7e7e7;
   border-bottom-color: #eaeaea;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+  .border-top-left-radius(3px);
+  .border-top-right-radius(3px);
+
+  p.commit-title {
+    margin: 0 0 6px;
+  }
+
+  .commit-meta {
+    padding: 8px;
+    margin-right: -8px;
+    margin-left: -8px;
+    background: #fff;
+    border-top: 1px solid #d8e6ec;
+  }
+
+  .zeroclipboard-link {
+    float: right;
+    margin-top: -2px;
+    margin-left: 5px;
+  }
+
+  .sha-block {
+    float: right;
+    color: #888;
+    &>.sha {
+      color: #444;
+    }
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .authorship {
+    margin: -2px 0 -4px -4px;
+    font-size: 12px;
+    color: #999;
+    .avatar {
+      margin: -2px 3px 0 0;
+    }
+    .author-name {
+      color: #444;
+    }
+    a {
+      font-weight: bold;
+      color: #444;
+      text-decoration: none;
+    }
+  }
 }
 
-.commit .commit-title, .commit .commit-title a {
+.commit .commit-title,
+.commit .commit-title a {
 color: #4e575b;
 }
 
-.commit-tease p.commit-title {
-margin: 0 0 6px;
-}
-
-.commit .commit-title, .commit .commit-title a {
-color: #4e575b;
-}
-
-.commit-tease .commit-meta {
-padding: 8px;
-margin-right: -8px;
-margin-left: -8px;
-background: #fff;
-border-top: 1px solid #d8e6ec;
-}
-
-.commit-tease .zeroclipboard-link {
-float: right;
-margin-top: -2px;
-margin-left: 5px;
-}
-.commit .sha-block, .commit .sha {
+.commit .sha-block,
+.commit .sha {
 font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 font-size: 12px;
 }
 
-.commit-tease .sha-block {
-float: right;
-color: #888;
-  &:hover {
-    text-decoration: underline;
+.file-wrap {
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-top: 0;
+  .border-bottom-right-radius(3px);
+  .border-bottom-left-radius(3px);
+
+  .include-fragment-error {
+    display: none;
   }
 }
 
-.commit-tease .sha-block>.sha {
-color: #444;
-}
-
-.commit-tease .authorship {
-margin: -2px 0 -4px -4px;
-font-size: 12px;
-color: #999;
-}
-
-.commit-tease .authorship .avatar {
-margin: -2px 3px 0 0;
-}
-
-.commit-tease .authorship .author-name {
-color: #444;
-}
-
-.commit-tease .authorship a {
-font-weight: bold;
-color: #444;
-text-decoration: none;
-}
-
-.file-wrap {
-margin-bottom: 10px;
-border: 1px solid #ddd;
-border-top: 0;
-border-bottom-right-radius: 3px;
-border-bottom-left-radius: 3px;
+.css-truncate.css-truncate-target,
+.css-truncate .css-truncate-target {
+  display: inline-block;
+  max-width: 125px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: top;
 }
 
 table.files {
-width: 100%;
-background: #f8f8f8;
-border-radius: 2px;
+  width: 100%;
+  background: #f8f8f8;
   border-collapse: collapse;
-border-spacing: 0;
-}
+  border-spacing: 0;
+  .border-radius(2px);
 
-table.files tr.up-tree {
-border-bottom: 1px solid #eee;
-}
+  tr.up-tree {
+    border-bottom: 1px solid #eee;
+    a {
+      padding: 3px 6px;
+      margin-left: -3px;
+      font-weight: bold;
+      .border-radius(2px);
+      &:hover {
+        background-color: #eee;
+      }
+    }
+  }
 
-table.files tr.up-tree a:hover {
-background-color: #eee;
-}
+  td {
+    padding: 6px 3px;
+    line-height: 20px;
+    border-top: 1px solid #eee;
+    &.content-title {
+      max-width: 180px;
+    }
+    &.message {
+      max-width: 442px;
+      padding-left: 10px;
+      overflow: hidden;
+      color: #888;
+      a {
+        color: #888;
+      }
+    }
+    &.age {
+      max-width: 140px;
+      padding-right: 10px;
+      color: #888;
+      text-align: right;
+      white-space: nowrap;
+    }
+    &.icon {
+      width: 17px;
+      padding-right: 2px;
+      padding-left: 10px;
+      color: #777;
+      .spinner {
+        position: relative;
+        top: 3px;
+        display: none;
+        margin-top: -3px;
+        margin-left: -2px;
+      }
+      .fa-folder {
+        color: #80a6cd;
+      }
+    }
+    .css-truncate {
+      max-width: 100%;
+    }
 
-table.files td {
-padding: 6px 3px;
-line-height: 20px;
-border-top: 1px solid #eee;
-}
+  }
 
-table.files tbody tr:first-child td {
-border-top: 0;
-}
-
-table.files tr.up-tree a {
-padding: 3px 6px;
-margin-left: -3px;
-font-weight: bold;
-border-radius: 2px;
-}
-
-.file-wrap .include-fragment-error {
-display: none;
-}
-
-table.files td.icon {
-width: 17px;
-padding-right: 2px;
-padding-left: 10px;
-color: #777;
-}
-
-table.files td.icon .spinner {
-position: relative;
-top: 3px;
-display: none;
-margin-top: -3px;
-margin-left: -2px;
-}
-
-table.files td.icon .fa-folder {
-color: #80a6cd;
-}
-
-table.files td.content-title {
-max-width: 180px;
-}
-
-.css-truncate.css-truncate-target, .css-truncate .css-truncate-target {
-display: inline-block;
-max-width: 125px;
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
-vertical-align: top;
-}
-
-table.files td .css-truncate {
-max-width: 100%;
-}
-
-table.files td.message {
-max-width: 442px;
-padding-left: 10px;
-overflow: hidden;
-color: #888;
-}
-
-table.files td.message a {
-color: #888;
-}
-
-table.files td.age {
-max-width: 140px;
-padding-right: 10px;
-color: #888;
-text-align: right;
-white-space: nowrap;
+  tbody tr:first-child td {
+    border-top: 0;
+  }
 }
 
 .octicon {
-font: normal normal 16px octicons;
-line-height: 1;
-display: inline-block;
-text-decoration: none;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
--webkit-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
-user-select: none;
+  font: normal normal 16px octicons;
+  line-height: 1;
+  display: inline-block;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .file-navigation {
@@ -5130,6 +5117,7 @@ user-select: none;
   }
 }
 
+/* svn checkout url */
 .co-url {
   width: 600px;
   padding: 15px 20px 15px 30px;
@@ -5139,16 +5127,16 @@ user-select: none;
     opacity: 1;
   }
 }
+
 .svn-toolbar {
   border-bottom: 2px solid #f2f4f7;
-
 }
 
 table.bb-list td {
   &>div {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   a {
     word-break: normal !important;
@@ -5159,94 +5147,105 @@ table.commit-list td>div {
   width: 530px;
 }
 
-.commit-desc pre {
-max-width: 700px;
-margin: 10px 0;
-  padding: 0;
-font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-font-size: 13px;
-line-height: 1.45;
-color: #596063;
-white-space: pre-wrap;
-}
-
-.full-commit p.commit-title {
-margin: 0 0 8px;
-font-size: 18px;
-font-weight: bold;
-color: #213f4d;
-text-shadow: 0 1px rgba(255,255,255,0.5);
-}
-
-.full-commit .commit-desc, .commit-desc-container .commit-desc {
-display: block;
-margin: -5px 0 10px;
-}
-
-.full-commit .commit-desc pre, .commit-desc-container .commit-desc pre {
-max-width: 100%;
-overflow: visible;
-text-shadow: 0 1px rgba(255,255,255,0.5);
-word-wrap: break-word;
-}
-
 .commit-branches {
-min-height: 18px;
-margin-top: -6px;
-font-size: 12px;
-color: #818c90;
-vertical-align: middle;
+  min-height: 18px;
+  margin-top: -6px;
+  font-size: 12px;
+  color: #818c90;
+  vertical-align: middle;
 }
 
-.commit-desc+.commit-branches {
-padding-top: 8px;
-margin-top: 2px;
-border-top: solid 1px #d1e2eb;
+.commit-desc {
+  pre {
+    max-width: 700px;
+    margin: 10px 0;
+    padding: 0;
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #596063;
+    white-space: pre-wrap;
+  }
+  &+.commit-branches {
+    padding-top: 8px;
+    margin-top: 2px;
+    border-top: solid 1px #d1e2eb;
+  }
 }
 
-.full-commit .branches-list {
-display: inline-block;
-margin-right: 10px;
-  margin-bottom: 0;
-  padding: 0;
-vertical-align: middle;
-list-style: none;
+.full-commit {
+  p.commit-title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #213f4d;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.5);
+  }
+
+  .commit-desc {
+    display: block;
+    margin: -5px 0 10px;
+    pre {
+      max-width: 100%;
+      overflow: visible;
+      text-shadow: 0 1px rgba(255,255,255,0.5);
+      word-wrap: break-word;
+    }
+  }
+
+  .branches-list {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 0;
+    padding: 0;
+    vertical-align: middle;
+    list-style: none;
+  }
+
+  .commit-meta {
+    padding: 0 8px;
+    margin-right: -8px;
+    margin-left: -8px;
+    background: #fff;
+  }
+
+  .sha-block {
+    float: right;
+    margin-left: 15px;
+    font-size: 12px;
+    color: #888;
+  }
+
+  .authorship {
+    margin-top: -2px;
+    margin-bottom: -4px;
+    margin-left: -4px;
+    font-size: 14px;
+    color: #999;
+    a {
+      font-weight: bold;
+      color: #444;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    .author-name {
+      color: #444;
+    }
+  }
 }
 
-.full-commit .commit-meta {
-padding: 0 8px;
-margin-right: -8px;
-margin-left: -8px;
-background: #fff;
+.commit-desc-container .commit-desc {
+  display: block;
+  margin: -5px 0 10px;
 }
 
-.full-commit .sha-block {
-float: right;
-margin-left: 15px;
-font-size: 12px;
-color: #888;
-}
-
-.full-commit .authorship {
-margin-top: -2px;
-margin-bottom: -4px;
-margin-left: -4px;
-font-size: 14px;
-color: #999;
-}
-
-.full-commit .authorship a {
-font-weight: bold;
-color: #444;
-text-decoration: none;
-}
-
-.full-commit .authorship a:hover {
-text-decoration: underline;
-}
-
-.full-commit .authorship .author-name {
-  color: #444;
+.commit-desc-container .commit-desc pre {
+  max-width: 100%;
+  overflow: visible;
+  text-shadow: 0 1px rgba(255,255,255,0.5);
+  word-wrap: break-word;
 }
 
 .node-source-container {
@@ -5290,60 +5289,55 @@ text-decoration: underline;
 }
 
 .node-history-tease {
-margin-bottom: 10px;
-font-size: 14px;
-color: #7b878c;
-background: #e7ecee;
-border: 1px solid #d2d9dd;
-border-radius: 3px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #7b878c;
+  background: #e7ecee;
+  border: 1px solid #d2d9dd;
+  .border-radius(3px);
+
+  .author a {
+    font-weight: bold;
+    color: #000;
+  }
+
+  .commit-title {
+    display: inline;
+  }
+
+  .participation {
+    padding: 5px 8px;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 20px;
+    color: #666;
+    background-color: #fff;
+    border-top: 1px solid #d8e6ec;
+    .border-bottom-right-radius(3px);
+    .border-bottom-left-radius(3px);
+    .quickstat {
+      float: left;
+      margin: 0 10px 0 0;
+      strong {
+        color: #000;
+      }
+    }
+    a {
+      color: #888;
+      text-decoration: none;
+    }
+  }
+
 }
 
 .node-history-tease-header {
-padding: 5px 8px;
-line-height: 24px;
+  padding: 5px 8px;
+  line-height: 24px;
+  .avatar {
+    float: left;
+    margin-right: 5px;
+  }
 }
-
-.node-history-tease-header .avatar {
-float: left;
-margin-right: 5px;
-}
-
-.node-history-tease .author a {
-font-weight: bold;
-color: #000;
-}
-
-.node-history-tease .commit-title {
-display: inline;
-}
-
-.node-history-tease .participation {
-padding: 5px 8px;
-font-size: 12px;
-font-weight: normal;
-line-height: 20px;
-color: #666;
-background-color: #fff;
-border-top: 1px solid #d8e6ec;
-border-bottom-right-radius: 3px;
-border-bottom-left-radius: 3px;
-}
-
-.node-history-tease .participation .quickstat {
-float: left;
-margin: 0 10px 0 0;
-}
-
-.node-history-tease .participation a {
-color: #888;
-text-decoration: none;
-}
-
-.node-history-tease .participation .quickstat strong {
-color: #000;
-}
-
-
 
 .diff-container {
   position: relative;
@@ -5380,19 +5374,19 @@ color: #000;
   }
 }
 
-body.chrome .refract-container,body.safari .refract-container
-{
-    overflow-x: hidden
+body.chrome .refract-container,
+body.safari .refract-container {
+  overflow-x: hidden
 }
 
-body.chrome .refract-container:hover,body.safari .refract-container:hover
-{
-    overflow-x: auto
+body.chrome .refract-container:hover,
+body.safari .refract-container:hover {
+  overflow-x: auto
 }
 
 .refract-content-container {
-display: table;
-width: 100%;
+  display: table;
+  width: 100%;
 }
 
 .refract-container .gutter
@@ -5576,12 +5570,12 @@ width: 100%;
 
 .diffstat {
   white-space: nowrap;
-text-align: right;
-font-family: Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
-color: #666;
-font-weight: bold;
-font-size: 11px;
-cursor: default;
+  text-align: right;
+  font-family: Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  color: #666;
+  font-weight: bold;
+  font-size: 11px;
+  cursor: default;
   .diffstat-bar {
     margin-left: 3px;
     display: inline-block;
