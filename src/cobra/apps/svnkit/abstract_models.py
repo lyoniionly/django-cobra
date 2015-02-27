@@ -1,7 +1,5 @@
 from __future__ import absolute_import, print_function
 
-from hashlib import md5
-import logging
 import datetime
 import mimetypes
 import posixpath
@@ -125,7 +123,7 @@ class AbstractRepository(Model):
         also collected. If no previous sync has been run, all
         changesets are collected.
         """
-        self.last_synced = datetime.datetime.now()
+        self.last_synced = timezone.now()
 
         if not self.uuid:
             self.sync_uuid()
@@ -233,7 +231,7 @@ class AbstractChangeset(Model):
         if not message:
             message = '<unlabeled message>'
         else:
-            message = truncatechars(message.splitlines()[0], 50)
+            message = truncatechars(message.splitlines()[0], 40)
         return message
 
     @property
@@ -244,8 +242,8 @@ class AbstractChangeset(Model):
         else:
             split_msgs = message.splitlines()
             first_line_msg = split_msgs[0]
-            if len(first_line_msg) > 50:
-                split_msgs[0] = '...'+first_line_msg[47:]
+            if len(first_line_msg) > 40:
+                split_msgs[0] = '...'+first_line_msg[37:]
             else:
                 del split_msgs[0]
             message = '\n'.join(split_msgs)
@@ -257,17 +255,11 @@ class AbstractChangeset(Model):
 
     def get_previous(self):
         """Get the previous changeset in the repository."""
-        try:
-            return self.repository.changesets.get(revision=self.revision - 1)
-        except self.__class__.DoesNotExist:
-            return None
+        return self.repository.changesets.filter(revision__lte=self.revision - 1).first()
 
     def get_next(self):
         """Get the next changeset in the repository."""
-        try:
-            return self.repository.changesets.get(revision=self.revision + 1)
-        except self.__class__.DoesNotExist:
-            return None
+        return self.repository.changesets.filter(revision__gte=self.revision + 1).last()
 
 
 @python_2_unicode_compatible

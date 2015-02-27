@@ -1,4 +1,5 @@
 import os
+import six
 
 # Use 'dev', 'beta', or 'final' as the 4th element to indicate release type.
 
@@ -64,6 +65,11 @@ def get_core_apps(overrides=None):
     """
     if not overrides:
         return COBRA_CORE_APPS
+
+    if isinstance(overrides, six.string_types):
+        raise ValueError(
+            "get_core_apps expects a list or tuple of apps "
+            "to override")
 
     def get_app_label(app_label, overrides):
         pattern = app_label.replace('cobra.apps.', '')

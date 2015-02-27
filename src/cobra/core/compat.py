@@ -1,3 +1,6 @@
+import sys
+import csv
+
 from django.utils import six
 
 from django.conf import settings
@@ -76,7 +79,7 @@ def existing_user_fields(fields):
     """
     user_fields = get_user_model()._meta.fields
     user_field_names = [field.name for field in user_fields]
-    return list(set(fields) & set(user_field_names))
+    return [field for field in fields if field in user_field_names]
 
 
 # Python3 compatibility layer
@@ -101,9 +104,6 @@ Changes:
 - Added possibility to specify an open file to the writer to send as response
   of a view
 """
-
-import sys
-import csv
 
 PY3 = sys.version > '3'
 

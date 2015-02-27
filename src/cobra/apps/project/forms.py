@@ -7,6 +7,7 @@ from cobra.core.loading import get_model, get_class
 
 AuditLogEntry = get_model('auditlog', 'AuditLogEntry')
 Project = get_model('project', 'Project')
+Repository = get_model('svnkit', 'Repository')
 AuditLogEntryEvent = get_class('auditlog.utils', 'AuditLogEntryEvent')
 
 
@@ -63,7 +64,13 @@ class AddProjectForm(forms.ModelForm):
             data=project.get_audit_log_data(),
         )
 
-        # create_sample_event(project)
+        # create repo for this project
+        Repository.objects.create(project=project,
+                                  root=self.cleaned_data['svn_url'],
+                                  prefix=self.cleaned_data['svn_repo_prefix'],
+                                  uri=self.cleaned_data['svn_url'],
+                                  username=self.cleaned_data['svn_username'],
+                                  password=self.cleaned_data['svn_password'])
 
         return project
 

@@ -21,6 +21,7 @@ from .utils import diff
 
 Repository = get_model('svnkit', 'Repository')
 Changeset = get_model('svnkit', 'Changeset')
+Change = get_model('svnkit', 'Change')
 Content = get_model('svnkit', 'Content')
 
 
@@ -134,6 +135,46 @@ class SvnNodeView(ExtraContextMixin, generic.TemplateView):
             return 'svnkit/node_file.html'
 
 
+class SvnNodeHistoryView(ExtraContextMixin, generic.ListView):
+    context_object_name = "changesets"
+    template_name = 'svnkit/node_history_list.html'
+    paginate_by = settings.COBRA_SVNKIT_NODE_HISTORY_PER_PAGE
+
+    @method_decorator(has_access)
+    @method_decorator(autosync_repositories)
+    def dispatch(self, request, *args, **kwargs):
+        self.organization = kwargs.get('organization')
+        self.project = kwargs.get('project')
+        self.repository = self.get_repository()
+        return super(SvnNodeHistoryView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self.path = self.kwargs['path']
+        try:
+            self.node = self.repository.get_node(self.path)
+        except exceptions.InvalidNode:
+            self.node = None
+        return super(SvnNodeHistoryView, self).get(request, *args, **kwargs)
+
+    def get_repository(self):
+        repository_lookup = {'project': self.project}
+        repository = shortcuts.get_object_or_404(
+            Repository, **repository_lookup)
+        return repository
+
+    def get_queryset(self):
+        changeset_list = [c.changeset for c in Change.objects.filter(path=self.repository.prefix + self.path,
+                                                                      changeset__in=self.repository.changesets.all())]
+        return changeset_list
+
+    def get_context_data(self, **kwargs):
+        ctx = {}
+        ctx.update(kwargs)
+        ctx['path'] = self.path
+        ctx['node'] = self.node
+        return super(SvnNodeHistoryView, self).get_context_data(**ctx)
+
+
 class SvnContentView(VirtualDownloadView):
     @method_decorator(has_access)
     @method_decorator(autosync_repositories)
@@ -217,7 +258,7 @@ class SvnNodeDiffView(ExtraContextMixin, generic.TemplateView):
         else:
             addition = int((addition_num / total)*5)
             deletion = int((deletion_num / total)*5)
-            return (range(addition), range(deletion), range(5-addition+deletion))
+            return (range(addition), range(deletion), range(5-addition-deletion))
 
     def get_repository(self):
         repository_lookup = {'project': self.project}

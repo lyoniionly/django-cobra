@@ -47,7 +47,7 @@ class ProjectCreateView(OrganizationView):
         if form.is_valid():
             project = form.save(request.user, request.META['REMOTE_ADDR'])
 
-            url = reverse('cobra-stream', args=[organization.slug, project.slug])
+            url = reverse('svnkit:node', args=[organization.slug, project.slug, '/'])
 
             return self.redirect(url + '?newinstall=1')
 

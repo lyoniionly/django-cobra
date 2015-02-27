@@ -1,0 +1,69 @@
+{% extends "svnkit/base.html" %}
+{% load helper_tags %}
+
+{% block title %}{{ repository.label }}{% endblock %}
+
+{% block main %}
+  <section class="body">
+    <div class="file-navigation clearfix">
+      <div class="breadcrumb">
+        History for
+        <span class="node-path">
+          {% for path, basename in node.iter_path_basename reversed %}
+              <span class="node">
+                {% if forloop.last %}
+                  {{ basename }}
+                {% else %}
+                  {% ifequal path '/' %}
+                    <a href="{% url 'svnkit:changeset-list' organization.slug project.slug %}">{{ basename }}</a>
+                  {% else %}
+                    <a href="{% url 'svnkit:node-history' organization.slug project.slug path %}">{{ basename }}</a>
+                  {% endifequal %}
+                {% endif %}
+              </span>
+              {% if not forloop.last %}<span class="sep">/</span>{% endif %}
+          {% endfor %}
+        </span>
+      </div>
+    </div>
+
+    <table class="table table-striped bb-list commit-list">
+      <colgroup>
+        <col width="50px">
+        <col width="50px">
+        <col width="400px">
+        <col width="100px">
+        <col width="20px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Author</th>
+          <th>Resivion</th>
+          <th>Message</th>
+          <th>Date</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for changeset in changesets %}
+          <tr>
+            <td>
+                {{ changeset.author }}
+            </td>
+            <td><a href="{{ changeset.get_absolute_url }}">{{ changeset }}</a></td>
+            <td><div title="{{ changeset.message }}">{{ changeset.message }}</div></td>
+            <td>
+                {{ changeset.date|timesince }} ago
+            </td>
+            <td>
+                <a href="{% url 'svnkit:node-revision' organization.slug project.slug changeset.revision path %}">View</a>
+            </td>
+          </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% if is_paginated %}
+    {% include 'partials/pagination.html' %}
+  {% endif %}
+{% endblock %}

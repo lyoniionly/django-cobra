@@ -1,25 +1,22 @@
 {% extends "svnkit/base.html" %}
 
-
 {% block main %}
   <section class="body">
     <div class="file-navigation clearfix">
       <div class="breadcrumb pull-left">
         {% with to_node as node %}{% with to_revision as revision %}
-        {% include "svnkit/node_path.html" %}
+          {% include "svnkit/node_path.html" %}
         {% endwith %}{% endwith %}
       </div>
     </div>
     <h3>
       Diff from <a href="{% url 'svnkit:node-revision' organization.slug project.slug from_changeset.revision path %}">
-        {{ from_changeset }}</a>
+      {{ from_changeset }}</a>
       to <a href="{% url 'svnkit:node-revision' organization.slug project.slug to_changeset.revision path %}">
-        {{ to_changeset }}</a>
+      {{ to_changeset }}</a>
     </h3>
 
-
-          {% include "svnkit/node_diff_data.html" %}
+    {% include "svnkit/node_diff_data.html" %}
 
   </section>
-
 {% endblock %}

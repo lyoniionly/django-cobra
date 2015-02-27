@@ -8,6 +8,7 @@ class SvnkitApplication(Application):
     name = 'svnkit'
 
     svn_node_view = get_class('svnkit.views', 'SvnNodeView')
+    svn_node_history_view = get_class('svnkit.views', 'SvnNodeHistoryView')
     svn_changeset_list_view = get_class('svnkit.views', 'SvnChangesetListView')
     svn_changeset_view = get_class('svnkit.views', 'SvnChangesetView')
     svn_content_view = get_class('svnkit.views', 'SvnContentView')
@@ -38,6 +39,9 @@ class SvnkitApplication(Application):
 
             url(r'^(?P<organization_slug>[\w_-]+)/(?P<project_id>[\w_-]+)(?P<path>/.*)$', self.svn_node_view.as_view(), {'revision': None},
                 name='node'),
+
+            url(r'^(?P<organization_slug>[\w_-]+)/(?P<project_id>[\w_-]+):history(?P<path>/.*)$', self.svn_node_history_view.as_view(),
+                name='node-history'),
         ]
         return self.post_process_urls(urls)
 

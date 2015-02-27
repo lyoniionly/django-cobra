@@ -2,55 +2,54 @@
 {% load i18n %}
 {% load static %}
 {% block node_content %}
+  {% if not node.content.is_binary and node.size %}
+    {% with node.get_last_changeset as last_changeset %}
+      {% with last_changeset.get_previous as previous_changeset %}
+        <div class="commit node-history-tease">
+          <div class="node-history-tease-header">
+              <img alt="" class="avatar" height="24" src="{% static 'cobra/img/avatar/default_avatar.png' %}" width="24">
+              <span class="author"><a href="#" rel="author">{{ last_changeset.author }}</a></span>
+              last changed in <a href="{{ last_changeset.get_absolute_url }}">{{ last_changeset }}</a> at
+              <time datetime="{{ last_changeset.date }}" title="{{ last_changeset.date }}">{{ last_changeset.date|timesince }} ago</time>
+          </div>
 
-{% if not node.content.is_binary and node.size %}
-  {% with node.get_last_changeset as last_changeset %}
-    {% with last_changeset.get_previous as previous_changeset %}
-  <div class="commit node-history-tease">
-    <div class="node-history-tease-header">
-        <img alt="" class="avatar" height="24" src="{% static 'cobra/img/avatar/default_avatar.png' %}" width="24">
-        <span class="author"><a href="#" rel="author">{{ last_changeset.author }}</a></span>
-        last changed in <a href="{{ last_changeset.get_absolute_url }}">{{ last_changeset }}</a> at
-        <time datetime="{{ last_changeset.date }}" title="{{ last_changeset.date }}">{{ last_changeset.date|timesince }} ago</time>
-    </div>
+          <div class="participation clearfix">
+            <p class="quickstat">
+              {{ last_changeset.message }}
+            </p>
+          </div>
+        </div>
 
-    <div class="participation clearfix">
-      <p class="quickstat">
-        {{ last_changeset.message }}
-      </p>
+        <div class="node-source-container">
+          <div class="node-meta clearfix">
+              <div class="info file-name">
+                  <span>{{ node.content.lines }} lines (1303 sloc)</span>
+                  <span class="meta-divider"></span>
+                <span>{{ node.size|filesizeformat }}</span>
+              </div>
+              <div class="actions">
+                <div class="btn-group" role="group" aria-label="...">
+                  {% if previous_changeset %}
+                    <a href="{% url 'svnkit:node-diff' organization.slug project.slug previous_changeset.revision last_changeset.revision path %}"
+                       class="btn btn-default" title="{% trans 'Diff to previous change' %}">{% trans 'Diff' %}</a>
+                  {% endif %}
+                  <a href="{% url 'svnkit:node-history' organization.slug project.slug path %}" class="btn btn-default">{% trans 'History' %}</a>
+                  <a class="btn btn-default" href="{{ node.content.get_absolute_url }}">{% trans 'Download this file' %}</a>
+                </div>
+              </div><!-- /.actions -->
+            </div>
+          <div class="node-source">
+            {{ node.content.get_data_display }}
+          </div>
+        </div>
+      {% endwith %}
+    {% endwith %}
+  {% endif %}
 
-    </div>
-  </div>
-
-<div class="node-source-container">
-  <div class="node-meta clearfix">
-      <div class="info file-name">
-          <span>{{ node.content.lines }} lines (1303 sloc)</span>
-          <span class="meta-divider"></span>
-        <span>{{ node.size|filesizeformat }}</span>
-      </div>
-      <div class="actions">
-        <div class="btn-group" role="group" aria-label="...">
-          {% if previous_changeset %}
-            <a href="{% url 'svnkit:node-diff' organization.slug project.slug previous_changeset.revision changeset.revision path %}" class="btn btn-default">Diff</a>
-          {% endif %}
-  <button type="button" class="btn btn-default">History</button>
-  <a class="btn btn-default" href="{{ node.content.get_absolute_url }}">{% trans 'Download this file' %}</a>
-</div>
-      </div><!-- /.actions -->
-    </div>
-  <div class="node-source">
-    {{ node.content.get_data_display }}
-  </div>
-</div>
-  {% endwith %}
-  {% endwith %}
-{% endif %}
-
-{% ifequal node.content.get_maintype "image" %}
-<img class="node-image"
-     src="{{ node.content.get_absolute_url }}"
-     alt="{{ node.get_basename }}" />
-{% endifequal %}
+  {% ifequal node.content.get_maintype "image" %}
+  <img class="node-image"
+       src="{{ node.content.get_absolute_url }}"
+       alt="{{ node.get_basename }}" />
+  {% endifequal %}
 
 {% endblock %}

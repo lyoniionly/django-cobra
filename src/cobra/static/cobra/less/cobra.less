@@ -206,8 +206,7 @@ h3 {
 }
 
 .navbar-nav > li > .dropdown-menu {
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
+  .border-top-radius(4px);
 }
 
 .navbar {
@@ -4937,6 +4936,11 @@ h2 {
   border: 0;
   padding: 0;
   margin: 0;
+  .commit-tease & {
+    float: right;
+    margin-top: -2px;
+    margin-left: 5px;
+  }
 }
 
 .commit-tease {
@@ -4944,8 +4948,7 @@ h2 {
   background: #f1f2f3;
   border: 1px solid #e7e7e7;
   border-bottom-color: #eaeaea;
-  .border-top-left-radius(3px);
-  .border-top-right-radius(3px);
+  .border-top-radius(3px);
 
   p.commit-title {
     margin: 0 0 6px;
@@ -4957,12 +4960,6 @@ h2 {
     margin-left: -8px;
     background: #fff;
     border-top: 1px solid #d8e6ec;
-  }
-
-  .zeroclipboard-link {
-    float: right;
-    margin-top: -2px;
-    margin-left: 5px;
   }
 
   .sha-block {
@@ -4996,21 +4993,20 @@ h2 {
 
 .commit .commit-title,
 .commit .commit-title a {
-color: #4e575b;
+  color: #4e575b;
 }
 
 .commit .sha-block,
 .commit .sha {
-font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 12px;
 }
 
 .file-wrap {
   margin-bottom: 10px;
   border: 1px solid #ddd;
   border-top: 0;
-  .border-bottom-right-radius(3px);
-  .border-bottom-left-radius(3px);
+  .border-bottom-radius(3px);
 
   .include-fragment-error {
     display: none;
@@ -5089,7 +5085,6 @@ table.files {
     .css-truncate {
       max-width: 100%;
     }
-
   }
 
   tbody tr:first-child td {
@@ -5264,8 +5259,7 @@ table.commit-list td>div {
     text-shadow: 0 1px 0 #fff;
     border-bottom: 1px solid #d8d8d8;
     background-color: #fcfcfc;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    .border-top-radius(4px);
     .info {
       float: left;
       height: 33px;
@@ -5313,8 +5307,7 @@ table.commit-list td>div {
     color: #666;
     background-color: #fff;
     border-top: 1px solid #d8e6ec;
-    .border-bottom-right-radius(3px);
-    .border-bottom-left-radius(3px);
+    .border-bottom-radius(3px);
     .quickstat {
       float: left;
       margin: 0 10px 0 0;
@@ -5327,7 +5320,6 @@ table.commit-list td>div {
       text-decoration: none;
     }
   }
-
 }
 
 .node-history-tease-header {
@@ -5359,37 +5351,32 @@ table.commit-list td>div {
   }
 }
 
-.refract-container
-{
-    box-sizing: border-box;
-    border: 1px solid #ddd;
-    border-radius: 0 0 5px 5px;
-    overflow: hidden;
-    overflow-x: auto;
-  pre {
-    background: transparent;
-    padding: 0;
-    margin: 0;
-    .border-radius(0);
-  }
-}
-
-body.chrome .refract-container,
-body.safari .refract-container {
-  overflow-x: hidden
-}
-
-body.chrome .refract-container:hover,
-body.safari .refract-container:hover {
-  overflow-x: auto
-}
-
 .refract-content-container {
   display: table;
   width: 100%;
 }
 
 .refract-container {
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 0 0 5px 5px;
+  overflow: hidden;
+  overflow-x: auto;
+
+  body.chrome &,
+  body.safari & {
+    overflow-x: hidden;
+    &:hover {
+      overflow-x: auto;
+    }
+  }
+
+  pre {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    .border-radius(0);
+  }
   .gutter {
     position: absolute;
     left: 1px;
@@ -5403,65 +5390,58 @@ body.safari .refract-container:hover {
       background: #ebf2f9
     }
   }
-  .last .gutter {
-    .border-bottom-left-radius(5px);
+  .last {
+    .line-numbers,
+    &.line-numbers-skipped {
+      border-radius: 0 0 0 5px;
+    }
+    .gutter {
+      border-bottom-left-radius: 5px;
+    }
   }
 
   .line-numbers {
     .user-select(none);
     float: right;
     width: 70px;
+    &:before,&:after {
+      color: #707070;
+      content: '';
+      display: inline-block;
+      left: 0;
+      text-align: center;
+      width: 35px
+    }
+    &:hover:before,&:hover:after {
+      color: #333;
+      text-decoration: underline;
+    }
+    &.permalinked:before,&.permalinked:after {
+      color: #333;
+    }
   }
   .line-numbers-skipped {
-    .user-select(none);
-    float: right;
-    width: 70px;
+//    .user-select(none);
+//    float: right;
+//    width: 70px;
+    &:extend(.refract-container .line-numbers);
     position: absolute;
     left: 1px;
     background-color: #f5f5f5;
     border-right: 1px solid #ccc;
+    .commentable-diff & {
+      width: 96px;
+    }
+    .edit-form & {
+      width: 70px;
+    }
   }
-}
-
-.commentable-diff .refract-container .line-numbers-skipped
-{
-    width: 96px
-}
-
-.edit-form .refract-container .line-numbers-skipped
-{
-    width: 70px
-}
-
-.refract-container .last .line-numbers,
-.refract-container .last.line-numbers-skipped
-{
-    border-radius: 0 0 0 5px
-}
-
-.refract-container .line-numbers:before,
-.refract-container .line-numbers:after
-{
-    color: #707070;
-    content: '';
-    display: inline-block;
-    left: 0;
-    text-align: center;
-    width: 35px
-}
-
-.refract-container .line-numbers.permalinked:before,
-.refract-container .line-numbers.permalinked:after,
-.refract-container .line-numbers:hover:before,
-.refract-container .line-numbers:hover:after
-{
-    color: #333
-}
-
-.refract-container .line-numbers:hover:before,
-.refract-container .line-numbers:hover:after
-{
-    text-decoration: underline
+  .source {
+    padding-left: 72px;
+    .commentable-diff & {
+      padding-left: 98px;
+    }
+  }
 }
 
 .refract-container .deletion .line-numbers:before,
@@ -5474,16 +5454,6 @@ body.safari .refract-container:hover {
 .refract-container .common .line-numbers:after
 {
     content: attr(data-tnum)
-}
-
-.refract-container .source
-{
-    padding-left: 72px;
-}
-
-.commentable-diff .refract-container .source
-{
-    padding-left: 98px
 }
 
 .refract-container .deletion .source
@@ -5558,19 +5528,16 @@ body.safari .refract-container:hover {
 .deletion:hover .add-line-comment span,
 .addition:hover .add-line-comment span,
 .common:hover .add-line-comment span,
-.heading:hover .add-line-comment span
-{
-    display: inline-block
+.heading:hover .add-line-comment span {
+  display: inline-block
 }
 
-.add-file-comment
-{
-    padding: 15px 10px
+.add-file-comment {
+  padding: 15px 10px
 }
 
-.heading:hover .add-file-comment
-{
-    background-position: 3px 20px
+.heading:hover .add-file-comment {
+  background-position: 3px 20px
 }
 
 .diffstat {
@@ -5589,10 +5556,8 @@ body.safari .refract-container:hover {
     text-decoration: none;
     text-align: left;
     color: #ddd;
-    display: inline-block;
-    text-decoration: none;
-    -webkit-font-smoothing: antialiased;
     font-size: 11px;
+    -webkit-font-smoothing: antialiased;
     i.plus {
       color: #6cc644;
       font-style: normal;
