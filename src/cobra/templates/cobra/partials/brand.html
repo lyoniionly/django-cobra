@@ -22,7 +22,7 @@
           <ul class="project-list">
             {% for p in p_list %}
               <li{% if p.id == project.id %} class="active"{% endif %}>
-                <a href="{% comment %}{% url 'sentry-stream' organization.slug p.slug %}{% endcomment %}" title="{{ p.name }}">{{ p.name }}</a>
+                <a href="{% url 'svnkit:node' organization.slug p.slug '/' %}" title="{{ p.name }}">{{ p.name }}</a>
               </li>
             {% endfor %}
           </ul>
