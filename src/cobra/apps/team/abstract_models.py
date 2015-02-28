@@ -18,7 +18,7 @@ from cobra.models import sane_repr
 from cobra.models.utils import slugify_instance
 from cobra.core.http import absolute_uri
 from cobra.core.constants import MEMBER_TYPES, MEMBER_USER
-from cobra.core.loading import get_class
+from cobra.core.loading import get_class, get_model
 from .utils import TeamStatus, TeamMemberType
 
 TeamManager = get_class('team.managers', 'TeamManager')
@@ -84,7 +84,12 @@ class AbstractTeam(Model):
         )
 
     def has_access(self, user, access=None):
-        queryset = self.member_set.filter(user=user)
+        OrganizationMember = get_model('organization', 'OrganizationMember')
+        queryset = self.member_set.filter(
+            # (Q(organization__authprovider__isnull=True) |
+            #  Q(flags=getattr(OrganizationMember.flags, 'sso:linked'))),
+            user=user,
+        )
         if access is not None:
             queryset = queryset.filter(type__lte=access)
 

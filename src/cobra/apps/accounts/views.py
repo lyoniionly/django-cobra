@@ -9,8 +9,7 @@ from django.contrib.auth import logout as auth_logout, login as auth_login
 from django.contrib.sites.models import get_current_site
 from django.conf import settings
 
-from cobra.core.utils import safe_referrer
-from cobra.views.generic import PostActionMixin, PageTitleMixin
+from cobra.views.mixins import PageTitleMixin
 from cobra.core.loading import (
     get_class, get_profile_class, get_classes, get_model)
 from cobra.core.compat import get_user_model

@@ -1,6 +1,7 @@
 
 from __future__ import absolute_import
 
+from django.db import connection
 from django.utils import timezone
 
 from cobra.models import create_or_update
@@ -35,4 +36,11 @@ class DjangoNodeStorage(NodeStorage):
         )
 
     def cleanup(self, cutoff_timestamp):
-        Node.objects.filter(timestamp__lte=cutoff_timestamp).delete()
+        # Node.objects.filter(timestamp__lte=cutoff_timestamp).delete()
+        query = """
+        DELETE FROM %s WHERE timestamp <= %%s
+        """ % (Node._meta.db_table,)
+        params = [cutoff_timestamp]
+
+        cursor = connection.cursor()
+        cursor.execute(query, params)

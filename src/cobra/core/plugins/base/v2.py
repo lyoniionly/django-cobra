@@ -285,6 +285,23 @@ class IPlugin2(local):
         """
         return []
 
+    def get_feature_hooks(self, **kwargs):
+        """
+        Return a list of callables to check for feature status.
+
+        >>> from cobra.features import FeatureHandler
+        >>>
+        >>> class NoRegistration(FeatureHandler):
+        >>>     features = set(['auth:register'])
+        >>>
+        >>>     def has(self, feature, actor):
+        >>>         return False
+
+        >>> def get_feature_hooks(self, **kwargs):
+        >>>     return [NoRegistration()]
+        """
+        return []
+
 
 class Plugin2(IPlugin2):
     """

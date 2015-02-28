@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from threading import local
 
 from .response import Response
+from .view import PluggableViewMixin
 
 
 class PluginMount(type):
@@ -24,7 +25,7 @@ class PluginMount(type):
         return new_cls
 
 
-class IPlugin(local):
+class IPlugin(local, PluggableViewMixin):
     """
     Plugin interface. Should not be inherited from directly.
 
@@ -168,28 +169,6 @@ class IPlugin(local):
 
     def get_form_initial(self, project=None):
         return {}
-
-    # Response methods
-
-    def redirect(self, url):
-        """
-        Returns a redirect response type.
-        """
-        return HttpResponseRedirect(url)
-
-    def render(self, template, context=None):
-        """
-        Given a template name, and an optional context (dictionary), returns a
-        ready-to-render response.
-
-        Default context includes the plugin instance.
-
-        >>> plugin.render('template.html', {'hello': 'world'})
-        """
-        if context is None:
-            context = {}
-        context['plugin'] = self
-        return Response(template, context)
 
     # The following methods are specific to web requests
 

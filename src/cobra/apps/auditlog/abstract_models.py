@@ -69,6 +69,8 @@ class AbstractAuditLogEntry(Model):
         if self.event == AuditLogEntryEvent.MEMBER_INVITE:
             return 'invited member %s' % (self.data['email'],)
         elif self.event == AuditLogEntryEvent.MEMBER_ADD:
+            if self.target_user == self.actor:
+                return 'joined the organization'
             return 'added member %s' % (self.target_user.get_display_name(),)
         elif self.event == AuditLogEntryEvent.MEMBER_ACCEPT:
             return 'accepted the membership invite'

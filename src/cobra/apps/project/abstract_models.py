@@ -154,15 +154,38 @@ class AbstractProject(Model):
 
         return ProjectOption.objects.unset_value(self, *args, **kwargs)
 
+    # def has_access(self, user, access=None):
+    #     OrganizationMember = get_model('organization', 'OrganizationMember')
+    #
+    #     queryset = OrganizationMember.objects.filter(
+    #         Q(teams=self.team) | Q(has_global_access=True),
+    #         user__is_active=True,
+    #         user=user,
+    #         organization=self.organization,
+    #     )
+    #     if access is not None:
+    #         queryset = queryset.filter(type__lte=access)
+    #
+    #     return queryset.exists()
+
+    @property
+    def member_set(self):
+        OrganizationMember = get_model('organization', 'OrganizationMember')
+
+        return OrganizationMember.objects.filter(
+            Q(teams=self.team) | Q(has_global_access=True),
+            user__is_active=True,
+            organization=self.organization,
+        )
+
     def has_access(self, user, access=None):
         OrganizationMember = get_model('organization', 'OrganizationMember')
 
-        queryset = OrganizationMember.objects.filter(
-            Q(teams=self.team) | Q(has_global_access=True),
-            user__is_active=True,
-            user=user,
-            organization=self.organization,
-        )
+        queryset = self.member_set.filter(
+            # (Q(organization__authprovider__isnull=True) |
+            #  Q(flags=getattr(OrganizationMember.flags, 'sso:linked'))),
+            user=user)
+
         if access is not None:
             queryset = queryset.filter(type__lte=access)
 
@@ -206,6 +229,16 @@ class AbstractProjectKey(Model):
         'public_key',
         'secret_key',
     ))
+
+    # support legacy project keys in API
+    scopes = (
+        'project:read',
+        'project:write',
+        'project:delete',
+        'event:read',
+        'event:write',
+        'event:delete',
+    )
 
     class Meta:
         abstract = True

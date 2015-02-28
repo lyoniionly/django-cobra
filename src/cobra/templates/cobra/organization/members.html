@@ -17,7 +17,7 @@
 
   <br>
 
-  <table class="table table-striped member-list">
+  {% comment %}<table class="table table-striped member-list">
     <colgroup>
       <col width="20px"/>
       <col/>
@@ -51,6 +51,72 @@
             {% endif %}
           </td>
           <td>{{ member.get_email }}</td>
+          <td>{{ member.get_type_display }}</td>
+          <td>
+            {% if member.has_global_access %}
+              <span class="tip" title="Access to all teams">&infin;</span>
+            {% elif team_list|length > 1 %}
+              <span class="tip"
+                    title="{% for team in team_list %}{{ team.name }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+                {{ team_list|length }} teams
+              </span>
+            {% else %}
+              {{ team_list.0.name }}
+            {% endif %}
+          </td>
+          <td>
+            {% if authorizing_access <= member.type %}
+              {% if member.user != request.user or member_can_leave %}
+                <a href="javascript:void(0)" class="remove-member" data-member-id="{{ member.id }}">
+                  <span class="glyphicon glyphicon-remove"></span>
+                </a>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>{% endcomment %}
+
+  <table class="table simple-list table-striped member-list">
+    <colgroup>
+      <col width="30%"/>
+      <col width="25%" />
+      <col width="20%"/>
+      <col width="20%"/>
+      <col width="5%"/>
+    </colgroup>
+    <thead>
+      <tr>
+        <th>Member</th>
+        <th>&nbsp;</th>
+        <th>Role</th>
+        <th>Teams</th>
+        <th>&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for member, team_list, needs_sso in member_list %}
+        <tr>
+          <td class="user-info">
+            <img class="avatar" src="{% get_avatar_url member.user member.get_email %}">
+            <strong><a href="{% url 'organization:member-settings' organization.slug member.id %}">
+              {{ member.get_display_name }}
+            </a></strong>
+            <br />
+            <small>{{ member.get_email }}</small>
+            <br />
+          </td>
+          <td class="status">
+            {% if needs_sso or member.is_pending %}
+              {% if needs_sso %}
+                <strong>Missing SSO Link</strong>
+              {% else %}
+                <strong>Invited</strong>
+              {% endif %}
+              <a href="javascript:void(0)" class="resend-invite btn btn-small btn-primary" data-member-id="{{ member.id }}">Resend invite</a>
+            {% endif %}
+          </td>
           <td>{{ member.get_type_display }}</td>
           <td>
             {% if member.has_global_access %}

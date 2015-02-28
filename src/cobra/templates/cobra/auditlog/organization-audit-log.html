@@ -19,7 +19,7 @@
 
     <br>
 
-    <table class="table table-striped">
+    {% comment %}<table class="table table-striped">
       <colgroup>
         <col width="32px"/>
         <col/>
@@ -40,6 +40,38 @@
             <td>{{ entry.get_event_display }}</td>
             <td>{{ entry.ip_address }}</td>
             <td style="text-align:right">
+              <span class="pretty-date" title="{{ entry.datetime|date:"c" }}Z">{{ entry.datetime|timesince_ago }}</span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>{% endcomment %}
+    <table class="table simple-list">
+      <colgroup>
+        <col width="30%">
+        <col width="18%"/>
+        <col width="18%"/>
+        <col width="24%"/>
+      </colgroup>
+      <thead>
+      <tr>
+        <th>Member</th>
+        <th>Event</th>
+        <th>IP</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+      <tbody>
+        {% for entry in entry_list.objects %}
+          <tr>
+            <td class="user-info">
+              <img class="avatar" src="{% get_avatar_url entry.actor %}">
+              <strong>{{ entry.actor.get_display_name }}</strong><br>
+              {{ entry.get_note }}
+            </td>
+            <td>{{ entry.get_event_display }}</td>
+            <td>{{ entry.ip_address }}</td>
+            <td>
               <span class="pretty-date" title="{{ entry.datetime|date:"c" }}Z">{{ entry.datetime|timesince_ago }}</span>
             </td>
           </tr>

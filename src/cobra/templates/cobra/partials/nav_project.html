@@ -1,0 +1,18 @@
+{% load i18n %}
+{% load permissions_tags %}
+
+<ul class="nav nav-tabs">
+  <li{% if active_nav == 'code' %} class="active"{% endif %}>
+    <a href="{% url 'svnkit:node' organization.slug project.slug '/' %}">{% trans "Code" %}</a>
+  </li>
+  <li{% if active_nav == 'explore' %} class="active"{% endif %}>
+    <a href="">{% trans "Explore" %}</a>
+  </li>
+  {% if request.user|can_manage_project:project %}
+    <li{% if active_nav == 'settings' %} class="active"{% endif %}>
+      <a href="{% url 'project:settings' project.slug project.organization.slug %}">
+        {% trans "Settings" %}
+      </a>
+    </li>
+  {% endif %}
+</ul>

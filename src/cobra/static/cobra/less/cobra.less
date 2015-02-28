@@ -314,7 +314,7 @@ h3 {
 
     .dropdown-menu {
       max-height: 400px;
-      min-width: 200px;
+      min-width: 500px;
       overflow: auto;
       top: 56px;
       position: absolute;
@@ -2723,6 +2723,52 @@ table.vars {
   tbody tr:nth-child(even) td,
   tbody tr:nth-child(even) th {
     background-color: #fff;
+  }
+}
+
+table.table-bordered {
+  border: 1px solid #e1e2e3;
+
+  th, td {
+    padding: 10px 15px;
+  }
+
+  td {
+    border-top: 1px solid #e1e2e3;
+  }
+}
+
+table.simple-list {
+  margin: 0 0 20px;
+
+  td, th {
+    font-size: 14px;
+  }
+
+  .user-info {
+    padding-left: 65px;
+    position: relative;
+
+    .avatar {
+      .square(40px);
+      position: absolute;
+      left: 15px;
+      top: 10px;
+    }
+  }
+}
+
+table.member-list {
+
+  .status strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 2px;
+    margin-top: -3px;
+  }
+
+  .status .btn {
+    padding: 1px 8px;
   }
 }
 

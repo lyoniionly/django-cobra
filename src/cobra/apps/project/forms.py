@@ -1,9 +1,11 @@
 from __future__ import absolute_import
 
 from django import forms
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from cobra.core.loading import get_model, get_class
+from cobra.core.permissions import can_set_public_projects
 
 AuditLogEntry = get_model('auditlog', 'AuditLogEntry')
 Project = get_model('project', 'Project')
@@ -38,7 +40,7 @@ class AddProjectForm(forms.ModelForm):
                                                   'repository, we will replace it for you automatic.<br><strong class="text-danger">If you do not have this problem, please ignore the attention.</strong>'))
     svn_username = forms.CharField(label=_('SVN Username'), max_length=512, required=False)
     svn_password = forms.CharField(label=_('SVN Password'), max_length=512, required=False,
-                                   widget=forms.PasswordInput())
+                                   widget=forms.PasswordInput(render_value=True))
 
     class Meta:
         # fields = ('name', 'platform')
@@ -103,3 +105,91 @@ class AddProjectWithTeamForm(AddProjectForm):
     def save(self, actor, ip_address):
         team = self.cleaned_data['team']
         return super(AddProjectWithTeamForm, self).save(actor, team, ip_address)
+
+
+class ProjectEditForm(forms.ModelForm):
+    name = forms.CharField(label=_('Project Name'), max_length=200,
+        widget=forms.TextInput(attrs={'placeholder': _('Project display name')}))
+    # platform = forms.ChoiceField(choices=Project._meta.get_field('platform').get_choices(blank_choice=BLANK_CHOICE),
+    #     widget=forms.Select(attrs={'data-placeholder': _('Select a platform')}))
+    public = forms.BooleanField(required=False,
+        help_text=_('Imply public access to this project.'))
+    team = forms.TypedChoiceField(choices=(), coerce=int, required=False)
+    svn_url = forms.URLField(label=_('SVN URL'), max_length=512,
+                             help_text=_('Example: svn://example.com or file:///svn/ or http://host:port'))
+    svn_repo_prefix = forms.CharField(label=_('SVN Repository Prefix'), max_length=200, required=False,
+                                      help_text=_('<strong class="text-danger">Important!</strong> You maybe meet this situation, the svn url you supply is not the '
+                                                  'root of the repository, and you do not have the right permission '
+                                                  'to access the real root of repository, input a right prefix of '
+                                                  'repository, we will replace it for you automatic.<br><strong class="text-danger">If you do not have this problem, please ignore the attention.</strong>'))
+    svn_username = forms.CharField(label=_('SVN Username'), max_length=512, required=False)
+    svn_password = forms.CharField(label=_('SVN Password'), max_length=512, required=False,
+                                   widget=forms.PasswordInput(render_value=True))
+    token = forms.CharField(label=_('Security token'), required=True,
+        help_text=_('Outbound requests matching Allowed Domains will have the header "X-Cobra-Token: {token}" appended.'))
+
+    class Meta:
+        fields = ('name', 'public', 'team', 'slug')
+        model = Project
+
+    def __init__(self, request, organization, team_list, data, instance, *args, **kwargs):
+        super(ProjectEditForm, self).__init__(data=data, instance=instance, *args, **kwargs)
+
+        self.organization = organization
+        self.team_list = team_list
+
+        if not can_set_public_projects(request.user):
+            del self.fields['public']
+        self.fields['team'].choices = self.get_team_choices(team_list, instance.team)
+        self.fields['team'].widget.choices = self.fields['team'].choices
+
+    def get_team_label(self, team):
+        return '%s (%s)' % (team.name, team.slug)
+
+    def get_team_choices(self, team_list, default=None):
+        sorted_team_list = sorted(team_list, key=lambda x: x.name)
+
+        choices = []
+        for team in sorted_team_list:
+            # TODO: optimize queries
+            choices.append(
+                (team.id, self.get_team_label(team))
+            )
+
+        if default is None:
+            choices.insert(0, (-1, mark_safe('&ndash;' * 8)))
+        elif default not in sorted_team_list:
+            choices.insert(0, (default.id, self.get_team_label(default)))
+
+        return choices
+
+    def clean_team(self):
+        value = self.cleaned_data.get('team')
+        if not value:
+            return
+
+        # TODO: why is this not already an int?
+        value = int(value)
+        if value == -1:
+            return
+
+        if self.instance.team and value == self.instance.team.id:
+            return self.instance.team
+
+        for team in self.team_list:
+            if value == team.id:
+                return team
+
+        raise forms.ValidationError('Unable to find chosen team')
+
+    def clean_slug(self):
+        slug = self.cleaned_data.get('slug')
+        if not slug:
+            return
+        exists_qs = Project.objects.filter(
+            slug=slug,
+            organization=self.organization
+        ).exclude(id=self.instance.id)
+        if exists_qs.exists():
+            raise forms.ValidationError('Another project is already using that slug')
+        return slug

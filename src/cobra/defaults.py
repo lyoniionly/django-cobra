@@ -319,7 +319,7 @@ COBRA_REDIS_OPTIONS = {}
 
 # Should users without superuser permissions be allowed to
 # make projects public
-COBRA_ALLOW_PUBLIC_PROJECTS = True
+COBRA_ALLOW_PUBLIC_PROJECTS = False
 
 # Rate limiting backend
 COBRA_RATELIMITER = 'cobra.core.ratelimits.base.RateLimiter'
