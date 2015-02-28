@@ -5,8 +5,8 @@
   <li{% if active_nav == 'code' %} class="active"{% endif %}>
     <a href="{% url 'svnkit:node' organization.slug project.slug '/' %}">{% trans "Code" %}</a>
   </li>
-  <li{% if active_nav == 'explore' %} class="active"{% endif %}>
-    <a href="">{% trans "Explore" %}</a>
+  <li{% if active_nav == 'pack' %} class="active"{% endif %}>
+    <a href="">{% trans "Pack" %}</a>
   </li>
   {% if request.user|can_manage_project:project %}
     <li{% if active_nav == 'settings' %} class="active"{% endif %}>
