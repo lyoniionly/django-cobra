@@ -59,13 +59,6 @@
 </ul>
 {% endif %}
 
-{% if node.is_file %}
-<div class="node-download">
-<a href="{{ node.content.get_absolute_url }}">download</a>
-<span class="node-size">({{ node.size|filesizeformat }})</span>
-</div>
-{% endif %}
-
 <div class="node-details">
 {#  <p class="revision-panel">#}
 {#    <a class="revision-number"#}

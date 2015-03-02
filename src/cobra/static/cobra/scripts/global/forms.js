@@ -151,6 +151,10 @@
         button.removeClass('primary').addClass('disabled');
         button.attr('disabled', 'disabled');
       }
+      if(button.data('load-modal')){
+        $(button.data('load-modal')).modal({backdrop: 'static'});
+      }
+
       return true;
     });
   };

@@ -18,7 +18,7 @@
                 {% endfor %}
               </span>
             </span>
-            {{ path }}
+            <a href="{% url 'svnkit:node-revision' organization.slug project.slug revision path %}">{{ path }}</a>
           </h1>
         </div>
         <div class="second">

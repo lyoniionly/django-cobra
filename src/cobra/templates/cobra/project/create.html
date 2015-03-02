@@ -31,7 +31,7 @@
         - {% trans "please check the error messages below and try again" %}
       </div>
     {% endif %}
-
+    {{ form|as_crispy_errors }}
     <fieldset>
       {{ form.name|as_crispy_field }}
       <div class="row">
@@ -59,9 +59,31 @@
       </div>
     </fieldset>
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary">{% trans "Create Now" %}</button>
+      <button type="submit" class="btn btn-primary" data-load-modal="#create-project-now">{% trans "Create Now" %}</button>
     </div>
   </form>
   {#  {% include "partials/form.html" %}#}
+
+  <div id='create-project-now' class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{% trans 'Please wait...' %}</h4>
+      </div>
+      <div class="modal-body">
+
+        <p>{% trans 'Cobra will do operations for you orderly.' %}</p>
+        <ol>
+          <li>{% trans 'Verify the data you applied.' %}</li>
+          <li>{% trans 'Sync data from the SVN server' %}</li>
+          <li>{% trans 'Download data from the SVN server.' %}</li>
+        </ol>
+        <div class="alert alert-warning alert-dismissible fade in" role="alert">
+          <strong>{% trans 'Attention!' %}</strong> {% trans 'It will redirect to the right page automately.' %}
+        </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 {% endblock %}
 </div>

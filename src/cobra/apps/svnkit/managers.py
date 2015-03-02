@@ -7,6 +7,7 @@ import posixpath
 
 import pysvn
 from django.db import transaction
+from django.utils import timezone
 
 from cobra.core.loading import get_model
 from cobra.models import BaseManager
@@ -111,9 +112,9 @@ class NodeManager(BaseManager):
                     repository=repository, path=node_path, revision=revision)
 
             node.node_type = choices.NODE_TYPE_MAP[item['kind']]
-            node.last_changed = datetime.datetime.fromtimestamp(item['time'])
+            node.last_changed = datetime.datetime.fromtimestamp(item['time'], timezone.utc)
             node.size = item['size']
-            node.cached_datetime = datetime.datetime.now()
+            node.cached_datetime = timezone.now()
             node_list.append(node)
 
         # separate out the primary node from any child nodes following it.

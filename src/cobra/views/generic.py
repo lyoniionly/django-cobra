@@ -347,12 +347,14 @@ class OrganizationMixin(object):
         Returns the currently active organization for the request or None
         if no organization.
         """
+        UserOption = get_model('option', 'UserOption')
+        options = UserOption.objects.get_all_values(user=request.user, project=None)
         active_organization = None
 
         is_implicit = organization_slug is None
 
         if is_implicit:
-            organization_slug = request.session.get('activeorg')
+            organization_slug = request.session.get('activeorg') or options.get('last_active_org')
 
         if organization_slug is not None:
             if request.user.is_superuser:
@@ -384,6 +386,12 @@ class OrganizationMixin(object):
                              organization_slug)
                 if is_implicit:
                     del request.session['activeorg']
+                    UserOption.objects.set_value(
+                        user=request.user,
+                        project=None,
+                        key='last_active_org',
+                        value=None,
+                    )
                 active_organization = None
 
         if active_organization is None:
@@ -398,6 +406,14 @@ class OrganizationMixin(object):
 
         if active_organization and active_organization.slug != request.session.get('activeorg'):
             request.session['activeorg'] = active_organization.slug
+
+        if active_organization and active_organization.slug != options.get('last_active_org'):
+            UserOption.objects.set_value(
+                user=request.user,
+                project=None,
+                key='last_active_org',
+                value=active_organization.slug,
+            )
 
         return active_organization
 

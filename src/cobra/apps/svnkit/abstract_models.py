@@ -6,28 +6,22 @@ import posixpath
 from django.conf import settings
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models import Q
 from django.db import transaction
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 import pysvn
 
-from cobra.core.compat import AUTH_USER_MODEL
 from cobra.models import Model
 from cobra.models import fields
 from cobra.models import sane_repr
-from cobra.models.utils import slugify_instance
-from cobra.core.http import absolute_uri
-from cobra.core.constants import MEMBER_TYPES, MEMBER_USER
 from cobra.core.loading import get_class, get_model
 from cobra.core.strings import strip, truncatechars
 
 from . import choices
 from .exceptions import map_svn_exceptions
-from .markup.hightlighter import make_html, get_lexer
+from .markup.hightlighter import make_html
 from .utils.binaryornot import get_starting_chunk
 from .utils.binaryornot import is_binary_string
 
@@ -59,8 +53,7 @@ class AbstractRepository(Model):
     password = models.CharField(max_length=512, blank=True)
 
     last_synced = models.DateTimeField(
-        # default=datetime.datetime.fromtimestamp(0, timezone.utc),
-        default=datetime.datetime.fromtimestamp(0),
+        default=datetime.datetime.fromtimestamp(0, timezone.utc),
         editable=False)
 
     class Meta:
@@ -98,9 +91,9 @@ class AbstractRepository(Model):
         client.exception_style = 1
 
         # hook for cancelling an api call thats taking too long
-        started_dt = datetime.datetime.now()
+        started_dt = timezone.now()
         def _cancel():
-            current_dt = datetime.datetime.now()
+            current_dt = timezone.now()
             delta = (current_dt - started_dt).seconds
             if delta > settings.COBRA_SVNKIT_CLIENT_TIMEOUT:
                 return True
@@ -162,7 +155,7 @@ class AbstractRepository(Model):
 
             changeset = Changeset.objects.create(
                 repository=self,
-                date=datetime.datetime.fromtimestamp(item['date']),
+                date=datetime.datetime.fromtimestamp(item['date'], timezone.utc),
                 revision=item['revision'].number,
                 author=item.get('author', ''),
                 message=item.get('message', '') # Normally, message must be exist, but I meet some condition that there is no message.
@@ -346,7 +339,7 @@ class AbstractNode(Model):
     last_changed = models.DateTimeField(null=True)
 
     revision = models.PositiveIntegerField()
-    cached = models.DateTimeField(default=datetime.datetime.now)
+    cached = models.DateTimeField(default=timezone.now)
     cached_indirectly = models.BooleanField(default=True)
 
     content = fields.FlexibleForeignKey('svnkit.Content', related_name='nodes', null=True)
@@ -472,7 +465,7 @@ class AbstractContent(Model):
     repository = fields.FlexibleForeignKey('svnkit.Repository', related_name='content')
     path = models.CharField(max_length=2048)
     last_changed = models.DateTimeField()
-    cached = models.DateTimeField(default=datetime.datetime.now)
+    cached = models.DateTimeField(default=timezone.now)
     size = models.PositiveIntegerField(default=0)
     data = models.TextField()
 

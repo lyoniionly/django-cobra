@@ -1,8 +1,9 @@
 from __future__ import absolute_import, division
 
 import posixpath
+from braces.views import AjaxResponseMixin
 
-from django import http, shortcuts, template
+from django import http, shortcuts
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
@@ -10,13 +11,13 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 from django_downloadview import VirtualDownloadView
 
+from .markup.hightlighter import get_pygmentize_diff
 from cobra.core.decorators import has_access
 from cobra.core.loading import get_model
 from cobra.views.mixins import ExtraContextMixin
 
 from . import exceptions
 from .decorators import autosync_repositories
-from .markup.hightlighter import get_lexer
 from .utils import diff
 
 Repository = get_model('svnkit', 'Repository')
@@ -196,7 +197,7 @@ class SvnContentView(VirtualDownloadView):
         return ContentFile(content.get_data(), name=self.kwargs['path'])
 
 
-class SvnNodeDiffView(ExtraContextMixin, generic.TemplateView):
+class SvnNodeDiffView(AjaxResponseMixin, ExtraContextMixin, generic.TemplateView):
     """View a diff of two revisions at a node."""
     template_name = 'svnkit/node_diff.html'
 
@@ -208,8 +209,14 @@ class SvnNodeDiffView(ExtraContextMixin, generic.TemplateView):
         self.repository = self.get_repository()
         return super(SvnNodeDiffView, self).dispatch(request, *args, **kwargs)
 
+    def get_ajax(self, request, *args, **kwargs):
+        self.template_name = 'svnkit/node_diff_data.html'
+        return super(SvnNodeDiffView, self).get_ajax(request, *args, **kwargs)
+
+
     def get(self, request, *args, **kwargs):
         self.path = self.kwargs['path']
+        self.revision = self.kwargs['to_revision']
         self.from_changeset = shortcuts.get_object_or_404(
             Changeset, repository=self.repository, revision=self.kwargs['from_revision'])
         self.to_changeset = shortcuts.get_object_or_404(
@@ -249,6 +256,8 @@ class SvnNodeDiffView(ExtraContextMixin, generic.TemplateView):
             content_from,
             content_to, self.from_node.get_basename())
         self.addition_stats, self.deletion_stats, self.nil_stats = self._calc_diffstas(self.addition_num, self.deletion_num)
+
+        self.ajax_diff_html = get_pygmentize_diff(content_from, content_to)
         return super(SvnNodeDiffView, self).get(request, *args, **kwargs)
 
     def _calc_diffstas(self, addition_num, deletion_num):
@@ -281,4 +290,5 @@ class SvnNodeDiffView(ExtraContextMixin, generic.TemplateView):
         ctx['addition_stats'] = getattr(self, 'addition_stats', None)
         ctx['deletion_stats'] = getattr(self, 'deletion_stats', None)
         ctx['nil_stats'] = getattr(self, 'nil_stats', None)
+        ctx['ajax_diff_html'] = self.ajax_diff_html
         return super(SvnNodeDiffView, self).get_context_data(**ctx)

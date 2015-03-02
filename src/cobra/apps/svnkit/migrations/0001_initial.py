@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import datetime
 from django.utils.timezone import utc
+import django.utils.timezone
 import cobra.models.fields.foreignkey
 import cobra.models.fields.bounded
 
@@ -53,7 +54,7 @@ class Migration(migrations.Migration):
                 ('id', cobra.models.fields.bounded.BoundedBigAutoField(serialize=False, primary_key=True)),
                 ('path', models.CharField(max_length=2048)),
                 ('last_changed', models.DateTimeField()),
-                ('cached', models.DateTimeField(default=datetime.datetime.now)),
+                ('cached', models.DateTimeField(default=django.utils.timezone.now)),
                 ('size', models.PositiveIntegerField(default=0)),
                 ('data', models.TextField()),
             ],
@@ -72,7 +73,7 @@ class Migration(migrations.Migration):
                 ('size', models.PositiveIntegerField(default=0)),
                 ('last_changed', models.DateTimeField(null=True)),
                 ('revision', models.PositiveIntegerField()),
-                ('cached', models.DateTimeField(default=datetime.datetime.now)),
+                ('cached', models.DateTimeField(default=django.utils.timezone.now)),
                 ('cached_indirectly', models.BooleanField(default=True)),
                 ('content', cobra.models.fields.foreignkey.FlexibleForeignKey(related_name='nodes', to='svnkit.Content', null=True)),
                 ('parent', cobra.models.fields.foreignkey.FlexibleForeignKey(related_name='children', to='svnkit.Node', null=True)),

@@ -4,6 +4,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
+from cobra.apps.svnkit.utils.check import check_repo_valid
 from cobra.core.loading import get_model, get_class
 from cobra.core.permissions import can_set_public_projects
 
@@ -50,6 +51,15 @@ class AddProjectForm(forms.ModelForm):
             # 'svn_url': forms.URLInput(attrs={'placeholder': _(''),}),
             # 'svn_password': forms.PasswordInput()
         }
+
+    def clean(self):
+        cleaned_data = super(AddProjectForm, self).clean()
+        svn_url = cleaned_data.get("svn_url")
+        svn_username = cleaned_data.get("svn_username")
+        svn_password = cleaned_data.get("svn_password")
+        (is_repo_valid, msg) = check_repo_valid(svn_url, svn_username, svn_password)
+        if not is_repo_valid:
+            raise forms.ValidationError(msg)
 
     def save(self, actor, team, ip_address):
         project = super(AddProjectForm, self).save(commit=False)

@@ -9,7 +9,7 @@ from cobra.core.loading import get_model, get_class
 from cobra.core.permissions import can_remove_project
 from cobra.core.plugins import plugins
 from cobra.views.generic import OrganizationView, ProjectView
-from cobra.views.mixins import PageTitleMixin
+from cobra.apps.svnkit.utils.check import check_repo_valid
 
 Team = get_model('team', 'Team')
 OrganizationMember = get_model('organization', 'OrganizationMember')
@@ -56,9 +56,7 @@ class ProjectCreateView(OrganizationView):
         form = self.get_form(request, organization, team_list)
         if form.is_valid():
             project = form.save(request.user, request.META['REMOTE_ADDR'])
-
             url = reverse('svnkit:node', args=[organization.slug, project.slug, '/'])
-
             return self.redirect(url + '?newinstall=1')
 
         context = {

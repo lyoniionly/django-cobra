@@ -2016,8 +2016,25 @@ section.body .page-header:first-child {
 }
 
 .modal {
-  width: 760px;
-  margin-left: -480px;
+  .modal-header {
+    font-size: 20px;
+    letter-spacing: 0;
+    font-weight: 500;
+    background: #fafafa;
+    border-bottom: 2px solid #f1f2f3;
+    border-radius: 7px 7px 0 0;
+  }
+  .modal-content {
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    .modal-body {
+      p {
+        font-size: 14px;
+        line-height: 1.4;
+        font-weight: bold;
+        letter-spacing: -0.05em;
+      }
+    }
+  }
 }
 
 .image {
@@ -4478,7 +4495,7 @@ ul.content-list.content-list-grid > li.content-list-footer a {
 }
 
 .loading {
-  background: url(../img/loading/loading-white-bg.gif) transparent no-repeat center center;
+  background: url('@{img-url}/loading/large-loading.gif') transparent no-repeat center center;
   min-height: 32px;
   min-width: 32px;
   height: 100%;
@@ -5393,6 +5410,12 @@ table.commit-list td>div {
       color: #707070;
       text-transform: none;
       word-wrap: break-word;
+      a {
+        color: inherit;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 }
@@ -5427,7 +5450,7 @@ table.commit-list td>div {
     position: absolute;
     left: 1px;
     height: 18px;
-//    background-color: #f5f5f5;
+    background-color: #fafafa;
     border-right: 1px solid #ccc;
     &:hover, &:target {
       background: #e9e9e9;
@@ -5611,6 +5634,16 @@ table.commit-list td>div {
     i.minus {
       color: #bd2c00;
       font-style: normal;
+    }
+  }
+}
+
+.inline-diff-body {
+  margin: 20px 0;
+  .panel-heading a {
+    color: #707070;
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
