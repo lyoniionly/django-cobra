@@ -1,22 +1,26 @@
 from uuid import uuid1
 
+from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
+from django import forms
 
 from cobra.core.loading import get_model, get_class
 from cobra.core.permissions import can_remove_project
 from cobra.core.plugins import plugins
 from cobra.views.generic import OrganizationView, ProjectView
-from cobra.apps.svnkit.utils.check import check_repo_valid
+from cobra.tasks.deletion import delete_project
 
 Team = get_model('team', 'Team')
+Project = get_model('project', 'Project')
 OrganizationMember = get_model('organization', 'OrganizationMember')
 AuditLogEntry = get_model('auditlog', 'AuditLogEntry')
 AddProjectWithTeamForm = get_class('project.forms', 'AddProjectWithTeamForm')
 ProjectEditForm = get_class('project.forms', 'ProjectEditForm')
 OrganizationMemberType = get_class('organization.utils', 'OrganizationMemberType')
+ProjectStatus = get_class('project.utils', 'ProjectStatus')
 AuditLogEntryEvent = get_class('auditlog.utils', 'AuditLogEntryEvent')
 
 ERR_NO_TEAMS = 'You cannot create a new project because there are no teams to assign it to.'
@@ -155,3 +159,70 @@ class ProjectSettingsView(ProjectView):
         }
 
         return self.respond('project/settings.html', context)
+
+
+class RemoveProjectForm(forms.Form):
+    pass
+
+class ProjectRemoveView(ProjectView):
+    required_access = OrganizationMemberType.OWNER
+    sudo_required = True
+
+    def get_form(self, request):
+        if request.method == 'POST':
+            return RemoveProjectForm(request.POST)
+        return RemoveProjectForm()
+
+    def get(self, request, organization, team, project):
+        if not can_remove_project(request.user, project):
+            return HttpResponseRedirect(reverse('home:home'))
+
+        form = self.get_form(request)
+
+        context = {
+            'form': form,
+            'active_nav': 'settings',
+            'active_tab':'details'
+        }
+
+        return self.respond('project/remove.html', context)
+
+    def post(self, request, organization, team, project):
+        if not can_remove_project(request.user, project):
+            return HttpResponseRedirect(reverse('home:home'))
+
+        form = self.get_form(request)
+
+        if form.is_valid():
+            updated = Project.objects.filter(
+                id=project.id,
+                status=ProjectStatus.VISIBLE,
+            ).update(status=ProjectStatus.PENDING_DELETION)
+            if updated:
+                if settings.COBRA_USE_CELERY:
+                    delete_project.delay(object_id=project.id)
+                else:
+                    delete_project(object_id=project.id)
+
+                AuditLogEntry.objects.create(
+                    organization=organization,
+                    actor=request.user,
+                    ip_address=request.META['REMOTE_ADDR'],
+                    target_object=project.id,
+                    event=AuditLogEntryEvent.PROJECT_REMOVE,
+                    data=project.get_audit_log_data(),
+                )
+
+            messages.add_message(
+                request, messages.SUCCESS,
+                _(u'The project %r was scheduled for deletion.') % (project.name.encode('utf-8'),))
+
+            return HttpResponseRedirect(reverse('organization:home', args=[team.organization.id]))
+
+        context = {
+            'form': form,
+            'active_nav': 'settings',
+            'active_tab':'details'
+        }
+
+        return self.respond('project/remove.html', context)

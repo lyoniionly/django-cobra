@@ -29,6 +29,7 @@ from cobra.core.loading import get_classes, get_model
 from cobra.core.render import render_to_response
 from cobra.core.plugins import plugins
 from cobra.core.plugins.base import Response
+from cobra.core.auth import access
 
 OrganizationMemberType, OrganizationStatus = get_classes('organization.utils',
                                                          [ 'OrganizationMemberType', 'OrganizationStatus'])
@@ -236,107 +237,6 @@ class PhoneNumberMixin(object):
 
 ERR_MISSING_SSO_LINK = _('You need to link your account with the SSO provider to continue.')
 
-
-class NoAccess(object):
-    is_global = False
-    is_sso_valid = False
-
-    def has_access(self, type):
-        return False
-
-    def has_team_access(self, team):
-        return False
-
-
-class Access(object):
-    # TODO(dcramer): this is still a little gross, and ideally backend access
-    # would be based on the same scopes as API access so theres clarity in
-    # what things mean
-    def __init__(self, type, is_global=False, is_sso_valid=False, teams=()):
-        self._is_global = is_global
-        self._is_sso_valid = is_sso_valid
-        self._teams = teams
-        self._type = type
-
-    def has_access(self, type):
-        if self._type is None:
-            return False
-        return self._type <= type
-
-    def has_team_access(self, team):
-        if self._type is None:
-            return False
-        if self._is_global:
-            return True
-        return team in self._teams
-
-    @property
-    def is_admin(self):
-        if self._type is None:
-            return False
-        return self.has_access(OrganizationMemberType.ADMIN)
-
-    @property
-    def is_global(self):
-        return self._is_global
-
-    @property
-    def is_owner(self):
-        if self._type is None:
-            return False
-        return self.has_access(OrganizationMemberType.OWNER)
-
-    @property
-    def is_sso_valid(self):
-        return self._is_sso_valid
-
-    @classmethod
-    def from_user(cls, user, organization):
-        if user.is_superuser:
-            return cls(
-                is_global=True,
-                is_sso_valid=True,
-                type=OrganizationMemberType.OWNER,
-            )
-
-        if not organization:
-            return NoAccess()
-
-        try:
-            om = OrganizationMember.objects.get(
-                user=user, organization=organization
-            )
-        except OrganizationMember.DoesNotExist:
-            return cls(type=None)
-
-        return cls.from_member(om)
-
-    @classmethod
-    def from_member(cls, member):
-        if member.has_global_access:
-            teams = ()
-        else:
-            teams = member.teams.all()
-
-        # try:
-        #     auth_provider = AuthProvider.objects.get(
-        #         organization=member.organization_id,
-        #     )
-        # except AuthProvider.DoesNotExist:
-        #     is_sso_valid = True
-        # else:
-        #     is_sso_valid = auth_provider.member_is_valid(member)
-
-        is_sso_valid = True
-
-        return cls(
-            is_global=member.has_global_access,
-            is_sso_valid=is_sso_valid,
-            type=member.type,
-            teams=teams,
-        )
-
-
 class OrganizationMixin(object):
     # TODO(dcramer): move the implicit organization logic into its own class
     # as it's only used in a single location and over complicates the rest of
@@ -457,11 +357,11 @@ class BaseView(View, OrganizationMixin):
 
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
-        if self.is_auth_required(request):
-            return self.handle_auth_required(request)
+        if self.is_auth_required(request, *args, **kwargs):
+            return self.handle_auth_required(request, *args, **kwargs)
 
-        if self.is_sudo_required(request):
-            return self.handle_sudo_required(request)
+        if self.is_sudo_required(request, *args, **kwargs):
+            return self.handle_sudo_required(request, *args, **kwargs)
 
         args, kwargs = self.convert_args(request, *args, **kwargs)
 
@@ -476,7 +376,7 @@ class BaseView(View, OrganizationMixin):
         return self.handle(request, *args, **kwargs)
 
     def get_access(self, request, *args, **kwargs):
-        return NoAccess()
+        return access.DEFAULT
 
     def convert_args(self, request, *args, **kwargs):
         return (args, kwargs)
@@ -546,26 +446,36 @@ class OrganizationView(BaseView):
     valid_sso_required = True
 
     def get_access(self, request, organization, *args, **kwargs):
-        return Access.from_user(request.user, organization)
+        return access.from_user(request.user, organization)
 
     def get_context_data(self, request, organization, **kwargs):
         context = super(OrganizationView, self).get_context_data(request)
         context['organization'] = organization
         context['TEAM_LIST'] = self.get_team_list(request.user, organization)
-        context['ACCESS'] = request.access
+        context['ACCESS'] = {
+            'team_read': request.access.has_scope('team:read'),
+            'team_write': request.access.has_scope('team:write'),
+            'team_delete': request.access.has_scope('team:delete'),
+            'org_read': request.access.has_scope('org:read'),
+            'org_write': request.access.has_scope('org:write'),
+            'org_delete': request.access.has_scope('org:delete'),
+            'project_read': request.access.has_scope('project:read'),
+            'project_write': request.access.has_scope('project:write'),
+            'project_delete': request.access.has_scope('project:delete'),
+        }
         return context
 
     def has_permission(self, request, organization, *args, **kwargs):
         if organization is None:
             return False
-        if self.valid_sso_required and not request.access.is_sso_valid:
+        if self.valid_sso_required and not request.access.sso_is_valid:
             return False
         return True
 
     def handle_permission_required(self, request, organization, *args, **kwargs):
         needs_link = (
             organization and request.user.is_authenticated()
-            and self.valid_sso_required and not request.access.is_sso_valid
+            and self.valid_sso_required and not request.access.sso_is_valid
         )
 
         if needs_link:

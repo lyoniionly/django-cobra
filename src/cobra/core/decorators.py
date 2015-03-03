@@ -12,6 +12,7 @@ from sudo.decorators import sudo_required
 from cobra.core.utils import get_login_url
 from cobra.core.loading import get_model
 from cobra.core.constants import MEMBER_OWNER
+from cobra.core.render import render_to_response
 
 Organization = get_model('organization', 'Organization')
 Team = get_model('team', 'Team')
@@ -203,3 +204,12 @@ def has_access(access_or_func=None, organization=None, access=None):
             _wrapped = login_required(sudo_required(_wrapped))
         return _wrapped
     return wrapped
+
+
+def requires_admin(func):
+    @wraps(func)
+    def wrapped(request, *args, **kwargs):
+        if not request.user.is_staff:
+            return render_to_response('cobra/missing_permissions.html', status=400)
+        return func(request, *args, **kwargs)
+    return login_required(wrapped)

@@ -96,7 +96,6 @@
     <!-- javaScript Libs -->
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery-migrate.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.animate-colors.js" %}"></script>
-    <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.clippy.min.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.cookie.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.flot.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.flot.dashes.js" %}"></script>
@@ -116,6 +115,7 @@
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.jSelectDate.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.maskloading.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/fileinput.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/ZeroClipboard.min.js" %}"></script>
     <!-- Globle -->
     <script type="text/javascript" src="{% static "cobra/scripts/global/core.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/conf.js" %}"></script>
@@ -131,6 +131,7 @@
     <script type="text/javascript" src="{% static "cobra/scripts/global/app.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/communication.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/messages.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/copy.js" %}"></script>
     <!-- Legacy -->
     <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.core.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.charts.js" %}"></script>
@@ -140,7 +141,7 @@
     {% if request.LANGUAGE_CODE %}
       moment.lang('{{ request.LANGUAGE_CODE }}');
     {% endif %}
-    app.config.clippyPath = '{% static "cobra/clippy.swf" %}';
+    app.config.zeroClipboardPath = '{% static "cobra/ZeroClipboard.swf" %}';
     app.config.popupCss = '{% static "cobra/styles/popup.css" %}';
     app.config.mediaUrl = '';
     app.config.urlPrefix = {{ URL_PREFIX|to_json|safe }};
@@ -178,4 +179,8 @@
 {% block onbodyload %}
   {{ block.super }}
   app.init();
+  $('[data-toggle="tooltip"]').tooltip({
+                html: true,
+                container: 'body'
+            });
 {% endblock %}

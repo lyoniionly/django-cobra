@@ -9,36 +9,35 @@
 {% block content_class %}with-left-sidebar{% endblock %}
 
 {% block page_header_block %}
-    <section id="page-header" class="toolbar">
-      <div class="pull-right">
-        {% block actions %}
-        {% if ACCESS.is_admin %}
-          {% if ACCESS.is_global %}
-            <a href="{% url 'team:create' organization.slug %}"
-               class="btn btn-small btn-primary">{% trans "New Team" %}</a>
-          {% endif %}
+  <section id="page-header" class="toolbar">
+    <div class="pull-right">
+      {% block actions %}
+        {% if ACCESS.org_write %}
+          <a href="{% url 'team:create' organization.slug %}"
+             class="btn btn-small btn-primary">{% trans "New Team" %}</a>
+        {% endif %}
+        {% if ACCESS.team_write %}
           <a href="{% url 'project:create' organization.slug %}"
              class="btn btn-small btn-primary">{% trans "New Project" %}</a>
-          {% if ACCESS.is_global %}
-            <a href="{% url 'organization:member-create' organization.slug %}"
-               class="btn btn-small btn-primary">{% trans "New Member" %}</a>
-          {% endif %}
         {% endif %}
-        {% endblock %}
-      </div>
-      <h3>{{ organization.name }} <small>Dashboard</small></h3>
-    </section>
+        {% if ACCESS.org_write %}
+          <a href="{% url 'organization:member-create' organization.slug %}"
+             class="btn btn-small btn-primary">{% trans "New Member" %}</a>
+        {% endif %}
+      {% endblock %}
+    </div>
+    <h3>{{ organization.name }} <small>Dashboard</small></h3>
+  </section>
 {% endblock %}
 
 {% block sidebar %}
   <ul class="nav nav-list">
-    <!-- <li class="nav-header"><h6>{{ organization.name }}</h6></li> -->
     <li class="{% block org_teams_nav %}{% endblock %}">
-      <a href="{% comment %}{% url 'sentry-organization-home' organization.slug %}{% endcomment %}">
+      <a href="{% url 'organization:home' organization.slug %}">
         {% trans "Teams" %}
       </a>
     </li>
-    {% if ACCESS.is_global and ACCESS.is_admin %}
+    {% if ACCESS.org_read %}
     <li class="{% block org_stats_nav %}{% endblock %}">
       <a href="{% comment %}{% url 'sentry-organization-stats' organization.slug %}{% endcomment %}">
         {% trans "Statistic" %}
@@ -54,6 +53,8 @@
         {% trans "Audit Log" %}
       </a>
     </li>
+    {% endif %}
+    {% if ACCESS.org_write %}
     <li class="{% block org_settings_nav %}{% endblock %}">
       <a href="{% url 'organization:settings' organization.slug %}">
         {% trans "Settings" %}

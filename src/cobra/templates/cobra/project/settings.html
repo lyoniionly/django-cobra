@@ -49,9 +49,9 @@
             </fieldset>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
-                {% if ACCESS.is_owner %}
+                {% if ACCESS.project_delete %}
                     {% if not project.is_internal_project %}
-                        <a href="{% comment %}{% url 'sentry-remove-project' project.organization.slug project.slug %}{% endcomment %}" class="btn btn-danger">{% trans "Remove Project" %}</a>
+                        <a href="{% url 'project:remove' project.slug project.organization.slug %}" class="btn btn-danger">{% trans "Remove Project" %}</a>
                     {% else %}
                         <a class="btn btn-danger disabled tip" title="{% trans "This project cannot be removed. It is used internally by the Sentry server." %}">{% trans "Remove Project" %}</a>
                     {% endif %}

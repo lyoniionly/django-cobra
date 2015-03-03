@@ -76,21 +76,12 @@ def delete_team(object_id, **kwargs):
     t.delete()
 
 
-@instrumented_task(name='cobra.tasks.deletion.delete_project', queue='cleanup',
-                   default_retry_delay=60 * 5, max_retries=None)
-@retry
+# @instrumented_task(name='cobra.tasks.deletion.delete_project', queue='cleanup',
+#                    default_retry_delay=60 * 5, max_retries=None)
+# @retry
 def delete_project(object_id, **kwargs):
     Project = get_model('project', 'Project')
-    ProjectKey = get_model('project', 'ProjectKey')
-    TagKey = get_model('tag', 'TagKey')
-    TagValue = get_model('tag', 'TagValue')
-    GroupTagKey = get_model('tag', 'GroupTagKey')
-    GroupTagValue = get_model('tag', 'GroupTagValue')
-    Activity = get_model('activity', 'Activity')
-    EventMapping = get_model('event', 'EventMapping')
-    Group = get_model('group', 'Group')
-    ProjectStatus = get_class('project', 'ProjectStatus')
-
+    ProjectStatus = get_class('project.utils', 'ProjectStatus')
 
     try:
         p = Project.objects.get(id=object_id)
@@ -100,30 +91,6 @@ def delete_project(object_id, **kwargs):
     if p.status != ProjectStatus.DELETION_IN_PROGRESS:
         p.update(status=ProjectStatus.DELETION_IN_PROGRESS)
 
-    logger = delete_project.get_logger()
-
-    # XXX: remove keys first to prevent additional data from flowing in
-    model_list = (
-        ProjectKey, TagKey, TagValue, GroupTagKey, GroupTagValue, EventMapping,
-        Activity
-    )
-    for model in model_list:
-        has_more = bulk_delete_objects(model, project_id=p.id, logger=logger)
-        if has_more:
-            delete_project.delay(object_id=object_id, countdown=15)
-            return
-
-    has_more = delete_events(relation={'project_id': p.id}, logger=logger)
-    if has_more:
-        delete_project.delay(object_id=object_id, countdown=15)
-        return
-
-    model_list = (Group,)
-    for model in model_list:
-        has_more = bulk_delete_objects(model, project_id=p.id, logger=logger)
-        if has_more:
-            delete_project.delay(object_id=object_id, countdown=15)
-            return
     p.delete()
 
 

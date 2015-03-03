@@ -16,6 +16,7 @@ COBRA_SVNKIT_SYNC_INTERVAL = 180
 
 
 # Accounts settings
+COBRA_ACCOUNTS_REDIRECT_URL = 'customer:profile-view'
 COBRA_ACCOUNTS_AVATAR_PATH = 'avatars/'
 COBRA_ACCOUNTS_AVATAR_SIZE = 120
 COBRA_ACCOUNTS_AVATAR_CROP_TYPE = 'smart'
@@ -71,8 +72,6 @@ COBRA_PROMOTION_POSITIONS = (('page', 'Page'),
 COBRA_ALLOW_ANON_REVIEWS = True
 COBRA_MODERATE_REVIEWS = False
 
-# Accounts
-COBRA_ACCOUNTS_REDIRECT_URL = 'customer:profile-view'
 
 # This enables sending alert notifications/emails instantly when products get
 # back in stock by listening to stock record update signals.
@@ -324,6 +323,9 @@ COBRA_ALLOW_PUBLIC_PROJECTS = False
 # Rate limiting backend
 COBRA_RATELIMITER = 'cobra.core.ratelimits.base.RateLimiter'
 COBRA_RATELIMITER_OPTIONS = {}
+
+# User celery
+COBRA_USE_CELERY = False
 
 COBRA_SETTINGS = dict(
     [(k, v) for k, v in locals().items() if k.startswith('COBRA_')])
