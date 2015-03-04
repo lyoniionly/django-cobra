@@ -25,6 +25,7 @@
           <div class="navbar-inner">
             <div class="container">
               {% include "partials/brand.html" %}
+              <h1>{% block heading %}{% endblock %}</h1>
               {% include "partials/nav_primary.html" %}
             </div>
           </div>
@@ -180,7 +181,7 @@
   {{ block.super }}
   app.init();
   $('[data-toggle="tooltip"]').tooltip({
-                html: true,
-                container: 'body'
-            });
+    html: true,
+    container: 'body'
+  });
 {% endblock %}

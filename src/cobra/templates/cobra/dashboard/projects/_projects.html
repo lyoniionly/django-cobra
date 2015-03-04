@@ -1,0 +1,31 @@
+{% load i18n %}
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <div class="input-group">
+      <input class="dash-filter form-control" id="filter_projects" name="filter_projects" placeholder="Filter by name" type="search">
+      <div class="input-group-addon dash-new-project">
+        <a href="#"><strong>New project</strong></a>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <ul class="nav-linkerer">
+        <li><a href="#" class="nav-linker js-repo-filter-tab" data-filter=".public, li.private" data-ga-click="Dashboard, click, Repo list filter - context:user filter:all">All</a></li>
+        <li><a href="#" class="nav-linker js-repo-filter-tab" data-filter=".public" data-ga-click="Dashboard, click, Repo list filter - context:user filter:public">Public</a></li>
+        <li><a href="#" class="nav-linker js-repo-filter-tab" data-filter=".private" data-ga-click="Dashboard, click, Repo list filter - context:user filter:private">Private</a></li>
+        <li><a href="#" class="nav-linker js-repo-filter-tab" data-filter=".source" data-ga-click="Dashboard, click, Repo list filter - context:user filter:sources">Sources</a></li>
+        <li><a href="#" class="nav-linker js-repo-filter-tab linker-selected" data-filter=".fork" data-ga-click="Dashboard, click, Repo list filter: forks">Forks</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <ul class="well-list dash-list">
+    {% for project in projects %}
+      <li class="project-row">
+        {% include 'dashboard/projects/_project.html' %}
+      </li>
+    {% empty %}
+      <li><div class="nothing-here-block">{% trans 'There are no projects here.' %}</div></li>
+    {% endfor %}
+  </ul>
+</div>

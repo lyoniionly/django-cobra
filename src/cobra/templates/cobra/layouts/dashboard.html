@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% load i18n %}
+
+{% block title %} {% trans 'Dashboard' %} | {{ block.super }}{% endblock %}
+
+{% block heading %}{% trans 'Dashboard' %}{% endblock %}
+
+{% block page_header_block %}
+    <section id="page-header" class="toolbar" style="height:5px;"></section>
+{% endblock %}
+
+{% block main %}
+  <section class="body dashboard">
+    {% block inner %}{% endblock %}
+  </section>
+{% endblock %}
+
+{% block sidebar %}
+  <ul class="nav nav-list">
+    <li{% if active_tab == 'activity' %} class="active"{% endif %}>
+        <a href="#">{% trans "Activity" %}</a>
+    </li>
+  </ul>
+{% endblock %}

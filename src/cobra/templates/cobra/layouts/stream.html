@@ -7,8 +7,10 @@
 
 {% block page_header %}
     <div class="pull-right">
-        <form action="{% comment %}{% url 'sentry-stream' project.organization.slug project.slug %}{% endcomment %}" id="search">
-            <input type="text" name="query" value="{% if query %}{{ query }}{% endif %}" placeholder="{% trans "Jump to revision" %}" />
+        <form action="{% url 'svnkit:jump-revision' project.organization.slug project.slug %}" method="post" id="search">{% csrf_token %}
+          <input type="hidden" name="path" value="{{ path|default:'/' }}">
+          <input type="hidden" name="current_request_path" value="{{ request.path }}">
+            <input type="text" name="revision" class="form-control" placeholder="{% trans "Jump to revision" %}" />
         </form>
     </div>
 

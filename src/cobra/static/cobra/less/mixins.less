@@ -13,8 +13,16 @@
           background-clip: @clip;
 }
 
-
 .buttonBackground (@start, @end)
 {
     background: @start;
+}
+
+.str-truncated(@max_width: 90%) {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+  white-space: nowrap;
+  max-width: @max_width;
 }

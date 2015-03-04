@@ -18,6 +18,7 @@ from cobra.apps.accounts.utils import get_gravatar
 from cobra.core.javascript import to_json
 from cobra.core.loading import get_model, get_class, get_profile_class
 from cobra.core.constants import EVENTS_PER_PAGE
+from cobra.core.utils import multi_get_letter
 
 register = template.Library()
 
@@ -111,6 +112,24 @@ def get_avatar_url(user, email=''):
         # User has no profile, try a blank one
         instance = Profile(user=user)
     return instance.get_avatar_url()
+
+
+@register.inclusion_tag('partials/project_avatar.html')
+def get_project_avatar(project, css_class=''):
+    allowed_colors = {
+      'red': 'FFEBEE',
+      'purple': 'F3E5F5',
+      'indigo': 'E8EAF6',
+      'blue': 'E3F2FD',
+      'teal': 'E0F2F1',
+      'orange': 'FBE9E7',
+      'gray': 'EEEEEE'
+    }
+    css_class += ' identicon'
+    bg_key = project.id % 7
+    style = "background-color: #%s; color: #555" % allowed_colors.values()[bg_key]
+    first_cap = multi_get_letter(project.name)[0]
+    return {'css_class': css_class, 'style': style, 'first_cap': first_cap.upper()}
 
 
 @register.filter

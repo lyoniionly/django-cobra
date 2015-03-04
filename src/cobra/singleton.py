@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from django.conf import settings
 from threading import local
-from core.loading import import_string
+from cobra.core.loading import import_string
 
 
 class State(local):

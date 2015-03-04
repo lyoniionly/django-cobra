@@ -5,10 +5,13 @@ from braces.views import AjaxResponseMixin
 
 from django import http, shortcuts
 from django.conf import settings
+from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from django.views import generic
+from django.views.generic import RedirectView
+from django.utils.translation import ugettext_lazy as _
 from django_downloadview import VirtualDownloadView
 
 from .markup.hightlighter import get_pygmentize_diff
@@ -90,14 +93,14 @@ class SvnNodeView(ExtraContextMixin, generic.TemplateView):
     def dispatch(self, request, *args, **kwargs):
         return super(SvnNodeView, self).dispatch(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        r = request.POST.get('revision', '').lower()
-        if r.startswith('r'):
-            r = r[1:]
-        if r.isdigit():
-            return http.HttpResponseRedirect(reverse(
-                'svnkit:node-revision',
-                args=(kwargs['organization'].slug, kwargs['project'].slug, r, self.kwargs.get('path'))))
+    # def post(self, request, *args, **kwargs):
+    #     r = request.POST.get('revision', '').lower()
+    #     if r.startswith('r'):
+    #         r = r[1:]
+    #     if r.isdigit():
+    #         return http.HttpResponseRedirect(reverse(
+    #             'svnkit:node-revision',
+    #             args=(kwargs['organization'].slug, kwargs['project'].slug, r, self.kwargs.get('path'))))
 
     def get(self, request, *args, **kwargs):
         self.organization = kwargs.get('organization')
@@ -292,3 +295,29 @@ class SvnNodeDiffView(AjaxResponseMixin, ExtraContextMixin, generic.TemplateView
         ctx['nil_stats'] = getattr(self, 'nil_stats', None)
         ctx['ajax_diff_html'] = self.ajax_diff_html
         return super(SvnNodeDiffView, self).get_context_data(**ctx)
+
+
+class SvnJumpRevisionView(RedirectView):
+    pattern_name = 'svnkit:node-revision'
+
+    def post(self, request, *args, **kwargs):
+        current_request_path = request.POST.get('current_request_path')
+        p = request.POST.get('path', '/')
+        r = request.POST.get('revision', '').lower()
+        if r.startswith('r'):
+            r = r[1:]
+        if r.isdigit():
+            kwargs.update({
+                'revision': r,
+                'path': p
+            })
+            messages.add_message(
+                request, messages.SUCCESS,
+                _('Jump to revision "%s" successfully.') % (r,))
+        else:
+            messages.add_message(
+                request, messages.ERROR,
+                _('Your input revision "%s" is not right format, please input digit or r(+)number.') % (r,))
+            self.url = current_request_path
+
+        return super(SvnJumpRevisionView, self).post(request, *args, **kwargs)

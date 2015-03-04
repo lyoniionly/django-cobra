@@ -1,0 +1,21 @@
+{% load helper_tags %}
+
+<a class="project" href="#">
+  <div class="dash-project-avatar">
+    {% get_project_avatar project 'avatar project-avatar s40' %}
+  </div>
+  <span class="str-truncated">
+    <span class="namespace-name">
+      {{ project.organization.name }}
+      {% ifnotequal project.organization.owner request.user %}
+        ({{ project.organization.owner.get_display_name }})
+      {% endifnotequal %} / {{ project.team.name }} /
+    </span>
+    <span class="project-name filter-title">
+      {{ project.name }}
+    </span>
+  </span>
+  <span class="arrow">
+    <i class="fa fa-angle-right"></i>
+  </span>
+</a>

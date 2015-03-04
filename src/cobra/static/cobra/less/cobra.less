@@ -16,6 +16,9 @@
 @import url("fileinput.less");
 @import url("select2.less");
 @import url("pygments.less");
+@import url("dashboard.less");
+@import url("blocks.less");
+@import url("lists.less");
 @import url("breadcrumb.less");
 @import url("simple-slider.less");
 
@@ -51,6 +54,30 @@ dd {
 
 .bg-transparent {
   background: transparent;
+}
+
+.str-truncated {
+  .str-truncated();
+}
+
+/** COMMON CLASSES **/
+.prepend-top-10 { margin-top:10px }
+.prepend-top-20 { margin-top:20px }
+.prepend-left-10 { margin-left:10px }
+.prepend-left-20 { margin-left:20px }
+.append-right-10 { margin-right:10px }
+.append-right-20 { margin-right:20px }
+.append-bottom-10 { margin-bottom:10px }
+.append-bottom-15 { margin-bottom:15px }
+.append-bottom-20 { margin-bottom:20px }
+.inline { display: inline-block }
+.center { text-align: center }
+
+.cobra-promo {
+  a {
+    color: #aaa;
+    margin-right: 30px;
+  }
 }
 
 // FORMS
@@ -743,7 +770,9 @@ h3 {
   }
   &.with-left-sidebar {
     min-width: 1086px;
-//    background: #ffffff url(../img/bg/sidebar-bg.png) -50px top repeat-y;
+    &.with-bg {
+      background: #ffffff url(../img/bg/sidebar-bg.png) -50px top repeat-y;
+    }
     .content {
       padding-left: 250px;
     }
@@ -2828,7 +2857,8 @@ table.member-list {
 }
 
 .nav-tabs > li.active > a,
-.nav-tabs > li.active > a:hover {
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
   border: 2px solid #dee3e9;
   border-bottom-color: transparent;
 }
@@ -5186,6 +5216,13 @@ table.files {
   }
   .input-group .input-group-btn .btn {
     border: 1px solid #ccc;
+    i {
+      color: inherit;
+      margin: inherit;
+      position: inherit;
+      top: inherit;
+      left: inherit;
+    }
   }
 }
 
@@ -5647,6 +5684,49 @@ table.commit-list td>div {
     color: #707070;
     &:hover {
       text-decoration: underline;
+    }
+  }
+}
+
+//.filter-bar {
+//  text-align: center;
+//  &:before {
+//    display: table;
+//    content: "";
+//  }
+//  &:after {
+//    display: table;
+//    clear: both;
+//    content: "";
+//  }
+//}
+
+.nav-linkerer {
+  display: inline-block;
+  margin-top: 6px;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+  li {
+    display: inline-block;
+  }
+
+  .nav-linker {
+    display: inline-block;
+    padding: 5px 5px 6px;
+    margin-right: 5px;
+    font-size: 13px;
+    color: #777;
+    border-bottom: 2px solid transparent;
+    &:hover {
+      text-decoration: none;
+      border-bottom-color: #e5e5e5;
+    }
+    &.linker-selected {
+      color: #333;
+      text-decoration: none;
+      border-bottom-color: #d26911;
+      outline: none;
     }
   }
 }

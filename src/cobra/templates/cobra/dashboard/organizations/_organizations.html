@@ -1,0 +1,33 @@
+{% load i18n %}
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <div class="input-group">
+      <input class="dash-filter form-control" id="filter_group" name="filter_group" placeholder="Filter by name" type="search">
+      <div class="input-group-addon">
+        <a class="" href="#"><strong>{% trans 'New organization' %}</strong></a>
+      </div>
+    </div>
+  </div>
+  <ul class="well-list dash-list">
+    {% for org in organizations %}
+      <li class="group-row">
+        <a class="group" href="#">
+          <div class="dash-project-avatar">
+            <img class="avatar s40" src="/assets/no_group_avatar-9b1c46c6baa02cd6ef73f07b40b685b5.png">
+          </div>
+          <span class="str-truncated">
+          <span class="group-name filter-title">
+            {{ org.name }}
+          </span>
+          </span>
+          <span class="arrow">
+            <i class="fa fa-angle-right"></i>
+          </span>
+        </a>
+      </li>
+    {% empty %}
+      <li><div class="nothing-here-block">{% trans 'There are no organizations here.' %}</div></li>
+    {% endfor %}
+  </ul>
+</div>

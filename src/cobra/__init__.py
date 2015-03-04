@@ -28,6 +28,7 @@ COBRA_CORE_APPS = [
     'cobra',
     'cobra.apps.accounts',
     'cobra.apps.auditlog',
+    'cobra.apps.dashboard',
     'cobra.apps.home',
     'cobra.apps.option',
     'cobra.apps.project',

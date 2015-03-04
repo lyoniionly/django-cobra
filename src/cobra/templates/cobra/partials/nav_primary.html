@@ -10,7 +10,7 @@
       <li class="dropdown org-dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
           {% if organization %}
-            {{ organization.name }}
+            {{ organization.name }} {% ifnotequal organization.owner request.user %}({{ organization.owner.get_display_name }}){% endifnotequal %}
           {% else %}
             {% trans "Organizations" %}
           {% endif %}
@@ -29,7 +29,7 @@
           {% endif %}
           {% for o in request.user|list_organizations %}
             <li{% if o == organization %} class="active"{% endif %}>
-              <a href="{% url 'organization:home' o.slug %}">{{ o.name }}</a>
+              <a href="{% url 'organization:home' o.slug %}">{{ o.name }} {% ifnotequal o.owner request.user %}({{ o.owner.get_display_name }})</a>{% endifnotequal %}
               {% if request.user|can_manage_org:o %}
                 <a href="{% url 'organization:settings' o.slug %}" class="org-settings">
                   <span class="icon-cog"></span>

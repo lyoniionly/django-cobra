@@ -1,0 +1,1 @@
+default_app_config = 'cobra.apps.dashboard.config.DashboardConfig'

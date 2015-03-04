@@ -18,7 +18,11 @@
       <span class="input-group-addon" id="sizing-addon1">Http access</span>
       <input type="text" id="svn_co_url" class="form-control" readonly="readonly" value="svn checkout {{ repository.root }}">
       <span class="input-group-btn">
-        <button aria-label="{% trans 'Copy to clipboard' %}" data-clipboard-target="svn_co_url"  class="btn btn-default copy-button" data-placement="bottom" data-original-title="{% trans 'Copy to clipboard' %}" data-copied-hint="{% trans 'Copied!' %}" type="button">Copy!</button>
+        <button aria-label="{% trans 'Copy to clipboard' %}"
+                data-clipboard-target="svn_co_url"
+                class="btn btn-default copy-button"
+                data-placement="bottom" data-original-title="{% trans 'Copy to clipboard' %}"
+                data-copied-hint="{% trans 'Copied!' %}" type="button"><i class="glyphicon glyphicon-copy"></i></button>
       </span>
     </div>
   </div>
