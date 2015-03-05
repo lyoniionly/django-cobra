@@ -1,6 +1,6 @@
 {% load helper_tags %}
 
-<a class="project" href="#">
+<a class="project" href="{% url 'svnkit:node' project.organization.slug project.slug '/' %}">
   <div class="dash-project-avatar">
     {% get_project_avatar project 'avatar project-avatar s40' %}
   </div>

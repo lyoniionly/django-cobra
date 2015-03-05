@@ -10,26 +10,41 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from easy_thumbnails.fields import ThumbnailerImageField
 
 from cobra.core.compat import AUTH_USER_MODEL
+from cobra.core.constants import RESERVED_ORGANIZATION_SLUGS
+from cobra.core.http import absolute_uri
+from cobra.core.loading import get_class
+from cobra.core.utils import generate_sha1
 from cobra.models import Model
 from cobra.models import fields
 from cobra.models import sane_repr
 from cobra.models.utils import slugify_instance
-from cobra.core.constants import RESERVED_ORGANIZATION_SLUGS
-from cobra.core.http import absolute_uri
-from cobra.core.loading import get_class
 
 from .utils import OrganizationStatus, OrganizationMemberType
 
 OrganizationManager = get_class('organization.managers', 'OrganizationManager')
 
 
+def upload_to_avatar(instance, filename):
+    extension = filename.split('.')[-1].lower()
+    salt, hash = generate_sha1(instance.id)
+    path = settings.COBRA_ORGANIZATION_AVATAR_PATH % {'organization_slug': instance.slug,
+                                                  'date': instance.date_added,
+                                                  'date_now': timezone.now().date()}
+    return '%(path)s%(hash)s.%(extension)s' % {'path': path,
+                                               'hash': hash[:10],
+                                               'extension': extension}
+
 @python_2_unicode_compatible
 class AbstractOrganization(Model):
     """
     A team represents a group of individuals which maintain ownership of projects.
     """
+    AVATAR_SETTINGS = {'size': (settings.COBRA_ORGANIZATION_AVATAR_SIZE,
+                                 settings.COBRA_ORGANIZATION_AVATAR_SIZE),
+                       'crop': settings.COBRA_ORGANIZATION_AVATAR_CROP_TYPE}
     name = models.CharField(max_length=64)
     slug = models.SlugField(unique=True)
     owner = fields.FlexibleForeignKey(AUTH_USER_MODEL)
@@ -40,6 +55,11 @@ class AbstractOrganization(Model):
     ), default=OrganizationStatus.VISIBLE)
     date_added = models.DateTimeField(default=timezone.now)
     members = models.ManyToManyField(AUTH_USER_MODEL, through='OrganizationMember', related_name='org_memberships')
+    avatar = ThumbnailerImageField(_('Organization Avatar'),
+                                    blank=True,
+                                    upload_to=upload_to_avatar,
+                                    resize_source=AVATAR_SETTINGS,
+                                    help_text=_('The maximum file size allowed is 200KB.'))
 
     objects = OrganizationManager(cache_fields=(
         'pk',
@@ -67,6 +87,25 @@ class AbstractOrganization(Model):
             queryset = queryset.filter(type__lte=access)
 
         return queryset.exists()
+
+    def get_avatar_url(self):
+        """
+        """
+        # First check for a avatar and if any return that.
+        if self.avatar:
+            return self.avatar.url
+
+        if settings.COBRA_ORGANIZATION_AVATAR_DEFAULT not in ['404', 'mm',
+                                                            'identicon',
+                                                            'monsterid',
+                                                            'wavatar']:
+
+            if settings.COBRA_ORGANIZATION_AVATAR_DEFAULT.startswith(settings.STATIC_URL):
+                return settings.COBRA_ORGANIZATION_AVATAR_DEFAULT
+            else:
+                return settings.STATIC_URL + settings.COBRA_ORGANIZATION_AVATAR_DEFAULT
+        else:
+            return None
 
     def get_audit_log_data(self):
         return {

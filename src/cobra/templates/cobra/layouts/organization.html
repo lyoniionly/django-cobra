@@ -55,11 +55,12 @@
     </li>
     {% endif %}
     {% if ACCESS.org_write %}
-    <li class="{% block org_settings_nav %}{% endblock %}">
-      <a href="{% url 'organization:settings' organization.slug %}">
-        {% trans "Settings" %}
-      </a>
-    </li>
+      <hr>
+      <li class="{% block org_settings_nav %}{% endblock %}">
+        <a href="{% url 'organization:settings' organization.slug %}">
+          <i class="fa fa-cogs"></i>{% trans "Settings" %}
+        </a>
+      </li>
     {% endif %}
   </ul>
   {% block org_sidebar_nav_extra %}

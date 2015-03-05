@@ -64,6 +64,7 @@ class OrganizationCreateView(BaseView):
                 actor=request.user,
                 ip_address=request.META['REMOTE_ADDR'],
                 target_object=org.id,
+                target=org,
                 event=AuditLogEntryEvent.ORG_ADD,
                 data=org.get_audit_log_data(),
             )
@@ -79,14 +80,14 @@ class OrganizationCreateView(BaseView):
         return self.respond('organization/create.html', context)
 
 
-OrganizationSettingsForm = modelform_factory(Organization, fields=('name', 'slug',))
+OrganizationSettingsForm = modelform_factory(Organization, fields=('name', 'slug', 'avatar'))
 
 class OrganizationSettingsView(OrganizationView):
     required_access = OrganizationMemberType.ADMIN
 
     def get_form(self, request, organization):
         return OrganizationSettingsForm(
-            request.POST or None,
+            request.POST or None, request.FILES or None,
             instance=organization
         )
 
@@ -100,6 +101,7 @@ class OrganizationSettingsView(OrganizationView):
                 actor=request.user,
                 ip_address=request.META['REMOTE_ADDR'],
                 target_object=organization.id,
+                target=organization,
                 event=AuditLogEntryEvent.ORG_EDIT,
                 data=organization.get_audit_log_data(),
             )
@@ -408,6 +410,7 @@ class OrganizationMemberAcceptView(BaseView):
                     actor=request.user,
                     ip_address=request.META['REMOTE_ADDR'],
                     target_object=om.id,
+                    target=om,
                     target_user=request.user,
                     event=AuditLogEntryEvent.MEMBER_ACCEPT,
                     data=om.get_audit_log_data(),

@@ -2,17 +2,19 @@ from __future__ import absolute_import, print_function
 
 from django.views.generic import TemplateView
 from cobra.core.loading import get_model
+from cobra.views.mixins import PageTitleMixin
 
 Organization = get_model('organization', 'Organization')
 Team = get_model('team', 'Team')
 Project = get_model('project', 'Project')
 
 
-class IndexView(TemplateView):
+class IndexView(PageTitleMixin, TemplateView):
     """
     """
 
     template_name = 'dashboard/index.html'
+    active_tab = 'activity'
 
     def get_context_data(self, **kwargs):
         ctx = super(IndexView, self).get_context_data(**kwargs)

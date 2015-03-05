@@ -72,6 +72,7 @@ class AddProjectForm(forms.ModelForm):
             actor=actor,
             ip_address=ip_address,
             target_object=project.id,
+            target=project,
             event=AuditLogEntryEvent.PROJECT_ADD,
             data=project.get_audit_log_data(),
         )
@@ -139,11 +140,11 @@ class ProjectEditForm(forms.ModelForm):
         help_text=_('Outbound requests matching Allowed Domains will have the header "X-Cobra-Token: {token}" appended.'))
 
     class Meta:
-        fields = ('name', 'public', 'team', 'slug')
+        fields = ('name', 'public', 'team', 'slug', 'avatar', )
         model = Project
 
-    def __init__(self, request, organization, team_list, data, instance, *args, **kwargs):
-        super(ProjectEditForm, self).__init__(data=data, instance=instance, *args, **kwargs)
+    def __init__(self, request, organization, team_list, data, files, instance, *args, **kwargs):
+        super(ProjectEditForm, self).__init__(data=data, files=files, instance=instance, *args, **kwargs)
 
         self.organization = organization
         self.team_list = team_list

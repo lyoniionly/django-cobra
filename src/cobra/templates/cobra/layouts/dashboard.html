@@ -19,7 +19,7 @@
 {% block sidebar %}
   <ul class="nav nav-list">
     <li{% if active_tab == 'activity' %} class="active"{% endif %}>
-        <a href="#">{% trans "Activity" %}</a>
+      <a href="{% url 'dashboard:index' %}"><i class="fa fa-dashboard"></i>{% trans "Activity" %}</a>
     </li>
   </ul>
 {% endblock %}

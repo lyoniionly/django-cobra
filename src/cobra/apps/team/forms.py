@@ -32,6 +32,7 @@ class AddTeamForm(forms.ModelForm):
             actor=actor,
             ip_address=ip_address,
             target_object=team.id,
+            target=team,
             event=AuditLogEntryEvent.TEAM_ADD,
             data=team.get_audit_log_data(),
         )

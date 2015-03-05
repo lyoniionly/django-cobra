@@ -196,16 +196,48 @@
     initialize: function (data) {
       BasePage.prototype.initialize.apply(this, arguments);
 
-      $('#chart').height('150px');
-      Sentry.charts.render('#chart');
-
-      $('#visitors-chart').height('50px');
-      app.charts.render('#visitors-chart', {
-        placement: 'left'
+      var key = "dashboard_sidebar_filter";
+      // store selection in cookie
+      $('.dash-sidebar-tabs a').on('click', function (e) {
+        $.cookie(key, $(e.target).attr('id'));
       });
 
-    }
+      // show tab from cookie
+      var sidebar_filter = $.cookie(key);
+      if (sidebar_filter) {
+        $("#" + sidebar_filter).tab('show');
+      }
 
+      $(".dash-filter").keyup(_.bind(function (e) {
+        this.doFilter($(e.currentTarget).parents('.panel').first());
+      }, this));
+
+      $('.filter-bar .nav-linker').on('click', _.bind(function(e){
+        e.preventDefault();
+        var $this = $(e.currentTarget);
+        var uiBox = $this.parents('.panel').first();
+        uiBox.find('.nav-linker.linker-selected').removeClass('linker-selected');
+        $this.addClass('linker-selected');
+        this.doFilter(uiBox);
+      }, this));
+    },
+
+    doFilter: function (uiBox) {
+      var filter = uiBox.find('.filter-bar .linker-selected').data('filter') || '';
+      var terms = uiBox.find('.dash-filter').val();
+      uiBox.find(".dash-list li").hide();
+      if (terms == "" || terms == undefined) {
+        uiBox.find(".dash-list li"+filter).show();
+      } else {
+        uiBox.find(".dash-list li"+filter).each(function () {
+          var name = $(this).find(".filter-title").text();
+          if (name.toLowerCase().search(terms.toLowerCase()) == -1)
+            $(this).hide();
+          else
+            $(this).show();
+        });
+      }
+    }
   });
 
   app.PregnancyProfilePage = BasePage.extend({

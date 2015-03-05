@@ -106,7 +106,7 @@ class ProjectSettingsView(ProjectView):
             project.update_option('cobra:token', security_token)
 
         return ProjectEditForm(
-            request, organization, team_list, request.POST or None,
+            request, organization, team_list, request.POST or None, self.request.FILES or None,
             instance=project, initial={
                 'svn_url': project.repository.root,
                 'svn_repo_prefix': project.repository.prefix,
@@ -139,6 +139,7 @@ class ProjectSettingsView(ProjectView):
                 actor=request.user,
                 ip_address=request.META['REMOTE_ADDR'],
                 target_object=project.id,
+                target=project,
                 event=AuditLogEntryEvent.PROJECT_EDIT,
                 data=project.get_audit_log_data(),
             )
@@ -209,6 +210,7 @@ class ProjectRemoveView(ProjectView):
                     actor=request.user,
                     ip_address=request.META['REMOTE_ADDR'],
                     target_object=project.id,
+                    target=project,
                     event=AuditLogEntryEvent.PROJECT_REMOVE,
                     data=project.get_audit_log_data(),
                 )

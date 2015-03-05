@@ -194,3 +194,9 @@ try:
     from hashlib import sha1 as sha_constructor, md5 as md5_constructor
 except ImportError:  # pragma: no cover
     from django.utils.hashcompat import sha_constructor, md5_constructor
+
+
+try:
+    from django.contrib.contenttypes import fields as generic
+except ImportError:
+    from django.contrib.contenttypes import generic

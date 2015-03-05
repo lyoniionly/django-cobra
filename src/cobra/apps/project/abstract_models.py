@@ -12,6 +12,7 @@ from django.db.models import Q, F
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from easy_thumbnails.fields import ThumbnailerImageField
 import six
 
 from cobra.models import Model, BaseManager
@@ -22,11 +23,22 @@ from cobra.core.constants import PLATFORM_TITLES, PLATFORM_LIST
 from cobra.core.http import absolute_uri
 from cobra.core.loading import get_model, get_classes, get_class
 from cobra.core.compat import AUTH_USER_MODEL
+from cobra.core.utils import generate_sha1
 from .utils import ProjectStatus
 
 ProjectManager = get_class('project.managers', 'ProjectManager')
 ProjectKeyStatus = get_class('project.utils', 'ProjectKeyStatus')
 
+
+def upload_to_avatar(instance, filename):
+    extension = filename.split('.')[-1].lower()
+    salt, hash = generate_sha1(instance.id)
+    path = settings.COBRA_PROJECT_AVATAR_PATH % {'project_slug': instance.slug,
+                                                  'date': instance.date_added,
+                                                  'date_now': timezone.now().date()}
+    return '%(path)s%(hash)s.%(extension)s' % {'path': path,
+                                               'hash': hash[:10],
+                                               'extension': extension}
 
 @python_2_unicode_compatible
 class AbstractProject(Model):
@@ -34,6 +46,10 @@ class AbstractProject(Model):
     Projects are permission based namespaces which generally
     are the top level entry point for all data.
     """
+    AVATAR_SETTINGS = {'size': (settings.COBRA_PROJECT_AVATAR_SIZE,
+                                 settings.COBRA_PROJECT_AVATAR_SIZE),
+                       'crop': settings.COBRA_PROJECT_AVATAR_CROP_TYPE}
+
     PLATFORM_CHOICES = tuple(
         (p, PLATFORM_TITLES.get(p, p.title()))
         for p in PLATFORM_LIST
@@ -51,11 +67,11 @@ class AbstractProject(Model):
         (ProjectStatus.DELETION_IN_PROGRESS, _('Deletion in Progress')),
     ), db_index=True)
     platform = models.CharField(max_length=32, choices=PLATFORM_CHOICES, null=True)
-
-    #svn settings
-    # svn_url = models.URLField(_("SVN URL"))
-    # svn_username = models.CharField(_("SVN Username"), max_length=30)
-    # svn_password = models.CharField(_('SVN Password'), max_length=128)
+    avatar = ThumbnailerImageField(_('Project Avatar'),
+                                    blank=True,
+                                    upload_to=upload_to_avatar,
+                                    resize_source=AVATAR_SETTINGS,
+                                    help_text=_('The maximum file size allowed is 200KB.'))
 
     objects = ProjectManager(cache_fields=[
         'pk',

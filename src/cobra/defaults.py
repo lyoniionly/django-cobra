@@ -40,8 +40,7 @@ COBRA_IMAGE_FOLDER = 'images/products/%Y/%m/'
 COBRA_PROMOTION_FOLDER = 'images/promotions/'
 COBRA_DELETE_IMAGE_FILES = True
 
-# Copy this image from cobra/static/img to your MEDIA_ROOT folder.
-# It needs to be there so Sorl can resize it.
+# This is a hack for some reason that user forget to set defalut image.
 COBRA_MISSING_IMAGE_URL = 'image_not_found.jpg'
 COBRA_UPLOAD_ROOT = '/tmp'
 
@@ -319,6 +318,18 @@ COBRA_REDIS_OPTIONS = {}
 # Should users without superuser permissions be allowed to
 # make projects public
 COBRA_ALLOW_PUBLIC_PROJECTS = False
+
+# Project settings
+COBRA_PROJECT_AVATAR_PATH = 'project/avatars/'
+COBRA_PROJECT_AVATAR_SIZE = 160
+COBRA_PROJECT_AVATAR_CROP_TYPE = 'smart'
+COBRA_PROJECT_AVATAR_DEFAULT = 'cap_o'
+
+# Organization settings
+COBRA_ORGANIZATION_AVATAR_PATH = 'organization/avatars/'
+COBRA_ORGANIZATION_AVATAR_SIZE = COBRA_PROJECT_AVATAR_SIZE
+COBRA_ORGANIZATION_AVATAR_CROP_TYPE = COBRA_PROJECT_AVATAR_CROP_TYPE
+COBRA_ORGANIZATION_AVATAR_DEFAULT = 'cobra/img/avatar/default_org_avatar.png'
 
 # Rate limiting backend
 COBRA_RATELIMITER = 'cobra.core.ratelimits.base.RateLimiter'

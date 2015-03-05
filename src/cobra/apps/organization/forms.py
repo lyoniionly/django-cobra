@@ -69,6 +69,7 @@ class OrganizationMemberEditForm(forms.ModelForm):
             actor=actor,
             ip_address=ip_address,
             target_object=om.id,
+            target=om,
             target_user=om.user,
             event=AuditLogEntryEvent.MEMBER_EDIT,
             data=om.get_audit_log_data(),
@@ -105,6 +106,7 @@ class OrganizationMemberCreateForm(forms.ModelForm):
             actor=actor,
             ip_address=ip_address,
             target_object=om.id,
+            target=om,
             target_user=om.user,
             event=AuditLogEntryEvent.MEMBER_ADD,
             data=om.get_audit_log_data(),
@@ -149,6 +151,7 @@ class OrganizationMemberInviteForm(forms.ModelForm):
             actor=actor,
             ip_address=ip_address,
             target_object=om.id,
+            target=om,
             event=AuditLogEntryEvent.MEMBER_INVITE,
             data=om.get_audit_log_data(),
         )

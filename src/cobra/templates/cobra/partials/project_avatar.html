@@ -1,1 +1,5 @@
-<div class="{{ css_class }}" style="{{ style }}">{{ first_cap }}</div>
+{% if has_avatar %}
+  <img class="{{ css_class }}" src="{{ project.avatar.url }}">
+{% else %}
+  <div class="{{ css_class }}" style="{{ style }}">{{ first_cap }}</div>
+{% endif %}

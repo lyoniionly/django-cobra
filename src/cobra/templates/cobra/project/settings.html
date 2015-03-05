@@ -1,4 +1,5 @@
 {% extends "layouts/settings.html" %}
+{% load helper_tags %}
 
 {% load crispy_forms_tags %}
 {% load i18n %}
@@ -7,61 +8,88 @@
 {% block content_class %} with-left-sidebar{% endblock %}
 
 {% block main %}
-    <section class="body">
+  <section class="body">
     {% block inner %}
-        <div class="page-header">
-            <h2>{% trans "Project Details" %}</h2>
-        </div>
-        <form class="form-stacked" action="" method="post">
-            {% csrf_token %}
-
-            {{ form|as_crispy_errors }}
-
-            <fieldset>
-              <div class="row">
-                <div class="col-sm-6">
-                {{ form.name|as_crispy_field }}
-                {{ form.slug|as_crispy_field }}
-{#                {{ form.platform|as_crispy_field }}#}
-                {{ form.team|as_crispy_field }}
-                {% if form.public %}
-                  {{ form.public|as_crispy_field }}
-                {% endif %}
-                </div>
-              </div>
-            </fieldset>
-            <fieldset id="events">
-                <div><legend>{% trans "SVN Settings" %}</legend></div>
-                {{ form.svn_url|as_crispy_field }}
-                {{ form.svn_repo_prefix|as_crispy_field }}
-              <div class="row">
-                <div class="col-sm-6">
-                  {{ form.svn_username|as_crispy_field }}
-                </div>
-                <div class="col-sm-6">
-                  {{ form.svn_password|as_crispy_field }}
-                </div>
-              </div>
-            </fieldset>
-            <fieldset id="client-security">
-                <div><legend>{% trans "Security" %}</legend></div>
-                {{ form.token|as_crispy_field }}
-            </fieldset>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
-                {% if ACCESS.project_delete %}
-                    {% if not project.is_internal_project %}
-                        <a href="{% url 'project:remove' project.slug project.organization.slug %}" class="btn btn-danger">{% trans "Remove Project" %}</a>
-                    {% else %}
-                        <a class="btn btn-danger disabled tip" title="{% trans "This project cannot be removed. It is used internally by the Sentry server." %}">{% trans "Remove Project" %}</a>
-                    {% endif %}
-                {% else %}
-                    <a class="btn btn-danger disabled tip" title="{% trans "You do not have the required permission to remove this project." %}">{% trans "Remove Project" %}</a>
-                {% endif %}
+      <div class="page-header">
+        <h2>{% trans "Project Details" %}</h2>
+      </div>
+      <form class="form-stacked" action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|as_crispy_errors }}
+        <fieldset>
+          <div class="row">
+            <div class="col-sm-6">
+              {{ form.name|as_crispy_field }}
+              {{ form.slug|as_crispy_field }}
+              {% comment %}{{ form.platform|as_crispy_field }}{% endcomment %}
+              {{ form.team|as_crispy_field }}
+              {% if form.public %}
+                {{ form.public|as_crispy_field }}
+              {% endif %}
+{#            {{ form.avatar }}#}
             </div>
-        </form>
+            <div class="col-sm-6">
+              <div class="light-well">
+                <div class="form-group">
+                  <div class="fileinput fileinput-new" data-provides="fileinput">
+                    <div class="fileinput-new thumbnail" style="width: 170px; height: 170px;">
+                      {% get_project_avatar project 'avatar project-avatar s160' %}
+                    </div>
+                    <div class="fileinput-preview fileinput-exists thumbnail"
+                         style="max-width: 170px; max-height: 170px;"></div>
+                    <div>
+                      <p class="light">
+                        You can change your project avatar here.
+                      </p>
+                      <p class="light">
+                        The maximum file size allowed is 200KB.
+                      </p>
+
+                      <span class="btn btn-primary btn-file">
+                        <span class="fileinput-new">{% trans 'Choose avatar' %}</span>
+                        <span class="fileinput-exists">{% trans 'Change avatar' %}</span>
+                        <input id="id_avatar" name="avatar" type="file">
+                      </span>
+                      <a href="#" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">{% trans 'Clear' %}</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset id="events">
+          <div><legend>{% trans "SVN Settings" %}</legend></div>
+          {{ form.svn_url|as_crispy_field }}
+          {{ form.svn_repo_prefix|as_crispy_field }}
+          <div class="row">
+            <div class="col-sm-6">
+              {{ form.svn_username|as_crispy_field }}
+            </div>
+            <div class="col-sm-6">
+              {{ form.svn_password|as_crispy_field }}
+            </div>
+          </div>
+        </fieldset>
+        <fieldset id="client-security">
+          <div><legend>{% trans "Security" %}</legend></div>
+          {{ form.token|as_crispy_field }}
+        </fieldset>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
+          {% if ACCESS.project_delete %}
+            {% if not project.is_internal_project %}
+              <a href="{% url 'project:remove' project.slug project.organization.slug %}" class="btn btn-danger">{% trans "Remove Project" %}</a>
+            {% else %}
+              <a class="btn btn-danger disabled tip" title="{% trans "This project cannot be removed. It is used internally by the Sentry server." %}">{% trans "Remove Project" %}</a>
+            {% endif %}
+          {% else %}
+            <a class="btn btn-danger disabled tip" title="{% trans "You do not have the required permission to remove this project." %}">{% trans "Remove Project" %}</a>
+          {% endif %}
+        </div>
+      </form>
     {% endblock %}
-    </section>
+  </section>
 {% endblock %}
 
 {% block sidebar %}

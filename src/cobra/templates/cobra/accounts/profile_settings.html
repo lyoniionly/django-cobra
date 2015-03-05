@@ -11,11 +11,9 @@
       <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form|as_crispy_errors }}
-
         {% for field in form %}
           {% if field.name == 'avatar' %}
             <div class="form-group">
-{#              {% bootstrap_label content=field.label label_class='control-label' %}#}
               <label class="control-label ">{{ field.label }}</label>
               <div class="fileinput fileinput-new" data-provides="fileinput">
                 <div class="fileinput-new thumbnail" style="width: 80px; height: 80px;">
@@ -28,7 +26,6 @@
                     <span class="fileinput-new">{% trans 'Choose avatar' %}</span>
                     <span class="fileinput-exists">{% trans 'Change avatar' %}</span>
                     <input id="id_avatar" name="avatar" type="file">
-{#                    {{ field }}#}
                   </span>
                   <a href="#" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">{% trans 'Clear' %}</a>
                 </div>
@@ -40,7 +37,7 @@
           {% endif %}
         {% endfor %}
         <fieldset class="form-actions">
-            <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
+          <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
         </fieldset>
       </form>
     </div>

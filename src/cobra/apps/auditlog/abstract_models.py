@@ -1,13 +1,12 @@
 from __future__ import absolute_import, print_function
+from django.contrib.contenttypes.models import ContentType
 
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
 
-from cobra.core.compat import AUTH_USER_MODEL
-from cobra.models import Model
-from cobra.models import fields
-from cobra.models import sane_repr
+from cobra.core.compat import AUTH_USER_MODEL, generic
+from cobra.models import Model, fields, sane_repr
 
 from .utils import AuditLogEntryEvent
 
@@ -20,6 +19,14 @@ class AbstractAuditLogEntry(Model):
     organization = fields.FlexibleForeignKey('organization.Organization')
     actor = fields.FlexibleForeignKey(AUTH_USER_MODEL, related_name='audit_actors')
     target_object = fields.BoundedPositiveIntegerField(null=True)
+
+    # This code will replace the target_object to detail the target completeful.
+    target_content_type = models.ForeignKey(ContentType, blank=True, null=True,
+                                            related_name='target', db_index=True)
+    target_object_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    target = generic.GenericForeignKey('target_content_type',
+                                       'target_object_id')
+
     target_user = fields.FlexibleForeignKey(AUTH_USER_MODEL, null=True, blank=True,
                                     related_name='audit_targets')
     event = fields.BoundedPositiveIntegerField(choices=(

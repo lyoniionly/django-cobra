@@ -116,20 +116,27 @@ def get_avatar_url(user, email=''):
 
 @register.inclusion_tag('partials/project_avatar.html')
 def get_project_avatar(project, css_class=''):
-    allowed_colors = {
-      'red': 'FFEBEE',
-      'purple': 'F3E5F5',
-      'indigo': 'E8EAF6',
-      'blue': 'E3F2FD',
-      'teal': 'E0F2F1',
-      'orange': 'FBE9E7',
-      'gray': 'EEEEEE'
-    }
-    css_class += ' identicon'
-    bg_key = project.id % 7
-    style = "background-color: #%s; color: #555" % allowed_colors.values()[bg_key]
-    first_cap = multi_get_letter(project.name)[0]
-    return {'css_class': css_class, 'style': style, 'first_cap': first_cap.upper()}
+    has_avatar = False
+    cxt = {'project': project}
+    if project.avatar:
+        has_avatar = True
+    else:
+        allowed_colors = {
+          'red': 'FFEBEE',
+          'purple': 'F3E5F5',
+          'indigo': 'E8EAF6',
+          'blue': 'E3F2FD',
+          'teal': 'E0F2F1',
+          'orange': 'FBE9E7',
+          'gray': 'EEEEEE'
+        }
+        css_class += ' identicon'
+        bg_key = project.id % 7
+        style = "background-color: #%s; color: #555" % allowed_colors.values()[bg_key]
+        first_cap = multi_get_letter(project.name)[0]
+        cxt.update({'style': style, 'first_cap': first_cap.upper()})
+    cxt.update({'has_avatar': has_avatar, 'css_class': css_class, })
+    return cxt
 
 
 @register.filter
