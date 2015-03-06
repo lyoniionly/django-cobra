@@ -62,10 +62,11 @@ class AbstractTeam(Model):
         super(AbstractTeam, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return absolute_uri(reverse('cobra-team-dashboard', args=[
-            self.organization.slug,
-            self.slug,
-        ]))
+        # return absolute_uri(reverse('cobra-team-dashboard', args=[
+        #     self.organization.slug,
+        #     self.slug,
+        # ]))
+        return 'Do not set'
 
     def get_owner_name(self):
         if not self.owner:

@@ -5,6 +5,8 @@ import urllib
 
 from collections import namedtuple
 from django.conf import settings
+from django.utils.safestring import mark_safe
+
 from urlparse import urlparse, urljoin
 
 ParsedUriMatch = namedtuple('ParsedUriMatch', ['scheme', 'domain', 'path'])
@@ -149,3 +151,23 @@ def is_valid_origin(origin, project=None):
         if parsed.path.startswith(path):
             return True
     return False
+
+
+def generate_hyperlink(name, url='', safe=True, **options):
+    if url:
+        abs_url = absolute_uri(url)
+        css_class = options.pop('class', None)
+        target = options.pop('target', None)
+        hyperlink_template = '<a href="%(url)s"'
+        if css_class:
+            hyperlink_template += ' class="%(class)s"'
+        if target:
+            hyperlink_template += ' target="%(target)s"'
+        hyperlink_template += '>%(name)s</a>'
+        hyperlink = hyperlink_template % {'url': abs_url, 'class': css_class, 'target': target, 'name': name}
+        if safe:
+            return mark_safe(hyperlink)
+        else:
+            return hyperlink
+    else:
+        return name

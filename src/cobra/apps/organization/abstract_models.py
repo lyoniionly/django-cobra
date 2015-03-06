@@ -76,6 +76,10 @@ class AbstractOrganization(Model):
     def __str__(self):
         return self.name
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('organization:home', (self.slug, ))
+
     def save(self, *args, **kwargs):
         if not self.slug:
             slugify_instance(self, self.name, reserved=RESERVED_ORGANIZATION_SLUGS)

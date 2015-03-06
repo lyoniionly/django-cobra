@@ -206,7 +206,6 @@ class TeamSettingsView(TeamView):
                 actor=request.user,
                 ip_address=request.META['REMOTE_ADDR'],
                 target_object=team.id,
-                target=team,
                 event=AuditLogEntryEvent.TEAM_EDIT,
                 data=team.get_audit_log_data(),
             )
@@ -261,7 +260,6 @@ class TeamRemoveView(TeamView):
                     actor=request.user,
                     ip_address=request.META['REMOTE_ADDR'],
                     target_object=team.id,
-                    target=team,
                     event=AuditLogEntryEvent.TEAM_REMOVE,
                     data=team.get_audit_log_data(),
                 )

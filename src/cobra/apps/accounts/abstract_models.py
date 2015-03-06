@@ -101,6 +101,11 @@ class AbstractUser(Model, auth_models.AbstractBaseUser):
     def get_display_name(self):
         return self.first_name or self.username
 
+    # @models.permalink
+    def get_absolute_url(self):
+        # return ('svnkit:changeset', (self.repository.project.organization.slug, self.repository.project.slug, self.revision))
+        return 'Do not set'
+
 
 def upload_to_avatar(instance, filename):
     extension = filename.split('.')[-1].lower()

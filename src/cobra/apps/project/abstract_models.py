@@ -95,8 +95,8 @@ class AbstractProject(Model):
         super(AbstractProject, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return absolute_uri(reverse('cobra-stream', args=[
-            self.organization.slug, self.slug]))
+        return absolute_uri(reverse('svnkit:node', args=[
+            self.organization.slug, self.slug, '/']))
 
     def merge_to(self, project):
         from cobra.models import (

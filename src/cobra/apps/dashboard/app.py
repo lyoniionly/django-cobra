@@ -9,10 +9,13 @@ class DashboardApplication(Application):
     name = 'dashboard'
 
     index_view = get_class('dashboard.views', 'IndexView')
+    auditlog_app = get_class('dashboard.auditlog.app', 'application')
 
     def get_urls(self):
         urls = [
             url(r'^$', login_required(self.index_view.as_view()), name='index'),
+
+            url(r'^auditlog/', include(self.auditlog_app.urls)),
         ]
         return self.post_process_urls(urls)
 

@@ -64,7 +64,6 @@ class OrganizationCreateView(BaseView):
                 actor=request.user,
                 ip_address=request.META['REMOTE_ADDR'],
                 target_object=org.id,
-                target=org,
                 event=AuditLogEntryEvent.ORG_ADD,
                 data=org.get_audit_log_data(),
             )
@@ -101,7 +100,6 @@ class OrganizationSettingsView(OrganizationView):
                 actor=request.user,
                 ip_address=request.META['REMOTE_ADDR'],
                 target_object=organization.id,
-                target=organization,
                 event=AuditLogEntryEvent.ORG_EDIT,
                 data=organization.get_audit_log_data(),
             )
@@ -410,7 +408,6 @@ class OrganizationMemberAcceptView(BaseView):
                     actor=request.user,
                     ip_address=request.META['REMOTE_ADDR'],
                     target_object=om.id,
-                    target=om,
                     target_user=request.user,
                     event=AuditLogEntryEvent.MEMBER_ACCEPT,
                     data=om.get_audit_log_data(),

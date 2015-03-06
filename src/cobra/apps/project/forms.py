@@ -72,7 +72,6 @@ class AddProjectForm(forms.ModelForm):
             actor=actor,
             ip_address=ip_address,
             target_object=project.id,
-            target=project,
             event=AuditLogEntryEvent.PROJECT_ADD,
             data=project.get_audit_log_data(),
         )

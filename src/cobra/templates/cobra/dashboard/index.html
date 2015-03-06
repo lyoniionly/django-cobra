@@ -1,6 +1,8 @@
 {% extends "layouts/dashboard.html" %}
 {% load i18n %}
 {% load static %}
+{% load helper_tags %}
+
 
 {% block content_class %} with-left-sidebar with-bg{% endblock %}
 
@@ -8,63 +10,34 @@
   <div class="row">
     <div class="col-sm-7">
       <ul class="nav-linkerer">
-        <li><a href="#" class="nav-linker js-repo-filter-tab linker-selected" data-filter=".project-row">{% trans 'Tasks' %}</a></li>
+        <li><a href="#" class="nav-linker js-repo-filter-tab" data-filter=".project-row">{% trans 'OverView' %}</a></li>
+        <li><a href="#" class="nav-linker js-repo-filter-tab" data-filter=".joined">{% trans 'Events' %}</a></li>
         <li><a href="#" class="nav-linker js-repo-filter-tab" data-filter=".mine">{% trans 'Comments' %}</a></li>
-        <li><a href="#" class="nav-linker js-repo-filter-tab" data-filter=".joined">{% trans 'Organizations' %}</a></li>
-        <li><a href="#" class="nav-linker js-repo-filter-tab" data-filter=".joined">{% trans 'Projects' %}</a></li>
+        <li><a href="#" class="nav-linker js-repo-filter-tab" data-filter=".joined">{% trans 'Issues' %}</a></li>
+        <li><a href="#" class="nav-linker js-repo-filter-tab linker-selected" data-filter=".project-row">{% trans 'AuditLogs' %}</a></li>
       </ul>
-      <div class="news">
-        <div class="alert push"><div class="body"><!-- push -->
-<span class="mega-octicon octicon-git-commit"></span>
-
-<div class="time">
-  <time datetime="2015-02-27T02:45:03Z" is="relative-time" title="2015年2月27日 GMT+8上午10:45">6 days ago</time>
-</div>
-
-<div class="title">
-  <a href="https://github.com/yangyubo" data-ga-click="News feed, event click, Event click type:PushEvent target:actor">yangyubo</a> <span>pushed</span> to <a href="/django-notifications/django-notifications/tree/master" data-ga-click="News feed, event click, Event click type:PushEvent target:branch">master</a> at <a href="https://github.com/django-notifications/django-notifications" data-ga-click="News feed, event click, Event click type:PushEvent target:repo">django-notifications/django-notifications</a>
-</div>
-
-<div class="details">
-  <a href="https://github.com/yangyubo"><img alt="Yang.Y" class="gravatar" data-user="1528179" height="30" src="https://avatars1.githubusercontent.com/u/1528179?v=3&amp;s=60" width="30"></a>
-<div class="message">
-    <blockquote>Migration support for Django 1.7 and two new fields in Notification model</blockquote>
-      <div class="pull-info">
-        <span class="octicon octicon-git-commit"></span>
-        <em>2</em> commits with
-        <em>273</em> additions and
-        <em>98</em> deletions
-      </div>
-  </div>
-    <div class="commits ">
-      <ul>
-        <li>
-          <span title="yangyubo">
-            <img alt="Yang.Y" data-user="1528179" height="16" src="https://avatars0.githubusercontent.com/u/1528179?v=3&amp;s=32" width="16">
-          </span>
-          <code><a href="/django-notifications/django-notifications/commit/8f02e30be5346ca42c22e6ca9985013329bee878" data-ga-click="News feed, event click, Event click type:PushEvent target:sha">8f02e30</a></code>
-          <div class="message">
-            <blockquote>
-              Merge pull request #44 from zhang-z/master
-            </blockquote>
+      <div class="events">
+        {% for event in activities %}
+          <div class="event .{{ event.get_event_display }}">
+            <div class="body">
+              <span class="mega-icon {{ event.get_icon_font }}"></span>
+              <div class="time">
+                <time datetime="{{ event.datetime }}" title="{{ event.datetime }}">{{ event.datetime|timesince }} ago</time>
+              </div>
+              <div class="title">
+                <a href="#">{{ event.actor.get_display_name }}</a> <span>{{ event.get_note }}</span>
+              </div>
+              <div class="details">
+                <a href="#">
+                  <img alt="{{ event.actor.get_display_name }}" class="gravatar" height="30" src="{% get_avatar_url event.actor %}" width="30"></a>
+                <div class="message">
+                  <blockquote>From {{ event.ip_address }}</blockquote>
+                  <blockquote>{{ event.datetime }}</blockquote>
+                </div>
+              </div>
+            </div>
           </div>
-        </li>
-        <li>
-          <span title="zhang-z">
-            <img alt="zhang-z" data-user="3030194" height="16" src="https://avatars1.githubusercontent.com/u/3030194?v=3&amp;s=32" width="16">
-          </span>
-          <code><a href="/django-notifications/django-notifications/commit/f351e92223bdba05e8c71c4a6e16333ab69bb832" data-ga-click="News feed, event click, Event click type:PushEvent target:sha">f351e92</a></code>
-          <div class="message">
-            <blockquote>
-              Add 'deleted' and 'emailed' field
-            </blockquote>
-          </div>
-        </li>
-        <li class="more"><a href="https://github.com/django-notifications/django-notifications/compare/44ef50eabd...8f02e30be5" data-ga-click="News feed, event click, Event click type:PushEvent target:comparison">1 more commit »</a></li>
-      </ul>
-    </div>
-</div>
-</div></div>
+        {% endfor %}
       </div>
     </div>
 

@@ -139,7 +139,6 @@ class ProjectSettingsView(ProjectView):
                 actor=request.user,
                 ip_address=request.META['REMOTE_ADDR'],
                 target_object=project.id,
-                target=project,
                 event=AuditLogEntryEvent.PROJECT_EDIT,
                 data=project.get_audit_log_data(),
             )
@@ -210,7 +209,6 @@ class ProjectRemoveView(ProjectView):
                     actor=request.user,
                     ip_address=request.META['REMOTE_ADDR'],
                     target_object=project.id,
-                    target=project,
                     event=AuditLogEntryEvent.PROJECT_REMOVE,
                     data=project.get_audit_log_data(),
                 )

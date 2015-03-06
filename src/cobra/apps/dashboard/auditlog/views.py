@@ -1,8 +1,8 @@
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import
+from cobra.core.loading import get_model, get_class
+from django.utils.translation import ugettext_lazy as _
+from django.views import generic
 
-from django.views.generic import TemplateView
-from cobra.core.loading import get_model
-from cobra.views.mixins import PageTitleMixin
 
 Organization = get_model('organization', 'Organization')
 Team = get_model('team', 'Team')
@@ -10,23 +10,26 @@ Project = get_model('project', 'Project')
 AuditLogEntry = get_model('auditlog', 'AuditLogEntry')
 
 
-class IndexView(PageTitleMixin, TemplateView):
-    """
-    """
-
+class ListView(generic.ListView):
+    model = AuditLogEntry
     template_name = 'dashboard/index.html'
-    active_tab = 'activity'
+    context_object_name = 'activities'
+    paginate_by = 2
 
     def get_context_data(self, **kwargs):
-        ctx = super(IndexView, self).get_context_data(**kwargs)
-        ctx.update(self.get_stats())
-        return ctx
+        context = super(ListView, self).get_context_data(**kwargs)
+        context.update(self.stats)
+        return context
+
+    def get_queryset(self):
+        self.stats = self.get_stats()
+        return self.activities
 
     def get_stats(self):
-        orgs = self.get_organizations()
-        teams = self.get_teams(orgs)
-        projects = self.get_projects(teams)
-        activities = self.get_activities(orgs)
+        self.orgs = orgs =self.get_organizations()
+        self.teams = teams = self.get_teams(orgs)
+        self.projects = projects = self.get_projects(teams)
+        self.activities = activities = self.get_activities(orgs)
         return {
             'projects': projects,
             'projects_count': len(projects),
@@ -36,8 +39,6 @@ class IndexView(PageTitleMixin, TemplateView):
             'teams_count': len(teams),
             'activities': activities
         }
-
-
 
     def get_organizations(self):
         return Organization.objects.get_for_user(self.request.user)

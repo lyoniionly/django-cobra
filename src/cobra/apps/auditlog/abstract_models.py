@@ -1,15 +1,23 @@
 from __future__ import absolute_import, print_function
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 from cobra.core.compat import AUTH_USER_MODEL, generic
+from cobra.core.http import generate_hyperlink
+from cobra.core.loading import get_model
 from cobra.models import Model, fields, sane_repr
 
 from .utils import AuditLogEntryEvent
 
+
+Organization = get_model('organization', 'Organization')
+Team = get_model('team', 'Team')
+Project = get_model('project', 'Project')
 
 @python_2_unicode_compatible
 class AbstractAuditLogEntry(Model):
@@ -19,13 +27,6 @@ class AbstractAuditLogEntry(Model):
     organization = fields.FlexibleForeignKey('organization.Organization')
     actor = fields.FlexibleForeignKey(AUTH_USER_MODEL, related_name='audit_actors')
     target_object = fields.BoundedPositiveIntegerField(null=True)
-
-    # This code will replace the target_object to detail the target completeful.
-    target_content_type = models.ForeignKey(ContentType, blank=True, null=True,
-                                            related_name='target', db_index=True)
-    target_object_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    target = generic.GenericForeignKey('target_content_type',
-                                       'target_object_id')
 
     target_user = fields.FlexibleForeignKey(AUTH_USER_MODEL, null=True, blank=True,
                                     related_name='audit_targets')
@@ -66,54 +67,82 @@ class AbstractAuditLogEntry(Model):
         abstract = True
         app_label = 'auditlog'
         db_table = 'cobra_auditlogentry'
+        ordering = ('-datetime', )
 
     __repr__ = sane_repr('organization_id', 'type')
 
     def __str__(self):
         return ''
 
+    def get_icon_font(self):
+        return AuditLogEntryEvent.ICON_FONTS[self.event]
+
     def get_note(self):
+        note = 'No valid note for this action'
+        if self.event in (AuditLogEntryEvent.ORG_ADD, AuditLogEntryEvent.ORG_EDIT,):
+            org = Organization.objects.get(pk=self.target_object)
+            abs_url = org.get_absolute_url()
+            note = AuditLogEntryEvent.TEMPLATE[self.event] % {
+                'organization': generate_hyperlink(
+                    org.name, abs_url, safe=False),
+            }
+        elif self.event in (AuditLogEntryEvent.TEAM_ADD, AuditLogEntryEvent.TEAM_EDIT, AuditLogEntryEvent.TEAM_REMOVE):
+            try:
+                team = Team.objects.get(pk=self.target_object)
+                abs_url = team.get_absolute_url()
+            except ObjectDoesNotExist:
+                abs_url = ''
+            note = AuditLogEntryEvent.TEMPLATE[self.event] % {
+                'team': generate_hyperlink(self.data['name'], abs_url, safe=False),
+                'organization': generate_hyperlink(
+                    self.organization.name, self.organization.get_absolute_url(),safe=False),
+            }
+        elif self.event in (
+            AuditLogEntryEvent.PROJECT_ADD, AuditLogEntryEvent.PROJECT_EDIT, AuditLogEntryEvent.PROJECT_REMOVE,
+            AuditLogEntryEvent.PROJECT_SET_PUBLIC, AuditLogEntryEvent.PROJECT_SET_PRIVATE):
+            try:
+                project = Project.objects.get(pk=self.target_object)
+                abs_url = project.get_absolute_url()
+            except ObjectDoesNotExist:
+                abs_url = ''
+            note = AuditLogEntryEvent.TEMPLATE[self.event] % {
+                'project': generate_hyperlink(self.data['name'], abs_url, safe=False),
+                'organization': generate_hyperlink(
+                    self.organization.name, self.organization.get_absolute_url(),safe=False),
+            }
+
+
+
         if self.event == AuditLogEntryEvent.MEMBER_INVITE:
-            return 'invited member %s' % (self.data['email'],)
+            note = 'invited member %s on organization %s' % (self.data['email'], generate_hyperlink(self.organization.name, self.organization.get_absolute_url(),safe=False),)
         elif self.event == AuditLogEntryEvent.MEMBER_ADD:
             if self.target_user == self.actor:
-                return 'joined the organization'
-            return 'added member %s' % (self.target_user.get_display_name(),)
+                note = 'joined the organization %s' % (generate_hyperlink(self.organization.name, self.organization.get_absolute_url(), safe=False),)
+            else:
+                note = 'added member %s on organization %s' % (generate_hyperlink(self.target_user.get_display_name(), self.target_user.get_absolute_url(),safe=False), generate_hyperlink(self.organization.name, self.organization.get_absolute_url(),safe=False),)
         elif self.event == AuditLogEntryEvent.MEMBER_ACCEPT:
-            return 'accepted the membership invite'
+            note = 'accepted the membership invite on organization %s' % (generate_hyperlink(self.organization.name, self.organization.get_absolute_url(),safe=False),)
         elif self.event == AuditLogEntryEvent.MEMBER_REMOVE:
             if self.target_user == self.actor:
-                return 'left the organization'
-            return 'removed member %s' % (self.data.get('email') or self.target_user.get_display_name(),)
+                note = 'left the organization %s' % (generate_hyperlink(self.organization.name, self.organization.get_absolute_url(),safe=False),)
+            else:
+                note = 'removed member %s on organization %s' % (generate_hyperlink(self.target_user.get_display_name(), self.target_user.get_absolute_url(),safe=False), generate_hyperlink(self.organization.name, self.organization.get_absolute_url(),safe=False),)
         elif self.event == AuditLogEntryEvent.MEMBER_EDIT:
-            return 'edited member %s' % (self.data.get('email') or self.target_user.get_display_name(),)
+            note = 'edited member %s on organization %s' % (generate_hyperlink(self.target_user.get_display_name(), self.target_user.get_absolute_url(),safe=False), generate_hyperlink(self.organization.name, self.organization.get_absolute_url(),safe=False),)
 
-        elif self.event == AuditLogEntryEvent.TEAM_ADD:
-            return 'created team %s' % (self.data['slug'],)
-        elif self.event == AuditLogEntryEvent.TEAM_EDIT:
-            return 'edited team %s' % (self.data['slug'],)
-        elif self.event == AuditLogEntryEvent.TEAM_REMOVE:
-            return 'removed team %s' % (self.data['slug'],)
-
-        elif self.event == AuditLogEntryEvent.PROJECT_ADD:
-            return 'created project %s' % (self.data['slug'],)
-        elif self.event == AuditLogEntryEvent.PROJECT_EDIT:
-            return 'edited project %s' % (self.data['slug'],)
-        elif self.event == AuditLogEntryEvent.PROJECT_REMOVE:
-            return 'removed project %s' % (self.data['slug'],)
 
         elif self.event == AuditLogEntryEvent.TAGKEY_REMOVE:
-            return 'removed tags matching %s = *' % (self.data['key'],)
+            note = 'removed tags matching %s = *' % (self.data['key'],)
 
         elif self.event == AuditLogEntryEvent.PROJECTKEY_ADD:
-            return 'added project key %s' % (self.data['public_key'],)
+            note = 'added project key %s' % (self.data['public_key'],)
         elif self.event == AuditLogEntryEvent.PROJECTKEY_EDIT:
-            return 'edited project key %s' % (self.data['public_key'],)
+            note = 'edited project key %s' % (self.data['public_key'],)
         elif self.event == AuditLogEntryEvent.PROJECTKEY_REMOVE:
-            return 'removed project key %s' % (self.data['public_key'],)
+            note = 'removed project key %s' % (self.data['public_key'],)
         elif self.event == AuditLogEntryEvent.PROJECTKEY_ENABLE:
-            return 'enabled project key %s' % (self.data['public_key'],)
+            note = 'enabled project key %s' % (self.data['public_key'],)
         elif self.event == AuditLogEntryEvent.PROJECTKEY_DISABLE:
-            return 'disabled project key %s' % (self.data['public_key'],)
+            note = 'disabled project key %s' % (self.data['public_key'],)
 
-        return ''
+        return mark_safe(note)

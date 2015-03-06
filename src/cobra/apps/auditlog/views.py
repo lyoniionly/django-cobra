@@ -12,7 +12,7 @@ class ForOrganizationView(OrganizationView):
     def get(self, request, organization):
         queryset = AuditLogEntry.objects.filter(
             organization=organization,
-        ).select_related('actor', 'target_user').order_by('-datetime')
+        ).select_related('actor', 'target_user')
 
         context = {
             'audit_log_queryset': queryset,

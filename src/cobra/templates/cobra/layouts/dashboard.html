@@ -21,5 +21,23 @@
     <li{% if active_tab == 'activity' %} class="active"{% endif %}>
       <a href="{% url 'dashboard:index' %}"><i class="fa fa-dashboard"></i>{% trans "Activity" %}</a>
     </li>
+    <li{% if active_tab == 'todo' %} class="active"{% endif %}>
+      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Todo" %}</a>
+    </li>
+    <li{% if active_tab == 'calendar' %} class="active"{% endif %}>
+      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Calendar" %}</a>
+    </li>
+    <li{% if active_tab == 'task' %} class="active"{% endif %}>
+      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Task" %}</a>
+    </li>
+    <li{% if active_tab == 'bug' %} class="active"{% endif %}>
+      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Bug" %}</a>
+    </li>
+    <li{% if active_tab == 'test' %} class="active"{% endif %}>
+      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Test" %}</a>
+    </li>
+    <li{% if active_tab == 'story' %} class="active"{% endif %}>
+      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Story" %}</a>
+    </li>
   </ul>
 {% endblock %}
