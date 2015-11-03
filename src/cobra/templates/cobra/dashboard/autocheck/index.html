@@ -1,0 +1,39 @@
+{% extends "layouts/dashboard.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+
+{% block content_class %} with-left-sidebar with-bg{% endblock %}
+
+{% block inner %}
+  <ul class="nav-linkerer">
+    <li><a href="#" class="nav-linker js-repo-filter-tab linker-selected">{% trans 'Excel Diff' %}</a></li>
+    <li><a href="#" class="nav-linker js-repo-filter-tab">{% trans 'Parameter Check' %}</a></li>
+  </ul>
+  <div class="excel-diff">
+    <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+      <div class="row">
+        <div class="col-sm-6">
+          {{ form.excel_from|as_crispy_field }}
+        </div>
+        <div class="col-sm-6">
+          {{ form.excel_to|as_crispy_field }}
+        </div>
+      </div><hr>
+      <button type="submit" class="btn btn-primary">{% trans "Compare" %}</button>
+    </form>
+  </div>
+<br>
+  {% if report %}
+    <h3>Diff from {{ e_f }} to {{ e_t }}</h3>
+  {% endif %}
+{% for r in report %}
+  <p>{{ r }}</p>
+{% endfor %}
+
+{% endblock %}
+
+{% block onbodyload %}
+  {{ block.super }}
+
+{% endblock %}

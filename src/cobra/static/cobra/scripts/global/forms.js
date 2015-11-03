@@ -151,7 +151,7 @@
         button.removeClass('primary').addClass('disabled');
         button.attr('disabled', 'disabled');
       }
-      if(button.data('load-modal')){
+      if(button.data('load-modal') && !button.data('prevent-load-modal')){
         $(button.data('load-modal')).modal({backdrop: 'static'});
       }
 

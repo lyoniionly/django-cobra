@@ -21,23 +21,26 @@
     <li{% if active_tab == 'activity' %} class="active"{% endif %}>
       <a href="{% url 'dashboard:index' %}"><i class="fa fa-dashboard"></i>{% trans "Activity" %}</a>
     </li>
+    <li{% if active_tab == 'autocheck' %} class="active"{% endif %}>
+      <a href="{% url 'dashboard:autocheck-index' %}"><i class="fa fa-check"></i>{% trans "Auto Check" %}</a>
+    </li>
     <li{% if active_tab == 'todo' %} class="active"{% endif %}>
-      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Todo" %}</a>
+      <a href="#"><i class="fa fa-list"></i>{% trans "Todo" %}</a>
     </li>
     <li{% if active_tab == 'calendar' %} class="active"{% endif %}>
-      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Calendar" %}</a>
+      <a href="#"><i class="fa fa-calendar"></i>{% trans "Calendar" %}</a>
     </li>
     <li{% if active_tab == 'task' %} class="active"{% endif %}>
-      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Task" %}</a>
+      <a href="#"><i class="fa fa-tasks"></i>{% trans "Task" %}</a>
     </li>
     <li{% if active_tab == 'bug' %} class="active"{% endif %}>
-      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Bug" %}</a>
+      <a href="#"><i class="fa fa-bug"></i>{% trans "Bug" %}</a>
     </li>
     <li{% if active_tab == 'test' %} class="active"{% endif %}>
-      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Test" %}</a>
+      <a href="#">{% trans "Test" %}</a>
     </li>
     <li{% if active_tab == 'story' %} class="active"{% endif %}>
-      <a href="#"><i class="fa fa-dashboard"></i>{% trans "Story" %}</a>
+      <a href="#">{% trans "Story" %}</a>
     </li>
   </ul>
 {% endblock %}

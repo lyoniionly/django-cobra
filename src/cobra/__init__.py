@@ -30,6 +30,7 @@ COBRA_CORE_APPS = [
     'cobra.apps.auditlog',
     'cobra.apps.dashboard',
     'cobra.apps.dashboard.auditlog',
+    'cobra.apps.dashboard.autocheck',
     'cobra.apps.home',
     'cobra.apps.option',
     'cobra.apps.project',

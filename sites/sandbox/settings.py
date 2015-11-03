@@ -367,7 +367,7 @@ COBRA_SYSTEM_TAGLINE = 'Sandbox'
 # 'lessc' installed.
 USE_LESS = True
 
-COMPRESS_ENABLED = False
+COMPRESS_ENABLED = True
 COMPRESS_PRECOMPILERS = (
     ('text/less', 'lessc --source-map-less-inline --source-map-map-inline {infile} {outfile}'),
 )
