@@ -27,6 +27,7 @@
                 {{ form.public|as_crispy_field }}
               {% endif %}
 {#            {{ form.avatar }}#}
+              {{ form.desc|as_crispy_field }}
             </div>
             <div class="col-sm-6">
               <div class="light-well">
@@ -94,14 +95,15 @@
 
 {% block sidebar %}
     <ul class="nav nav-list">
-        <li class="nav-header">{% trans "Details" %}</li>
         <li{% if active_tab == 'details' %} class="active"{% endif %}>
-            <a href="{% url 'project:settings' project.slug project.organization.slug %}">{% trans "Settings" %}</a>
+            <a href="{% url 'project:settings' project.slug project.organization.slug %}">{% trans "Project" %}</a>
         </li>
+
+        <li{% if page == 'member-privileges' %} class="active"{% endif %}>
+            <a href="">{% trans "Member privileges" %}</a>
+        </li>
+
     {% comment %}
-        <li{% if page == 'notifications' %} class="active"{% endif %}>
-            <a href="{% url 'sentry-project-notifications' project.organization.slug project.slug %}">{% trans "Notifications" %}</a>
-        </li>
         <li{% if page == 'quotas' %} class="active"{% endif %}>
             <a href="{% url 'sentry-manage-project-quotas' project.organization.slug project.slug %}">{% trans "Rate Limits" %}</a>
         </li>

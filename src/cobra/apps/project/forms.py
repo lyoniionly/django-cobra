@@ -139,8 +139,11 @@ class ProjectEditForm(forms.ModelForm):
         help_text=_('Outbound requests matching Allowed Domains will have the header "X-Cobra-Token: {token}" appended.'))
 
     class Meta:
-        fields = ('name', 'public', 'team', 'slug', 'avatar', )
+        fields = ('name', 'public', 'team', 'slug', 'desc', 'avatar', )
         model = Project
+        widgets = {
+            'desc': forms.Textarea(attrs={'rows':2}),
+        }
 
     def __init__(self, request, organization, team_list, data, files, instance, *args, **kwargs):
         super(ProjectEditForm, self).__init__(data=data, files=files, instance=instance, *args, **kwargs)

@@ -1,0 +1,65 @@
+{% extends "layouts/project.html" %}
+{% load i18n helper_tags %}
+
+{% block body_class %}workreport{% endblock %}
+{% block content_class %} with-left-sidebar with-bg{% endblock %}
+
+{% block main %}
+  <div class="row">
+    <div class="col-sm-3">
+      <div class="report-date">
+        <div class="report-date-wrapper">
+          {% block report_nav_header %}
+          <div class="media p-l-10">
+            <div class="media-left">
+              {% get_avatar request.user 50 cls='media-object img-circle' %}
+            </div>
+            <div class="media-body">
+              <h3 class="media-heading">
+                {{ request.user|user_display_name }}
+              </h3>
+              <span class="str-truncated">
+                <span class="namespace-name">
+                  {{ project.organization.name }}
+                  {% ifnotequal project.organization.owner request.user %}
+                    ({{ project.organization.owner.get_display_name }})
+                  {% endifnotequal %} / {{ project.team.name }} /
+                </span>
+                <span class="project-name filter-title">
+                  {{ project.name }}
+                </span>
+              </span>
+            </div>
+          </div>
+          {% endblock %}
+          <hr>
+          <div class="dropdown years">
+            <a href="javascript:void(0);" class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              {{ filter_date.year }}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              {% for year in selected_years %}
+                <li><a href="{% url 'organization:project:workreport:daily-mine-year' organization.slug project.slug year %}">{{ year }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <ul class="nav nav-list nav-github">
+            {% for abbr_name, full_name in months.items %}
+            <li class="{% ifequal filter_date|date:'M' abbr_name %}active{% endifequal %}">
+              <a href="{% url 'organization:project:workreport:daily-mine-month' organization.slug project.slug filter_date.year abbr_name %}">{{ full_name }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-9">
+      <div class="p-t-25 p-r-15">
+        {% block report_content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

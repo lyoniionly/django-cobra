@@ -8,6 +8,7 @@
 @import url("@{vendor-url}/SemanticUI/image.less");
 @import url("mixins.less");
 @import url("variables.less");
+@import url("helper.less");
 @import url("fonts.less");
 @import url("fontello.less");
 @import url("datepicker.less");
@@ -23,6 +24,7 @@
 @import url("avatar.less");
 @import url("breadcrumb.less");
 @import url("simple-slider.less");
+@import url("overview.less");
 
 /* =============================  Global  ============================== */
 
@@ -44,6 +46,24 @@ body {
   padding-left: 0px;
   margin-right: auto;
   margin-left: auto;
+}
+
+.row.no-space {
+  margin-right: 0;
+  margin-left: 0;
+  & > [class*=col-] {
+    padding-right: 0;
+    padding-left: 0
+  }
+}
+
+.row.vertical-border {
+  & > [class*=col-] {
+    border-left: 1px solid #ececec;
+    &:nth-of-type(1) {
+      border-left: none;
+    }
+  }
 }
 
 dd {
@@ -244,9 +264,9 @@ h3 {
   margin-right: 0px;
 }
 
-.navbar-nav > li > .dropdown-menu {
+/*.navbar-nav > li > .dropdown-menu {
   .border-top-radius(4px);
-}
+}*/
 
 .navbar {
   position: relative;
@@ -2495,7 +2515,7 @@ section.body .page-header:first-child {
 
   i {
     background-image: none;
-    color: lighten(#a4adb7, 5);
+//    color: lighten(#a4adb7, 5);
     margin: 0 3px 0 0;
     position: relative;
     //    font-size: 15px;
@@ -2655,8 +2675,8 @@ table.table td .select2-container {
 .dropdown-menu {
   top: 33px;
   border: none;
-  .border-radius(4px);
-  .box-shadow(0 0 0 2px rgba(70, 82, 98, .43));
+  .border-radius(0);
+  .box-shadow(0 2px 10px rgba(0, 0, 0, 0.2));
   .background-clip(padding-box);
 
   li a {
@@ -2665,8 +2685,29 @@ table.table td .select2-container {
     color: #878e94;
 
     &:hover {
-      background: #fff;
+      /*background: #56afe8;
+      color: #fff;*/
+      background: #eee;
       color: #696f75;
+    }
+
+    &.disabled {
+      pointer-events: none;
+      cursor: not-allowed;
+      filter: alpha(opacity=65);
+      opacity: 0.65;
+    }
+
+    &.spinner-loading {
+      position: relative;
+      &:before {
+        left: inherit;
+        right: 4px;
+        width: 12px;
+        height: 12px;
+        margin-top: -6px;
+        margin-left: -6px;
+      }
     }
   }
 
@@ -5744,4 +5785,136 @@ table.commit-list td>div {
       outline: none;
     }
   }
+}
+
+/**
+ * GROUP/ITEM
+ */
+.aui-group {
+  display: table;
+  box-sizing: border-box;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: 100%;
+}
+.aui-group > .aui-item {
+  box-sizing: border-box;
+  display: table-cell;
+  margin: 0;
+  vertical-align: top;
+}
+.aui-group > .aui-item + .aui-item {
+  padding-left: 20px;
+}
+/* defensive header allowance */
+.aui-layout .aui-group > header {
+  display: table-caption;
+}
+/* .aui-group-split: two items; alignment is left, then right (splits the layout). */
+.aui-group.aui-group-split > .aui-item {
+  text-align: right;
+}
+.aui-group.aui-group-split > .aui-item:first-child {
+  text-align: left;
+}
+/* .aui-group-trio: three items; alignment is left, center, right */
+.aui-group.aui-group-trio > .aui-item {
+  text-align: left;
+}
+.aui-group.aui-group-trio > .aui-item + .aui-item {
+  text-align: center;
+}
+.aui-group.aui-group-trio > .aui-item + .aui-item + .aui-item {
+  text-align: right;
+}
+
+.workreport {
+  .report-date {
+    padding: 10px 0;
+    .report-date-wrapper {
+      position: relative;
+      min-height: 500px;
+      padding-top: 15px;
+      padding-bottom: 15px;
+      background-image: -webkit-linear-gradient(left, #f6f6f6 0%, #fff 8px);
+      background-image: linear-gradient(to left, #f6f6f6 0%, #fff 8px);
+      box-shadow: inset -1px 0 0 #eee;
+      &:before,&:after {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 15px;
+        content: "";
+        background-color: transparent;
+      }
+      &:before {
+        top: 0;
+        background-color: transparent;
+        background-image: -webkit-linear-gradient(#fff, rgba(255,255,255,0));
+        background-image: linear-gradient(#fff, rgba(255,255,255,0));
+      }
+      &:after {
+        bottom: 0;
+        background-color: transparent;
+        background-image: -webkit-linear-gradient(rgba(255,255,255,0), #fff);
+        background-image: linear-gradient(rgba(255,255,255,0), #fff);
+      }
+
+      .dropdown.years .dropdown-toggle {
+        color: #465262;
+        line-height: 26px;
+        padding-left: 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 24px;
+        text-decoration: none;
+      }
+
+      .nav-list > .active > a {
+        background-color: #5B5E68;
+      }
+
+      .nav-github {
+        margin-top: 20px;
+      }
+    }
+  }
+}
+
+.tt_daily_completion .title_dc {
+font-size: 24px;
+line-height: 26px;
+font-family: verdana,"Microsoft YaHei",SimHei,SimSun;
+color: #555;
+}
+/*.tt_daily_completion .left_dc {
+padding-right: 280px;
+}*/
+.tt_daily_completion .action_dc {
+margin-top: 25px;
+}
+.tt_daily_completion .todaystatus_dc {
+min-height: 240px;
+color: #aaa;
+font-size: 12px;
+line-height: 24px;
+font-family: verdana,"Microsoft YaHei",SimHei,SimSun;
+margin-top: 30px;
+}
+.tt_daily_completion .todaystatus_dc dd {
+border: 1px dashed #ddd;
+padding: 20px 40px;
+margin-left: 0;
+margin-top: 10px;
+}
+
+.tt_daily_completion .todaystatus_dc dd p span {
+vertical-align: middle;
+}
+.tt_daily_completion .todaystatus_dc dd .status_dc {
+font-size: 20px;
+line-height: 22px;
+font-family: verdana,"Microsoft YaHei",SimHei,SimSun;
+color: #555;
+margin-right: 10px;
 }

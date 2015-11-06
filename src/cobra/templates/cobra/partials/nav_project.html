@@ -2,11 +2,20 @@
 {% load permissions_tags %}
 
 <ul class="nav nav-tabs">
-  <li{% if active_nav == 'code' %} class="active"{% endif %}>
-    <a href="{% url 'svnkit:node' organization.slug project.slug '/' %}">{% trans "Code" %}</a>
+  <li{% if active_nav == 'overview' %} class="active"{% endif %}>
+    <a href="{% url 'organization:project:overview' organization.slug project.slug %}">{% trans "Overview" %}</a>
   </li>
-  <li{% if active_nav == 'pack' %} class="active"{% endif %}>
-    <a href="">{% trans "Pack" %}</a>
+  <li{% if active_nav == 'code' %} class="active"{% endif %}>
+    <a href="{% url 'svnkit:node' organization.slug project.slug '/' %}">{% trans "Source" %}</a>
+  </li>
+  <li{% if active_nav == 'weekly_report' %} class="active"{% endif %}>
+    <a href="">{% trans "Weekly Report" %}</a>
+  </li>
+  <li{% if active_nav == 'daily_report' %} class="active"{% endif %}>
+    <a href="{% url 'organization:project:workreport:daily-mine' organization.slug project.slug %}">{% trans "Daily Report" %}</a>
+  </li>
+  <li{% if active_nav == 'members' %} class="active"{% endif %}>
+    <a href="">{% trans "Members" %}</a>
   </li>
   {% if request.user|can_manage_project:project %}
     <li{% if active_nav == 'settings' %} class="active"{% endif %}>

@@ -10,13 +10,15 @@ from django.utils.encoding import python_2_unicode_compatible
 
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
+from easy_thumbnails.files import get_thumbnailer
 
 from cobra.core.loading import get_model
 from cobra.core.compat import AUTH_USER_MODEL
 from cobra.models import Model, BaseManager, fields
 from cobra.core.utils import generate_sha1
 
-from .utils import get_gravatar
+from .utils import get_gravatar, get_default_avatar_url
+
 
 class UserManager(BaseManager, auth_models.UserManager):
     pass
@@ -156,7 +158,7 @@ class AbstractProfile(Model):
     def __str__(self):
         return 'Profile of %(username)s' % {'username': self.user.username}
 
-    def get_avatar_url(self):
+    def get_avatar_url(self, size=settings.COBRA_ACCOUNTS_AVATAR_DEFAULT_SIZE):
         """
         Returns the image containing the avatar for the user.
 
@@ -172,20 +174,22 @@ class AbstractProfile(Model):
         """
         # First check for a avatar and if any return that.
         if self.avatar:
-            return self.avatar.url
+            thumbnail_options = {'crop': True, 'size': (size, size)}
+            thumbnailer = get_thumbnailer(self.avatar)
+            thumbnail = thumbnailer.get_thumbnail(thumbnail_options)
+            return thumbnail.url
 
         # Use Gravatar if the user wants to.
         if settings.COBRA_ACCOUNTS_AVATAR_GRAVATAR:
             return get_gravatar(self.user.email,
-                                settings.COBRA_ACCOUNTS_AVATAR_SIZE,
+                                size,
                                 settings.COBRA_ACCOUNTS_AVATAR_DEFAULT)
-
         # Gravatar not used, check for a default image.
         else:
-            if settings.COBRA_ACCOUNTS_AVATAR_DEFAULT not in ['404', 'mm',
+            if settings.MONICA_ACCOUNTS_AVATAR_DEFAULT not in ['404', 'mm',
                                                                 'identicon',
                                                                 'monsterid',
                                                                 'wavatar']:
-                return settings.COBRA_ACCOUNTS_AVATAR_DEFAULT
+                return get_default_avatar_url()
             else:
                 return None

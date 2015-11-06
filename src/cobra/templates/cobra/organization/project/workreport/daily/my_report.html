@@ -1,0 +1,84 @@
+{% extends "organization/project/workreport/daily/base_daily.html" %}
+
+{% block report_content %}
+  <div class="row">
+
+    <div class="col-sm-8">
+      <div class="tt_daily_completion">
+
+    <div class="title_dc">我的日报 2015年10月1日（星期四）</div>
+
+
+    <div class="cont_cd">
+      <div class="left_dc">
+        <div class="action_dc">
+
+
+        </div>
+        <div data-name="today－submit-situation">
+          <dl class="todaystatus_dc">
+            <dt>个人提交情况</dt>
+            <dd>
+              <p>
+
+
+                <span class="icon-dialog-closed-warn icon_dc"></span>
+
+                <span class="status_dc">未提交</span>
+                <span></span>
+
+              </p>
+
+              <div class="evaluation_dc">
+
+                评价：暂无
+
+              </div>
+
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+  </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="date-statistics">
+        <div class="highlight-date"></div>
+        <div class="remark">
+          <h2 data-name="title">团队统计：</h2>
+          <div class="statics">
+
+
+              <span class="comStyle borderAll"></span>
+
+              <span>已交</span>
+
+
+              <span class="comStyle borderIn"></span>
+
+              <span>未交</span>
+
+
+              <span class="comStyle borderPart"></span>
+
+              <span>补交</span>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block onbodyload %}
+  {{ block.super }}
+  $('.date-statistics .highlight-date').datetimepicker({
+    format: "YYYY/MM/DD",
+    inline: true
+  });
+
+{% endblock %}

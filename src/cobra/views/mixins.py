@@ -1,6 +1,9 @@
 from django.conf import settings
+from django.views.generic.dates import YearMixin, MonthMixin, DayMixin
 from cobra.core.constants import EVENTS_PER_PAGE
 from cobra.core.loading import get_model
+from cobra.core.utils import get_datetime_now
+
 
 class ExtraContextMixin(object):
 
@@ -74,3 +77,52 @@ class PageTitleMixin(object):
         ctx.setdefault('active_nav', self.active_nav)
         ctx.setdefault('active_tab', self.active_tab)
         return ctx
+
+
+class NiceYearMixin(YearMixin):
+    def get_year(self):
+        """
+        Return the year for which this view should display data.
+        """
+        try:
+            year = super(NiceYearMixin, self).get_year()
+        except Exception as e:
+            year = None
+
+        if year is None:
+            year = get_datetime_now().strftime(self.get_year_format())
+        return year
+
+
+class NiceMonthMixin(MonthMixin):
+    def get_month(self):
+        """
+        Return the month for which this view should display data.
+        """
+        try:
+            month = super(NiceMonthMixin, self).get_month()
+        except Exception as e:
+            month = None
+
+        if month is None:
+            month = get_datetime_now().strftime(self.get_month_format())
+        return month
+
+
+class NiceDayMixin(DayMixin):
+    def get_day(self):
+        """
+        Return the day for which this view should display data.
+        """
+        try:
+            day = super(NiceDayMixin, self).get_day()
+        except Exception as e:
+            day = None
+
+        if day is None:
+            day = get_datetime_now().strftime(self.get_day_format())
+        return day
+
+
+class DailyMixin(NiceYearMixin, NiceMonthMixin, NiceDayMixin):
+    pass

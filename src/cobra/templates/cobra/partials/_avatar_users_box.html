@@ -1,0 +1,33 @@
+{% load i18n %}
+{% load monica_helpers %}
+
+<div class="avatar-box">
+  <ul class="avatar-group">
+    {% for user in users %}
+      <li id="avatar-{{ user.username }}">
+        {% if not hide_visit %}
+        <a href="{% url 'accounts:profile_view' user.username %}">
+        {% endif %}
+        {% if show_monitoring_url %}
+          <a href="{% url 'holter:monitoring' user.username %}">
+        {% endif %}
+          <img src="{% get_avatar_url user %}" class="tip"
+               {% if not show_name %}
+               rel="tooltip"
+               title="<strong>{{ user|user_display_name|force_escape }}</strong>"{% endif %} >
+          {% if show_name %}
+            <strong>{{ user|user_display_name }}</strong>
+          {% endif %}
+        {% if not hide_visit or show_monitoring_url %}
+        </a>
+        {% endif %}
+      </li>
+    {% endfor %}
+    {% if show_more_link %}
+      <li><a href="{{ more_link }}" class="tip btn btn-white btn-circle" title="{% trans 'Click to see more' %}"><i class="fa fa-ellipsis-h"></i></a></li>
+    {% endif %}
+    {% if has_add_doctor_button %}
+      <li><a href="{% url 'medicine:doctor_explore' %}" class="btn btn-circle"><i class="fa fa-plus"></i></a></li>
+    {% endif %}
+  </ul>
+</div>

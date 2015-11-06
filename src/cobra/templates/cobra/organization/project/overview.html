@@ -1,0 +1,204 @@
+{% extends 'layouts/project.html' %}
+{% load i18n helper_tags %}
+
+{% block main %}
+  <section class="body" id="repo-overview">
+    <div class="media">
+      <div class="media-left">
+        {% get_project_avatar project 'media-object avatar project-avatar s90' %}
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading">
+          <span class="str-truncated">
+            <span class="namespace-name">
+              {{ project.organization.name }}
+              {% ifnotequal project.organization.owner request.user %}
+                ({{ project.organization.owner.get_display_name }})
+              {% endifnotequal %} / {{ project.team.name }} /
+            </span>
+            <span class="project-name filter-title">
+              {{ project.name }}
+            </span>
+          </span>
+        </h3>
+        {{ project.desc }}
+      </div>
+    </div>
+
+    <hr>
+
+    <div id="repo-info" class="aui-group">
+      <div class="aui-item repo-metadata-container">
+        <dl class="repo-metadata">
+          <dt>Last updated</dt>
+
+          <dd title="2015-03-02">
+            <time datetime="2015-03-02T02:32:15.587058" title="2 March 2015 10:32">2015-03-02</time>
+          </dd>
+
+
+          <dt>Language</dt>
+          <dd title="Java">
+
+            Java
+
+          </dd>
+
+          <dt>Access level</dt>
+
+
+          <dd title="You have read access">
+            Read
+          </dd>
+
+        </dl>
+      </div>
+      <div class="aui-item repo-stats-container" id="repo-stats" data-modules="repo/overview/repo-stats">
+        <ul class="stats">
+
+
+          <li class="branches">
+            <a href="#branches" id="branches-dialog-trigger" data-modules="repo/overview/filterable-list-dialog"
+               title="View branches in this repository"
+               data-url="/api/1.0/repositories/lyon_beihua/portfolio_isotope-django-django-cms/branches-tags"
+               data-template="branches-overview-template">
+              <span class="value">1</span>
+
+              Weekly Report
+
+            </a>
+          </li>
+          <li class="tags">
+            <a href="#tags" id="tags-dialog-trigger" data-modules="repo/overview/filterable-list-dialog"
+               title="View tags in this repository"
+               data-url="/api/1.0/repositories/lyon_beihua/portfolio_isotope-django-django-cms/branches-tags"
+               data-template="tags-overview-template">
+              <span class="value">1</span>
+
+              Daily Report
+
+            </a>
+          </li>
+          <li class="forks">
+            <a href="#forks" id="forks-dialog-trigger" data-modules="repo/overview/filterable-list-dialog"
+               title="View forks of this repository"
+               data-url="/api/1.0/repositories/lyon_beihua/portfolio_isotope-django-django-cms/forks"
+               data-template="forks-overview-template">
+              <span class="value">0</span>
+
+              Tasks
+
+            </a>
+          </li>
+          <li class="followers">
+
+            <a href="#followers" id="followers-dialog-trigger" data-modules="repo/overview/followers-dialog"
+               title="View watchers of this repository"
+               data-url="/api/1.0/repositories/lyon_beihua/portfolio_isotope-django-django-cms/followers"
+               data-template="watchers-overview-template">
+              <span class="value">1</span>
+
+              Bugs
+
+            </a>
+          </li>
+        </ul>
+
+        <script id="branches-overview-template" type="text/html">
+
+
+          <div class="tabbed-filter-widget repo-stats-dialog branches" id="branches-dialog">
+            <div class="tabbed-filter">
+              <input placeholder="Filter branches" class="filter-box" autosave="branch-dropdown-10262744" type="text">
+            </div>
+            <div class="tab-pane active-pane branches" id="branch-list">
+              <ol class="filter-list[[^branches]] empty[[/branches]]">
+                <li class="empty-msg">No matching branches</li>
+                [[#branches]]
+                <li class="comprev filter-item">
+                  <a href="/lyon_beihua/portfolio_isotope-django-django-cms/branch/[[encodedName]]"
+                     class="filter-item-link" title="View details for [[name]]">[[name]]</a>
+                </li>
+                [[/branches]]
+              </ol>
+            </div>
+          </div>
+
+        </script>
+        <script id="tags-overview-template" type="text/html">
+
+
+          <div class="tabbed-filter-widget repo-stats-dialog tags" id="tags-dialog">
+            <div class="tabbed-filter">
+              <input placeholder="Filter tags" class="filter-box" autosave="tag-dropdown-10262744" type="text">
+            </div>
+            <div class="tab-pane active-pane tags" id="tag-list">
+              <ol class="filter-list[[^tags]] empty[[/tags]]">
+                <li class="empty-msg">No matching tags</li>
+                [[#tags]]
+                <li class="comprev filter-item">
+                  <a href="/lyon_beihua/portfolio_isotope-django-django-cms/commits/tag/[[encodedName]]"
+                     class="filter-item-link" title="Browse source of [[name]]">[[name]]</a>
+                  <a rel="nofollow" class="compare"
+                     href="/lyon_beihua/portfolio_isotope-django-django-cms/branches/compare/[[encodedName]].."
+                     title="Show changes between [[name]] and the main branch.">Compare</a>
+                </li>
+                [[/tags]]
+              </ol>
+            </div>
+          </div>
+
+        </script>
+        <script id="forks-overview-template" type="text/html">
+
+
+          <div class="tabbed-filter-widget repo-stats-dialog forks" id="forks-dialog">
+            <div class="tabbed-filter">
+              <input placeholder="Filter forks" class="filter-box" autosave="fork-dropdown-10262744" type="text">
+            </div>
+            <div class="tab-pane active-pane forks" id="fork-list">
+              <ol class="filter-list[[^forks]] empty[[/forks]]">
+                <li class="empty-msg">No matching forks</li>
+                [[#forks]]
+                <li class="comprev filter-item">
+                  <a href="/[[owner.username]]/[[slug]]"
+                     class="filter-item-link" title="[[owner.username]]/[[slug]]">[[owner.username]]/[[slug]]</a>
+                  <a rel="nofollow" class="compare"
+                     href="/lyon_beihua/portfolio_isotope-django-django-cms/branches/compare/[[owner.username]]/[[slug]].."
+                     title="Show changes between [[owner.username]]/[[slug]] and this repository.">Compare</a>
+                </li>
+                [[/forks]]
+              </ol>
+            </div>
+          </div>
+
+        </script>
+        <script id="watchers-overview-template" type="text/html">
+
+
+          <div class="followers-dialog repo-stats-dialog" id="followers-dialog">
+            <div id="followers-list" class="followers-list">
+              <ol
+              [[^followers]] class="empty"[[/followers]]>
+              <li class="empty-msg">No watchers yet</li>
+              [[#followers]]
+              <li>
+                <a href="/[[username]]/" title="[[display_name]]">
+            <span class="aui-avatar aui-avatar-medium">
+              <span class="aui-avatar-inner">
+                <img src="[[avatar]]">
+              </span>
+            </span>
+                </a>
+              </li>
+              [[/followers]]
+              </ol>
+            </div>
+          </div>
+
+        </script>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+

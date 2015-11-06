@@ -11,6 +11,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from paging.helpers import paginate as paginate_func
+import six
 from templatetag_sugar.register import tag
 from templatetag_sugar.parser import Name, Variable, Constant, Optional
 
@@ -19,6 +20,8 @@ from cobra.core.javascript import to_json
 from cobra.core.loading import get_model, get_class, get_profile_class
 from cobra.core.constants import EVENTS_PER_PAGE
 from cobra.core.utils import multi_get_letter
+from cobra.apps.accounts.utils import get_gravatar, get_default_avatar_url, get_user
+from cobra.core.compat import get_user_model
 
 register = template.Library()
 
@@ -81,37 +84,41 @@ def paginator(context, queryset_or_list, request, asvar=None, per_page=EVENTS_PE
 
 
 @register.simple_tag
-def get_avatar_url(user, email=''):
-    if user is None:
-        # This situation is really exist.
-        # When we invite the member to join the organization,
-        # the organization member DB only store the email, but not the user instance.
-        # If the invited member do not accept the invitation yet, the organization member list page
-        # will contain all member include invited member, so, we should deal the user(none) avatar
-
-        # Use Gravatar if the user wants to.
-        if settings.COBRA_ACCOUNTS_AVATAR_GRAVATAR:
-            return get_gravatar(email,
-                                settings.COBRA_ACCOUNTS_AVATAR_SIZE,
-                                settings.COBRA_ACCOUNTS_AVATAR_DEFAULT)
-
-        # Gravatar not used, check for a default image.
-        else:
-            if settings.COBRA_ACCOUNTS_AVATAR_DEFAULT not in ['404', 'mm',
-                                                                'identicon',
-                                                                'monsterid',
-                                                                'wavatar']:
-                return settings.COBRA_ACCOUNTS_AVATAR_DEFAULT
-            else:
-                return None
-
+def get_avatar_url(user, size=settings.COBRA_ACCOUNTS_AVATAR_DEFAULT_SIZE):
     Profile = get_profile_class()
     try:
         instance = Profile.objects.get(user=user)
     except Profile.DoesNotExist:
         # User has no profile, try a blank one
         instance = Profile(user=user)
-    return instance.get_avatar_url()
+    return instance.get_avatar_url(size)
+
+
+@register.inclusion_tag('partials/_avatar_tag.html')
+def get_avatar(user, size=settings.COBRA_ACCOUNTS_AVATAR_DEFAULT_SIZE, **kwargs):
+    if not isinstance(user, get_user_model()):
+        try:
+            user = get_user(user)
+            alt = six.text_type(user)
+            url = get_avatar_url(user, size)
+        except get_user_model().DoesNotExist:
+            url = get_default_avatar_url()
+            alt = _("Default Avatar")
+    else:
+        alt = six.text_type(user)
+        url = get_avatar_url(user, size)
+    context = dict(kwargs, **{
+        'user': user,
+        'url': url,
+        'alt': alt,
+        'size': size,
+    })
+    return context
+
+
+@register.filter
+def user_display_name(user):
+    return user.get_full_name() or user.username
 
 
 @register.inclusion_tag('partials/project_avatar.html')

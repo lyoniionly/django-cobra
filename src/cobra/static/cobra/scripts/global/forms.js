@@ -90,38 +90,18 @@
       });
     },*/
 
-    datepicker: function() {
-      $('[data-toggle="datepicker"]').datepicker({
-        autoclose: true,
-        todayHighlight: true
+    datepicker: function(el) {
+      var $el = $(el);
+      $el.find('[data-toggle="datepicker"]').datetimepicker({
+        format: "YYYY/MM/DD",
+        minview : 2
       });
-      /*var startDate = $('input#id_start').datepicker({ language: app.config.datepickerLocale })
-        .on('changeDate', function(ev) {
-          if (ev.dates[0].valueOf() > endDate.dates[0].valueOf()) {
-            var newDate = new Date(ev.dates[0]);
-            newDate.setDate(newDate.getDate() + 1);
-            endDate.setDate(newDate);
-            $('input#id_end')[0].focus();
-          }
-          startDate.hide();
-          endDate.setStartDate(ev.dates[0]);
-          endDate.update();
-        }).data('datepicker');
+    },
 
-      var endDate = $('input#id_end').datepicker({
-        language: horizon.datepickerLocale,
-        startDate: startDate ? startDate.dates[0] : null
-      }).on('changeDate', function(ev) {
-          endDate.hide();
-        }).data('datepicker');
-
-      $("input#id_start").mousedown(function(){
-        endDate.hide();
+    datetimepicker: function(el) {
+      var $el = $(el);
+      $el.find('[data-toggle="datetimepicker"]').datetimepicker({
       });
-
-      $("input#id_end").mousedown(function(){
-        startDate.hide();
-      });*/
     }
   };
 
@@ -222,7 +202,10 @@
     app.forms.handle_volume_source();
     app.forms.handle_image_source();
     app.forms.handle_object_upload_source();*/
-    app.forms.datepicker();
+    app.modals.addModalInitFunction(app.forms.datepicker);
+    app.forms.datepicker($("body"));
+    app.modals.addModalInitFunction(app.forms.datetimepicker);
+    app.forms.datetimepicker($("body"));
 
     /*app.forms.add_password_fields_reveal_buttons($("body"));
     app.modals.addModalInitFunction(

@@ -22,7 +22,8 @@
           {% else %}
             <ul>
               {% for project in project_list %}
-                <li><a href="{% url 'svnkit:node' organization.slug project.slug '/' %}">{{ project.name }}</a></li>
+                {% comment %}<li><a href="{% url 'svnkit:node' organization.slug project.slug '/' %}">{{ project.name }}</a></li>{% endcomment %}
+                <li><a href="{% url 'organization:project:overview' organization.slug project.slug %}">{{ project.name }}</a></li>
               {% endfor %}
             </ul>
           {% endif %}

@@ -2,22 +2,58 @@ from __future__ import absolute_import  # for logging import below
 import logging
 import random
 import os
+import datetime
 from django.core.exceptions import ImproperlyConfigured
 
 from django.core.urlresolvers import resolve, reverse
 from django.contrib.staticfiles.finders import find
+from django.http import Http404
 
 from django.shortcuts import redirect, resolve_url
 from django.utils import six
+from django.utils.encoding import force_str
 from django.utils.http import is_safe_url
 from django.utils.timezone import get_current_timezone, is_naive, make_aware
 from django.conf import settings
 from django.template.defaultfilters import (date as date_filter,
                                             slugify as django_slugify)
+from django.utils.translation import ugettext as _
 from unidecode import unidecode
 
 from cobra.core.compat import sha_constructor
 from cobra.core.loading import import_string
+
+def get_datetime_now():
+    """
+    Returns datetime object with current point in time.
+
+    In Django 1.4+ it uses Django's django.utils.timezone.now() which returns
+    an aware or naive datetime that represents the current point in time
+    when ``USE_TZ`` in project's settings is True or False respectively.
+    In older versions of Django it uses datetime.datetime.now().
+
+    """
+    try:
+        from django.utils import timezone
+        return timezone.now() # pragma: no cover
+    except ImportError: # pragma: no cover
+        return datetime.datetime.now()
+
+
+def date_from_string(year, year_format, month='', month_format='', day='', day_format='', delim='__'):
+    """
+    Helper: get a datetime.date object given a format string and a year,
+    month, and day (only year is mandatory). Raise a 404 for an invalid date.
+    """
+    format = delim.join((year_format, month_format, day_format))
+    datestr = delim.join((year, month, day))
+    try:
+        return datetime.datetime.strptime(force_str(datestr), format).date()
+    except ValueError:
+        raise Http404(_("Invalid date string '%(datestr)s' given format '%(format)s'") % {
+            'datestr': datestr,
+            'format': format,
+        })
 
 
 def default_slugifier(value):

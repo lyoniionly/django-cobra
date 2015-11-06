@@ -13,7 +13,7 @@ class HomeView(AnonymousRequiredMixin, OrganizationMixin, TemplateView):
     template_name = 'home/landing.html'
 
     def get_authenticated_redirect_url(self):
-        # TODO(dcramer): deal with case when the user cannot create orgs
+        # TODO(lyon): deal with case when the user cannot create orgs
         organization = self.get_active_organization(self.request)
         if organization is None:
             url = reverse('home:help')

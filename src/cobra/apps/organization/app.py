@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 from cobra.core.application import Application
 from cobra.core.loading import get_class
@@ -16,6 +16,8 @@ class OrganizationApplication(Application):
     organization_member_settings_view = get_class('organization.views', 'OrganizationMemberSettingsView')
     organization_member_accept_view = get_class('organization.views', 'OrganizationMemberAcceptView')
     # organization_member_create_view = get_class('organization.views', 'OrganizationMemberCreateView')
+
+    project_app = get_class('organization.project.app', 'application')
 
     def get_urls(self):
         urls = [
@@ -41,6 +43,8 @@ class OrganizationApplication(Application):
                 name='member-accept'),
             # url(r'^(?P<organization_slug>[\w_-]+)/members/new/$', self.organization_member_create_view.as_view(),
             #     name='member-create'),
+
+            url(r'^(?P<organization_slug>[\w_-]+)/project/', include(self.project_app.urls)),
         ]
         return self.post_process_urls(urls)
 

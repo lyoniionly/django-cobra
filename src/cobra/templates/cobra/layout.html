@@ -89,11 +89,12 @@
 {# Local scripts #}
 {% block scripts %}
   {{ block.super }}
-  {% compress js %}
+  {% compress js %}{% endcompress %}
     <!-- Twitter Bootstrap -->
     <script type="text/javascript" src="{% static "cobra/vendor/bootstrap3/dist/js/bootstrap.min.js" %}"></script>
     <!-- Twitter Bootstrap plugins -->
     <script type="text/javascript" src="{% static "cobra/scripts/lib/bootstrap-datepicker/bootstrap-datepicker.js" %}"></script>
+
     <!-- javaScript Libs -->
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery-migrate.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.animate-colors.js" %}"></script>
@@ -105,7 +106,8 @@
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.flot.tooltip.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.timeago.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.countdown.js" %}"></script>
-    <script type="text/javascript" src="{% static "cobra/scripts/lib/moment.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/moment-with-locales.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/bootstrap-datetimepicker.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/simple-slider.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/json2.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/underscore.js" %}"></script>
@@ -137,10 +139,13 @@
     <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.core.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.charts.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.stream.js" %}"></script>
-  {% endcompress %}
+
   <script type="text/javascript">
     {% if request.LANGUAGE_CODE %}
-      moment.lang('{{ request.LANGUAGE_CODE }}');
+       moment.locale('{{ request.LANGUAGE_CODE }}');
+    {% endif %}
+    {% if TIME_ZONE %}
+      app.config.timezone = '{{ TIME_ZONE }}';
     {% endif %}
     app.config.zeroClipboardPath = '{% static "cobra/ZeroClipboard.swf" %}';
     app.config.popupCss = '{% static "cobra/styles/popup.css" %}';

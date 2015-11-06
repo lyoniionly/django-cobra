@@ -99,7 +99,7 @@
       {% for member, team_list, needs_sso in member_list %}
         <tr>
           <td class="user-info">
-            <img class="avatar" src="{% get_avatar_url member.user member.get_email %}">
+            <img class="avatar" src="{% get_avatar_url member.user %}">
             <strong><a href="{% url 'organization:member-settings' organization.slug member.id %}">
               {{ member.get_display_name }}
             </a></strong>

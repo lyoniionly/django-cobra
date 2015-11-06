@@ -67,6 +67,7 @@ class AbstractProject(Model):
         (ProjectStatus.DELETION_IN_PROGRESS, _('Deletion in Progress')),
     ), db_index=True)
     platform = models.CharField(max_length=32, choices=PLATFORM_CHOICES, null=True)
+    desc = models.TextField('Description', max_length=2048, null=True, blank=True)
     avatar = ThumbnailerImageField(_('Project Avatar'),
                                     blank=True,
                                     upload_to=upload_to_avatar,

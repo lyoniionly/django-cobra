@@ -14,15 +14,15 @@
       {% block actions %}
         {% if ACCESS.org_write %}
           <a href="{% url 'team:create' organization.slug %}"
-             class="btn btn-small btn-primary">{% trans "New Team" %}</a>
+             class="btn btn-small btn-primary"><i class="fa fa-plus"></i> {% trans "New Team" %}</a>
         {% endif %}
         {% if ACCESS.team_write %}
           <a href="{% url 'project:create' organization.slug %}"
-             class="btn btn-small btn-primary">{% trans "New Project" %}</a>
+             class="btn btn-small btn-primary"><i class="fa fa-plus"></i> {% trans "New Project" %}</a>
         {% endif %}
         {% if ACCESS.org_write %}
           <a href="{% url 'organization:member-create' organization.slug %}"
-             class="btn btn-small btn-primary">{% trans "New Member" %}</a>
+             class="btn btn-small btn-primary"><i class="fa fa-plus"></i> {% trans "New Member" %}</a>
         {% endif %}
       {% endblock %}
     </div>
@@ -58,7 +58,7 @@
       <hr>
       <li class="{% block org_settings_nav %}{% endblock %}">
         <a href="{% url 'organization:settings' organization.slug %}">
-          <i class="fa fa-cogs"></i>{% trans "Settings" %}
+          {% trans "Settings" %}
         </a>
       </li>
     {% endif %}

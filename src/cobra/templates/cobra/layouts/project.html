@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% load i18n %}
+
+{% block title %}{{ project.name }} | {{ block.super }}{% endblock %}
+
+{% block page_header %}
+    {{ block.super }}
+    {% include 'partials/nav_project.html' %}
+{% endblock %}
