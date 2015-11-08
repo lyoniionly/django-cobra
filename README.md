@@ -73,3 +73,11 @@ aa = markdown2.markdown(text, extras=['fenced-code-blocks'])
 # print html
 print aa
 input_file.close()
+
+
+
+
+import calendar
+
+for i in  calendar.Calendar().itermonthdates(2015,11):
+    print i
