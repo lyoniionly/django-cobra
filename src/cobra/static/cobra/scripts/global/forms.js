@@ -102,6 +102,11 @@
       var $el = $(el);
       $el.find('[data-toggle="datetimepicker"]').datetimepicker({
       });
+    },
+
+    autosize: function(el) {
+      var $el = $(el);
+      autosize($el.find('.auto-size'));
     }
   };
 
@@ -206,6 +211,9 @@
     app.forms.datepicker($("body"));
     app.modals.addModalInitFunction(app.forms.datetimepicker);
     app.forms.datetimepicker($("body"));
+
+    app.modals.addModalInitFunction(app.forms.autosize);
+    app.forms.autosize($("body"));
 
     /*app.forms.add_password_fields_reveal_buttons($("body"));
     app.modals.addModalInitFunction(

@@ -9,6 +9,9 @@ class WorkreportProjectOrganizationApplication(Application):
 
     daily_report_view = get_class('organization.project.workreport.views', 'DailyReportView')
 
+    # ajax
+    ajax_workreport_statistic_view = get_class('organization.project.workreport.views', 'AjaxWorkreportStatisticView')
+
     def get_urls(self):
         urls = [
             url(r'^daily/mine/$', self.daily_report_view.as_view(), name='daily-mine'),
@@ -18,6 +21,9 @@ class WorkreportProjectOrganizationApplication(Application):
 
             # team daily report
             # url(r'^daily/team/$', self.daily_team_report_view.as_view(), name='daily-team-report-view'),
+
+            # ajax
+            url(r'^ajax/statistic/$', self.ajax_workreport_statistic_view.as_view(), name='ajax-workreport-statistic'),
         ]
         return self.post_process_urls(urls)
 

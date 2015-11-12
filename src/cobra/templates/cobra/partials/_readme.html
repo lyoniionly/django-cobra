@@ -1,0 +1,9 @@
+{% load i18n %}
+<div class="panel panel-default m-t-20">
+  <div class="panel-heading">
+    <h3>{{ readme.name }}</h3>
+  </div>
+  <div class="panel-body">
+    {{ readme.content|safe }}
+  </div>
+</div>

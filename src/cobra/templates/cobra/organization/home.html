@@ -12,7 +12,7 @@
       {% for team, project_list in team_list %}
         <li>
           <h3>
-            <div class="pull-right actions">
+            <div class="pull-right action-bar">
               <a href="{% url 'team:manage' team.slug organization.slug %}"><span class="icon-cog"></span>{% trans 'Team Settings' %}</a>
             </div>
             <a href="{% comment %}{% url 'sentry-team-dashboard' organization.slug team.slug %}{% endcomment %}">{{ team.name }}</a>

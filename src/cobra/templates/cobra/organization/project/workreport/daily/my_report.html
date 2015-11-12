@@ -1,4 +1,5 @@
 {% extends "organization/project/workreport/daily/base_daily.html" %}
+{% load i18n %}
 
 {% block report_content %}
   <div class="row">
@@ -6,64 +7,61 @@
     <div class="col-sm-8">
       <div class="tt_daily_completion">
 
-    <div class="title_dc">我的日报 2015年10月1日（星期四）</div>
+        <div class="title_dc">{% trans 'My Dialy Report' %} - {{ filter_date }} ({{ filter_date|date:'l' }})</div>
 
 
-    <div class="cont_cd">
-      <div class="left_dc">
-        <div class="action_dc">
+        <div class="cont_cd">
+          <div class="left_dc">
+            <div class="action_dc">
 
 
+            </div>
+            <div data-name="today－submit-situation">
+              <dl class="todaystatus_dc">
+                <dt>个人提交情况</dt>
+                <dd>
+                  <p>
+
+
+                    <span class="icon-right icon_dc"></span>
+
+                    <span class="status_dc">按时提交</span>
+                    <span>2015年11月06日 06:59</span>
+
+                  </p>
+
+                  <div class="evaluation_dc">
+
+                    评价：暂无
+
+                  </div>
+
+                </dd>
+              </dl>
+            </div>
+          </div>
         </div>
-        <div data-name="today－submit-situation">
-          <dl class="todaystatus_dc">
-            <dt>个人提交情况</dt>
-            <dd>
-              <p>
 
-
-                <span class="icon-dialog-closed-warn icon_dc"></span>
-
-                <span class="status_dc">未提交</span>
-                <span></span>
-
-              </p>
-
-              <div class="evaluation_dc">
-
-                评价：暂无
-
-              </div>
-
-            </dd>
-          </dl>
-        </div>
       </div>
     </div>
-
-  </div>
-    </div>
     <div class="col-sm-4">
-      <div class="date-statistics">
-        <div class="highlight-date"></div>
+      <div class="date-statistics maskable">
+        <div class="highlight-date">
+        </div>
         <div class="remark">
-          <h2 data-name="title">团队统计：</h2>
+          <h2 data-name="title">个人统计：</h2>
+
           <div class="statics">
+            <span class="ui red empty circular label"></span>
+            <span>已交</span>
 
+            <span class="ui red empty circular label"></span>
 
-              <span class="comStyle borderAll"></span>
+            <span>未交</span>
 
-              <span>已交</span>
+            <span class="ui red empty circular label"></span>
 
-
-              <span class="comStyle borderIn"></span>
-
-              <span>未交</span>
-
-
-              <span class="comStyle borderPart"></span>
-
-              <span>补交</span>
+            <span>补交</span>
 
 
           </div>
@@ -72,13 +70,216 @@
     </div>
   </div>
 
+  <hr>
+  <div class="card">
+    <div class="card-header ch-alt">
+      <h2>{% trans 'You do not write report today' %}</h2>
+    </div>
+    
+    <div class="card-body card-padding">
+      <div class="empty-box">
+          <div class="empty-box-wrapper">
+            <i class="fa fa-exclamation-circle"></i>
+            <div class="empty-box-content">
+              
+                <h3>Yohho!There is no daily report for today!</h3>
+                <p>{% blocktrans %}
+                  Every day to write daily less than you can record what you do today, so that you can find in the future, you can also let colleagues know what you have done today
+                {% endblocktrans %}</p>
+                <p class="links">
+                  <a class="btn btn-primary btn-lg" href="#">{% trans 'Write Daily Report' %}</a>
+                </p>
+              
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="widget">
+            <div class="widget-content p-15 bgm-light-gray">
+              <div class="counter counter-lg">
+                <div class="counter-label text-uppercase">Finished Tasks</div>
+                <div class="counter-number-group">
+                  <span class="counter-icon m-r-10 c-green">
+                    <i class="fa fa-check"></i>
+                  </span>
+                  <span class="counter-number">5</span>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="widget">
+            <div class="widget-content p-15 bgm-light-gray">
+              <div class="counter counter-lg">
+                <div class="counter-label text-uppercase">Code Lines</div>
+                <div class="counter-number-group">
+                  <span class="counter-icon m-r-10 c-green">
+                    <i class="fa fa-code"></i>
+                  </span>
+                  <span class="counter-number">576</span>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+    <div class="col-sm-4">
+              <div class="widget">
+                <div class="widget-content p-15 bgm-green">
+                  <div class="counter counter-lg counter-inverse">
+                    <div class="counter-label text-uppercase">Work Hours</div>
+                    <span class="counter-number">480</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+  </div>
+
+
+  <div class="">
+    <div class="t-view">
+      <div class="tv-header media">
+        <a href="" class="tvh-user pull-left">
+          <img class="img-responsive" src="img/profile-pics/profile-pic-2.jpg" alt="">
+        </a>
+
+        <div class="media-body p-t-5">
+          <div>
+            <strong class="m-r-30">Malinda Hollaway</strong>
+            <span><i class="c-green fa fa-check"></i> {% trans 'Submit on time' %}</span>
+          </div>
+          <small class="c-gray">April 23, 2014 at 05:00</small>
+        </div>
+
+        <ul class="actions m-t-20 hidden-xs">
+          <li>
+            <a href="">
+              <i class="glyphicon glyphicon-pencil"></i>
+            </a>
+          </li>
+          {% comment %}<li class="dropdown">
+            <a href="" data-toggle="dropdown">
+              <i class="fa fa-key"></i>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li>
+                <a href="">Edit</a>
+              </li>
+              <li>
+                <a href="">Delete</a>
+              </li>
+            </ul>
+          </li>{% endcomment %}
+        </ul>
+      </div>
+      <div class="tv-body">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sem dolor, posuere convallis blandit sit amet,
+          aliquet in est. Ut condimentum magna enim, non venenatis elit interdum accumsan. In hac habitasse platea
+          dictumst. Etiam molestie felis non mollis viverra. In ipsum lorem, fermentum vitae lectus in, accumsan
+          malesuada neque.</p>
+
+        <p>Suspendisse vehicula urna nisi, in luctus lacus consequat at. Nam purus dolor, tristique id lacinia sed,
+          tincidunt congue metus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec gravida leo. Sed
+          nec ligula porta, dignissim elit molestie, finibus ligula. Nunc venenatis malesuada est ac molestie. Phasellus
+          ornare nibh eu nisl rhoncus, vitae porttitor ante feugiat. Nulla vehicula erat nec odio dignissim, sit amet
+          porttitor lorem auctor. Maecenas fermentum tellus ex, ac aliquet nisl malesuada id.</p>
+
+        <div class="clearfix"></div>
+
+        <ul class="tvb-stats">
+          <li class="tvbs-comments">54 Comments</li>
+          <li class="tvbs-likes">254 Likes</li>
+          <li class="tvbs-views">23K Views</li>
+        </ul>
+
+        <a class="tvc-more" href=""><i class="zmdi zmdi-mode-comment"></i> View all 54 Comments</a>
+      </div>
+
+      <div class="tv-comments">
+        <ul class="tvc-lists">
+          <li class="media">
+            <a href="" class="tvh-user pull-left">
+              <img class="img-responsive" src="img/profile-pics/1.jpg" alt="">
+            </a>
+
+            <div class="media-body">
+              <strong class="d-block">David Peiterson</strong>
+              <small class="c-gray">April 23, 2014 at 05:10</small>
+
+              <div class="m-t-10">Maecenas fermentum tellus ex, ac aliquet nisl malesuada id.</div>
+
+            </div>
+          </li>
+
+          <li class="media">
+            <a href="" class="tvh-user pull-left">
+              <img class="img-responsive" src="img/profile-pics/2.jpg" alt="">
+            </a>
+
+            <div class="media-body">
+              <strong class="d-block">Wernall Parnell</strong>
+              <small class="c-gray">April 22, 2014 at 13:00</small>
+
+              <div class="m-t-10">Nulla vehicula erat nec odio dignissim, sit amet porttitor lorem auctor. Maecenas
+                fermentum tellus ex, ac aliquet nisl malesuada id.
+              </div>
+
+            </div>
+          </li>
+
+          <li class="media">
+            <a href="" class="tvh-user pull-left">
+              <img class="img-responsive" src="img/profile-pics/3.jpg" alt="">
+            </a>
+
+            <div class="media-body">
+              <strong class="d-block">Shane Lee Yong</strong>
+              <small class="c-gray">April 19, 2014 at 10:10</small>
+
+              <div class="m-t-10">Sit amet porttitor lorem auctor. Maecenas fermentum tellus ex, ac aliquet nisl
+                malesuada idwoon lorem ipsum.
+              </div>
+            </div>
+          </li>
+
+          <li class="p-20">
+            <div class="fg fg-line">
+              <textarea class="form-control auto-size" placeholder="Write a comment..."></textarea>
+            </div>
+
+            <button class="m-t-15 btn btn-primary btn-sm">Post</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="load-more">
+      <a href="javascript:void(0);"><i class="zmdi zmdi-refresh-alt"></i> Load More...</a>
+    </div>
+  </div>
+
 {% endblock %}
 
 {% block onbodyload %}
   {{ block.super }}
-  $('.date-statistics .highlight-date').datetimepicker({
-    format: "YYYY/MM/DD",
-    inline: true
+  new app.WorkReportPage({
+    reportType: 'daily',
+    isTeam: false,
+    pollStatisticUrl: '{% url 'organization:project:workreport:ajax-workreport-statistic' organization.slug project.slug %}',
+    year: "{{ filter_date|date:'Y' }}",
+    month: "{{ filter_date|date:'m'}}",
+    day: "{{ filter_date|date:'d' }}"
+  });
+
+  $('.load-more').on('click', function(){
+    $(".date-statistics .highlight-date").data("DateTimePicker").date(new Date());
   });
 
 {% endblock %}

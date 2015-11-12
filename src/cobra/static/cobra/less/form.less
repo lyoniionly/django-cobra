@@ -1,0 +1,123 @@
+/*
+ * Input Feilds
+ */
+
+.fg-line {
+  position: relative;
+  vertical-align: top;
+  /* Validation Stats */
+}
+
+.fg-line:not(.form-group) {
+  display: inline-block;
+  width: 100%;
+}
+
+.fg-line .form-control {
+  resize: none;
+}
+
+.fg-line .form-control:not(:disabled) {
+  color: #000;
+}
+
+.fg-line .form-control:disabled {
+  color: #9d9d9d;
+  background: transparent;
+}
+
+.fg-line:not(.disabled):after,
+.fg-line:not(.readonly):after {
+  position: absolute;
+  z-index: 3;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  content: "";
+  -webkit-transition: all;
+  -o-transition: all;
+  transition: all;
+  -webkit-transition-duration: 300ms;
+  transition-duration: 300ms;
+}
+
+.fg-line:not([class*=has-]):after {
+  background: #2196f3;
+}
+
+.fg-line.input-toggled:after {
+  width: 100%;
+}
+
+.fg-line.readonly .form-control {
+  color: #9d9d9d;
+  background: transparent;
+}
+
+.fg-line.fg-toggled:after {
+  width: 100%;
+}
+
+.fg-line.has-success:after {
+  background: #4caf50;
+}
+
+.fg-line.has-warning:after {
+  background: #ffc107;
+}
+
+.fg-line.has-error:after {
+  background: #f44336;
+}
+
+.fg-line .form-control {
+  border-radius: 0;
+}
+
+.fg input:active,
+input:focus {
+  outline: 0;
+  box-shadow: none !important;
+}
+
+.fg .form-control {
+  box-shadow: none;
+  border: 0;
+  border-bottom: 1px solid #e0e0e0;
+  resize: none;
+}
+
+.fg .form-control:active,
+.fg .form-control:focus {
+  border-bottom-color: #b4b4b4;
+  box-shadow: none;
+}
+
+.fg .form-control:not(.fc-alt) {
+  box-shadow: none;
+  border: 0;
+  border-bottom: 1px solid #e0e0e0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 0;
+}
+
+.fg .form-control:not(.fc-alt):active,
+.fg .form-control:not(.fc-alt):focus {
+  border-bottom-color: #b4b4b4;
+}
+
+.fg .form-control:not(.fc-alt).auto-size {
+  padding-top: 6px;
+}
+
+.fc-alt {
+  border: 1px solid #E4E4E4;
+}
+
+.fc-alt:active,
+.fc-alt:focus {
+  border-color: #D7D7D7;
+}

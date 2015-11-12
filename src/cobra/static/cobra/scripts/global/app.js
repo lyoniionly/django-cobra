@@ -1,6 +1,6 @@
 /*global Cobra:true*/
 
-(function (window, app, Backbone, jQuery, _) {
+(function (window, app, Backbone, jQuery, _, moment) {
   "use strict";
 
   var $ = jQuery;
@@ -1053,7 +1053,186 @@
 
   });
 
+
+  app.WorkReportPage = BasePage.extend({
+
+    default_settings: {
+      reportType: 'daily',
+      isTeam: false,
+      year: "2013",
+      month: "12",
+      day: "1",
+      maxDate: "2016/12/30",
+      minDate: "2013/01/01"
+    },
+
+    ui: {
+      datePicker: $(".date-statistics .highlight-date")
+    },
+
+    initialize: function (data) {
+      BasePage.prototype.initialize.apply(this, arguments);
+
+//      _.bindAll(this, '_getMonthCompleteStatusData');
+
+      if (_.isUndefined(data))
+        data = {};
+
+      this.options = $.extend({}, this.default_settings, this.options, data);
+
+      this.firstComeIn = true;
+
+      this._timeBindPicker();
+//      this._addClassDom();
+
+      /*$('.date-statistics .highlight-date').datetimepicker({
+        format: "YYYY/MM/DD",
+        inline: true
+      });
+
+      console.log(this.options.reportType);
+      console.log(this.options.isTeam);
+
+      $(".dash-filter").keyup(_.bind(function (e) {
+        this.doFilter($(e.currentTarget).parents('.panel').first());
+      }, this));
+
+      $('.filter-bar .nav-linker').on('click', _.bind(function(e){
+        e.preventDefault();
+        var $this = $(e.currentTarget);
+        var uiBox = $this.parents('.panel').first();
+        uiBox.find('.nav-linker.linker-selected').removeClass('linker-selected');
+        $this.addClass('linker-selected');
+        this.doFilter(uiBox);
+      }, this));*/
+    },
+
+    _addClassDom: function(data) {
+      var a, b = this.ui.datePicker.find(".datepicker-days tbody td");
+      b.removeClass("complete partcomplete incomplete");
+      $.each(b, function(d) {
+          var e = {
+              0 : "",
+              1 : "complete",
+              2 : "partcomplete",
+              3 : "incomplete",
+              4 : "complete",
+              5 : "partcomplete",
+              6 : "incomplete"
+          };
+          if (d < data.length) {
+              var f = data[d],
+              g = f.status;
+              e[g] && (b.eq(d).addClass(e[g]), 0 == d ? (a = g, b.eq(d).addClass("startBorder")) : g != a && (b.eq(d - 1).addClass("endBorder"), b.eq(d).addClass("startBorder")))
+          }
+      });
+    },
+
+    _timeBindPicker: function() {
+      var month_short_name = moment.monthsShort();
+      var date = this.options.year + "/" + this.options.month + "/" + this.options.day;
+
+//      e = moment(b);
+      var redirectToUrl = '';
+
+      var datePickerSettings = {
+        format: "YYYY/MM/DD",
+        inline: true,
+        useCurrent: false
+      };
+      if (this.options.maxDate) {
+          var maxDate = this.options.maxDate;
+          datePickerSettings.maxDate = moment(maxDate).format("YYYY-MM-DD");
+      }
+      if (this.options.minDate) {
+          var minDate = this.options.minDate;
+          datePickerSettings.minDate = moment(minDate).format("YYYY-MM-DD");
+      }
+
+      this.ui.datePicker.on("dp.change", _.bind(function(e) { // day change
+        var newDate = e.date, oldDate = e.oldDate;
+        if(this.firstComeIn) {
+          this._getMonthCompleteStatusData(newDate);
+          this.firstComeIn = false;
+        } else {
+          var date_django = newDate.year() + "/" + month_short_name[newDate.month()] + "/" + newDate.date();
+          if(this.options.reportType=='daily'){
+            if(this.options.isTeam){
+
+            } else { // mine
+              redirectToUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/project/' + app.config.projectId + '/workreport/daily/mine/' + date_django + '/';
+            }
+          }
+          this.ui.datePicker.maskLoading();
+          window.location.href = redirectToUrl;
+        }
+
+      }, this));
+      this.ui.datePicker.on("dp.update", _.bind(function(e) { // Next and Previous buttons, selecting a year.
+        var change = e.change, viewDate  = e.viewDate ;
+//        console.log(change);
+//        console.log(viewDate);
+        if(change=='M'){
+          this._getMonthCompleteStatusData(viewDate);
+        }
+      }, this));
+
+      this.ui.datePicker.datetimepicker(datePickerSettings);
+      this.ui.datePicker.data("DateTimePicker").date(moment(date));
+
+      this.ui.datePicker.find('.datepicker-days').on("click", 'td.day.active', _.bind(function(e) { // day change
+        e.stopPropagation();
+      }, this));
+
+      /*this.ui.datePicker.off("changeDate");
+      this.ui.datePicker.on("changeDate",
+      function(b) {
+          var d = c(b.date),
+          e = d.get("month") + 1,
+          f = d.get("date");
+          a.model.set({
+              year: d.get("year"),
+              month: 10 > e ? "0" + e: e,
+              day: 10 > f ? "0" + f: f
+          },
+          {
+              silent: !0
+          }),
+          setTimeout(function() {
+              a._addClassDom()
+          },
+          0),
+          a.trigger("clickDate", a.model.toJSON())
+      })*/
+    },
+
+    _getMonthCompleteStatusData: function(date, async) {
+      var self = this;
+      var sync = typeof async !== 'undefined' ? async : false;
+      $.ajax({
+        dataType: "json",
+        url: this.options.pollStatisticUrl,
+        async: sync,
+        data: {
+          year: date.year(),
+          month: date.month()+1,
+          day: 1,
+          isTeam: this.options.isTeam?1:0,
+          reportType: this.options.reportType
+        },
+        success: function(data) {
+            self._addClassDom(data.calendar);
+        }
+      });
+    },
+    close: function() {
+        this.ui.datePicker.data("datetimepicker") && this.ui.datePicker.data("datetimepicker").remove()
+    }
+
+
+  });
+
   Backbone.sync = function (method, model, success, error) {
     success();
   };
-}(window, app, Backbone, jQuery, _));
+}(window, app, Backbone, jQuery, _, moment));

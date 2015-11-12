@@ -11,7 +11,7 @@
 @import url("helper.less");
 @import url("fonts.less");
 @import url("fontello.less");
-@import url("datepicker.less");
+@import url("bootstrap-datetimepicker.less");
 @import url("popover-extra-placements.less");
 @import url("github.less");
 @import url("fileinput.less");
@@ -25,6 +25,12 @@
 @import url("breadcrumb.less");
 @import url("simple-slider.less");
 @import url("overview.less");
+@import url("time-line.less");
+@import url("form.less");
+@import url("card.less");
+@import url("header-actions.less");
+@import url("statistic.less");
+@import url("widget.less");
 
 /* =============================  Global  ============================== */
 
@@ -63,6 +69,33 @@ body {
     &:nth-of-type(1) {
       border-left: none;
     }
+  }
+}
+
+pre {
+  margin-bottom: 0;
+  word-break: normal;
+  padding: 10px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f7f7f7;
+  border-radius: 3px;
+  word-wrap: normal;
+}
+
+pre code {
+  white-space: pre;
+}
+
+.panel {
+  border-radius: 0;
+}
+
+.panel-default {
+  border-color: #ececec;
+  & > .panel-heading {
+    background-color: #fbfcfd;
   }
 }
 
@@ -2509,7 +2542,7 @@ section.body .page-header:first-child {
   color: #666d73;
   font-weight: bold;
   text-shadow: none;
-  font-size: 13px;
+  //font-size: 13px;
   -webkit-font-smoothing: antialiased;
   padding: 7px 12px;
 
@@ -3116,7 +3149,7 @@ table.member-list {
         color: darken(@gray, 20);
       }
 
-      .actions {
+      .action-bar {
         font-size: 14px;
 
         a {
@@ -5917,4 +5950,103 @@ line-height: 22px;
 font-family: verdana,"Microsoft YaHei",SimHei,SimSun;
 color: #555;
 margin-right: 10px;
+}
+
+.highlight-date {
+  padding: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+  .table-condensed {
+    border-collapse: separate;
+    border-spacing: 2px;
+  }
+
+  .bootstrap-datetimepicker-widget table td.active,
+  .bootstrap-datetimepicker-widget table td.active:hover {
+    background-color: inherit;
+    color: inherit;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  }
+  .bootstrap-datetimepicker-widget table td.active:hover {
+    background-color: #eee;
+  }
+
+ /* .bootstrap-datetimepicker-widget table td.active:before {
+    content: '•';
+    display: inline-block;
+    position: absolute;
+    bottom: -5px;
+    right: 10px;
+  }*/
+}
+
+.highlight-date .datepicker table tr td.incomplete {
+    background-color: #ffdede;
+    color: #5c3b3b;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0
+}
+
+.highlight-date .datepicker table tr td.incomplete:hover {
+    background-color: #eee
+}
+
+.highlight-date .datepicker table tr td.partcomplete {
+    background-color: #ccf;
+    color: #563a37;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0
+}
+
+.highlight-date .datepicker table tr td.partcomplete:hover {
+    background-color: #eee
+}
+
+.highlight-date .datepicker table tr td.complete {
+    background-color: #baf1f4;
+    color: #326a69;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0
+}
+
+.highlight-date .datepicker table tr td.complete:hover {
+    background-color: #eee
+}
+
+.empty-box {
+  text-align: center;
+  /*display: table;
+  height: 100%;*/
+  padding: 20px;
+  width: 100%;
+  position: relative;
+  overflow: auto;
+}
+.empty-box .empty-box-wrapper {
+  /*display: table-cell;
+    vertical-align: middle;*/
+}
+.empty-box .empty-box-wrapper > i {
+  font-size: 54px;
+  color: #959faf;
+  opacity: .45;
+}
+.empty-box .empty-box-wrapper .empty-box-content {
+  margin-top: 15px;
+}
+.empty-box .empty-box-wrapper .empty-box-content h3 {
+  font-size: 22px;
+  text-align: center;
+  font-weight: 500;
+  margin: 0;
+  line-height: 40px;
+}
+.empty-box .empty-box-wrapper .empty-box-content p {
+  margin-bottom: 30px;
+}
+.empty-box .empty-box-wrapper .empty-box-content .links .btn.btn-lg {
+  padding: 20px 35px;
 }

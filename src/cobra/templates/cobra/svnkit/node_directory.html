@@ -2,65 +2,81 @@
 {% load static %}
 
 {% block node_content %}
-{% with node.get_last_changeset as last_changeset %}
-  <div class="commit commit-tease js-details-container">
-    <p class="commit-title ">
-        <a href="" class="message" data-pjax="true" title="{{ last_changeset.message}}">{{ last_changeset.message|truncatechars:80 }}</a>
-    </p>
-    <div class="commit-meta">
-      <button aria-label="Copy SHA" class="js-zeroclipboard zeroclipboard-link" data-clipboard-text="e" data-copied-hint="Copied!" type="button"><span class="octicon octicon-clippy"></span></button>
-      <a href="{% comment %}{{ last_changeset.get_absolute_url }}{% endcomment %}" class="sha-block" data-pjax="">latest change on revision <span class="sha">{{ last_changeset }}</span></a>
+  {% with node.get_last_changeset as last_changeset %}
+    <div class="commit commit-tease js-details-container">
+      <p class="commit-title ">
+        <a href="" class="message" data-pjax="true"
+           title="{{ last_changeset.message }}">{{ last_changeset.message|truncatechars:80 }}</a>
+      </p>
 
-      <div class="authorship">
-        <img alt="{{ last_changeset.author }}" class="avatar" height="20" src="{% static 'cobra/img/avatar/default_avatar.png'  %}" width="20">
-        <span class="author-name"><a href="#" rel="contributor">{{ last_changeset.author }}</a></span>
-        authored <time class="updated" datetime="" is="relative-time" title="{{ last_changeset.date }}">{{ last_changeset.date|timesince }}</time>
+      <div class="commit-meta">
+        <button aria-label="Copy SHA" class="js-zeroclipboard zeroclipboard-link" data-clipboard-text="e"
+                data-copied-hint="Copied!" type="button"><span class="octicon octicon-clippy"></span></button>
+        <a href="{% comment %}{{ last_changeset.get_absolute_url }}{% endcomment %}" class="sha-block" data-pjax="">latest
+          change on revision <span class="sha">{{ last_changeset }}</span></a>
 
+        <div class="authorship">
+          <img alt="{{ last_changeset.author }}" class="avatar" height="20"
+               src="{% static 'cobra/img/avatar/default_avatar.png' %}" width="20">
+          <span class="author-name"><a href="#" rel="contributor">{{ last_changeset.author }}</a></span>
+          authored
+          <time class="updated" datetime="" is="relative-time"
+                title="{{ last_changeset.date }}">{{ last_changeset.date|timesince }}</time>
+
+        </div>
       </div>
     </div>
-  </div>
-{% endwith %}
+  {% endwith %}
 
   <div class="file-wrap">
 
-  <table class="files" data-pjax="">
-    {% if not node.is_root %}
-      <tbody>
-      <tr class="up-tree">
-        <td></td>
-        <td><a href="{{ node.parent.get_absolute_url }}" title="Go to parent directory">..</a></td>
-        <td></td>
-        <td></td>
-      </tr>
+    <table class="files" data-pjax="">
+      {% if not node.is_root %}
+        <tbody>
+        <tr class="up-tree">
+          <td></td>
+          <td><a href="{{ node.parent.get_absolute_url }}" title="Go to parent directory">..</a></td>
+          <td></td>
+          <td></td>
+        </tr>
 
-    </tbody>
+        </tbody>
       {% endif %}
-    <tbody>
+      <tbody>
       <tr class="warning include-fragment-error">
         <td class="icon"><span class="octicon octicon-alert"></span></td>
         <td class="content-title" colspan="3">Failed to load latest log information.</td>
       </tr>
-{% for child in node.children.all %}
+      {% for child in node.children.all %}
         <tr>
           <td class="icon">
             <span class="fa fa-{% if child.is_directory %}folder{% else %}file-text-o{% endif %}"></span>
           </td>
           <td class="content-title">
             <span class="css-truncate css-truncate-target">
-              <a href="{{ child.get_absolute_url }}" class="js-directory-link" id="" title="{{ child.get_basename }}">{{ child.get_basename }}</a></span>
+              <a href="{{ child.get_absolute_url }}" class="js-directory-link" id=""
+                 title="{{ child.get_basename }}">{{ child.get_basename }}</a></span>
           </td>
           <td class="message">
             <span class="css-truncate css-truncate-target">
-              <a href="" class="message" data-pjax="true" title="{{ child.get_last_changeset.message }}">{{ child.get_last_changeset.message }}</a>
+              <a href="" class="message" data-pjax="true"
+                 title="{{ child.get_last_changeset.message }}">{{ child.get_last_changeset.message }}</a>
             </span>
           </td>
           <td class="age">
-            <span class="css-truncate css-truncate-target"><time datetime="{{ child.last_changed }}" is="time-ago" title="{{ child.last_changed }}">{{ child.last_changed|timesince }} ago</time></span>
+            <span class="css-truncate css-truncate-target"><time datetime="{{ child.last_changed }}" is="time-ago"
+                                                                 title="{{ child.last_changed }}">{{ child.last_changed|timesince }}
+              ago
+            </time></span>
           </td>
         </tr>  {% endfor %}
-    </tbody>
-  </table>
+      </tbody>
+    </table>
 
-</div>
+  </div>
+
+  {% if readme %}
+    {% include 'partials/_readme.html' %}
+  {% endif %}
 
 {% endblock %}

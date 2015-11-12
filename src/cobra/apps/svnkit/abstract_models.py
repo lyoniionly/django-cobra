@@ -2,6 +2,7 @@ from __future__ import absolute_import, print_function
 
 import datetime
 import mimetypes
+import os
 import posixpath
 from django.conf import settings
 
@@ -20,6 +21,7 @@ from cobra.core.loading import get_class, get_model
 from cobra.core.strings import strip, truncatechars
 
 from . import choices
+from cobra.core.constants import  README_MARKUPS
 from .exceptions import map_svn_exceptions
 from .markup.hightlighter import make_html
 from .utils.binaryornot import get_starting_chunk

@@ -13,6 +13,7 @@ from cobra.core.utils import get_login_url
 from cobra.core.loading import get_model
 from cobra.core.constants import MEMBER_OWNER
 from cobra.core.render import render_to_response
+from cobra.core.http import is_same_domain
 
 Organization = get_model('organization', 'Organization')
 Team = get_model('team', 'Team')
@@ -213,3 +214,19 @@ def requires_admin(func):
             return render_to_response('cobra/missing_permissions.html', status=400)
         return func(request, *args, **kwargs)
     return login_required(wrapped)
+
+
+def api(func):
+    @wraps(func)
+    def wrapped(request, *args, **kwargs):
+        data = func(request, *args, **kwargs)
+        if request.is_ajax():
+            response = HttpResponse(data)
+            response['Content-Type'] = 'application/json'
+        else:
+            ref = request.META.get('HTTP_REFERER')
+            if ref is None or not is_same_domain(ref, request.build_absolute_uri()):
+                ref = reverse('home:home')
+            return HttpResponseRedirect(ref)
+        return response
+    return wrapped

@@ -13,6 +13,7 @@ from django.views import generic
 from django.views.generic import RedirectView
 from django.utils.translation import ugettext_lazy as _
 from django_downloadview import VirtualDownloadView
+from cobra.apps.svnkit.utils.util import get_readme
 
 from .markup.hightlighter import get_pygmentize_diff
 from cobra.core.decorators import has_access
@@ -111,6 +112,8 @@ class SvnNodeView(ExtraContextMixin, generic.TemplateView):
         self.path = self.kwargs.get('path') or posixpath.sep
         try:
             self.node = self.repository.get_node(self.path, self.revision)
+            if self.node.is_directory():
+                self.readme = get_readme(self.repository, path=self.path, revision=self.revision)
         except exceptions.InvalidNode:
             self.node = None
         return super(SvnNodeView, self).get(request, *args, **kwargs)
@@ -128,6 +131,7 @@ class SvnNodeView(ExtraContextMixin, generic.TemplateView):
         ctx['changeset'] = self.changeset
         ctx['path'] = self.path
         ctx['node'] = self.node
+        ctx['readme'] = getattr(self, 'readme', None)
         return super(SvnNodeView, self).get_context_data(**ctx)
 
     def get_template_names(self):
@@ -137,6 +141,11 @@ class SvnNodeView(ExtraContextMixin, generic.TemplateView):
             return 'svnkit/node_directory.html'
         else:
             return 'svnkit/node_file.html'
+
+    def get_readme_content(self):
+        if self.node.is_directory():
+            children = self.node.children.all()
+
 
 
 class SvnNodeHistoryView(ExtraContextMixin, generic.ListView):

@@ -424,6 +424,14 @@ class BaseView(View, OrganizationMixin):
         return render_to_response(template, default_context, self.request,
                                   status=status)
 
+    def ajax_respond(self, context=None):
+        default_context = self.default_context
+        if context:
+            default_context.update(context)
+        response = HttpResponse(default_context)
+        response['Content-Type'] = 'application/json'
+        return response
+
     def redirect(self, url):
         return HttpResponseRedirect(url)
 

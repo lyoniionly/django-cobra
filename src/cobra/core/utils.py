@@ -316,3 +316,5 @@ class MissDefaultImage(object):
                     "Symlinked the 'missing image' image at %s into your "
                     "MEDIA_ROOT at %s") % (media_file_path,
                                            settings.MEDIA_ROOT))
+
+

@@ -76,6 +76,7 @@
 
   {# Local scripts #}
   {% block scripts %}
+    <script>window.gettext || document.write('<script src="{% url 'django.views.i18n.javascript_catalog' %}"><\/script>')</script>
   {% endblock %}
 
   {# Additional JS scripts #}

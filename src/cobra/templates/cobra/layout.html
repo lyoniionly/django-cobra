@@ -107,9 +107,15 @@
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.timeago.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.countdown.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/moment-with-locales.js" %}"></script>
+    <script type="text/javascript">
+      {% if request.LANGUAGE_CODE %}
+         moment.locale('{{ request.LANGUAGE_CODE }}');
+      {% endif %}
+    </script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/bootstrap-datetimepicker.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/simple-slider.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/json2.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/autosize.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/underscore.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/backbone.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/Chart.js" %}"></script>
@@ -141,9 +147,10 @@
     <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.stream.js" %}"></script>
 
   <script type="text/javascript">
-    {% if request.LANGUAGE_CODE %}
+    {% comment %}{% if request.LANGUAGE_CODE %}
        moment.locale('{{ request.LANGUAGE_CODE }}');
-    {% endif %}
+    {% endif %}{% endcomment %}
+
     {% if TIME_ZONE %}
       app.config.timezone = '{{ TIME_ZONE }}';
     {% endif %}
