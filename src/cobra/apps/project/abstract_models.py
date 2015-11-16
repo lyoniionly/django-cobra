@@ -88,7 +88,7 @@ class AbstractProject(Model):
     __repr__ = sane_repr('team_id', 'slug')
 
     def __str__(self):
-        return u'%s (%s)' % (self.name, self.slug)
+        return '%s (%s)' % (self.name, self.slug)
 
     def save(self, *args, **kwargs):
         if not self.slug:

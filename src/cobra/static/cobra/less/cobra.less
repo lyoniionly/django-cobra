@@ -13,6 +13,7 @@
 @import url("fontello.less");
 @import url("bootstrap-datetimepicker.less");
 @import url("popover-extra-placements.less");
+@import url("countdown.less");
 @import url("github.less");
 @import url("fileinput.less");
 @import url("select2.less");
@@ -22,6 +23,7 @@
 @import url("lists.less");
 @import url("events.less");
 @import url("avatar.less");
+@import url("nav.less");
 @import url("breadcrumb.less");
 @import url("simple-slider.less");
 @import url("overview.less");
@@ -5914,6 +5916,20 @@ table.commit-list td>div {
   }
 }
 
+.report-2-col {
+  .report-date-wrapper {
+    .media {
+      padding-left: 20px !important;
+    }
+    .dropdown.years .dropdown-toggle {
+      padding-left: 25px !important;
+    }
+    .nav > li > a {
+      padding-left: 28px;
+    }
+  }
+}
+
 .tt_daily_completion .title_dc {
 font-size: 24px;
 line-height: 26px;
@@ -5950,6 +5966,10 @@ line-height: 22px;
 font-family: verdana,"Microsoft YaHei",SimHei,SimSun;
 color: #555;
 margin-right: 10px;
+}
+
+.tt_daily_completion .todaystatus_dc .icon_dc {
+  font-size: 22px;
 }
 
 .highlight-date {
@@ -6049,4 +6069,15 @@ margin-right: 10px;
 }
 .empty-box .empty-box-wrapper .empty-box-content .links .btn.btn-lg {
   padding: 20px 35px;
+}
+
+.card-header {
+  .countdown-box {
+    width: 190px;
+    position: absolute;
+    right: 5px;
+    top: 7px;
+    border: none;
+    background: transparent;
+  }
 }

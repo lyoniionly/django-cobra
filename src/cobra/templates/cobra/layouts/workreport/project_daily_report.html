@@ -1,0 +1,23 @@
+{% extends "layouts/project.html" %}
+{% load i18n helper_tags %}
+
+{% block body_class %}workreport{% endblock %}
+{% block content_class %}{% endblock %}
+
+{% block main %}
+  {% block navigation %}
+    <ul class="nav nav-links">
+      <li{% if active_tab == 'mine' %} class="active"{% endif %}>
+        <a href="">{% trans "My Daily Report" %}</a>
+      </li>
+      <li{% if active_tab == 'team' %} class="active"{% endif %}>
+        <a href="">{% trans "Team Daily Report" %}</a>
+      </li>
+      <li{% if active_tab == 'member' %} class="active"{% endif %}>
+        <a href="">{% trans "Members Daily Report" %}</a>
+      </li>
+    </ul>
+  {% endblock %}
+
+  {% block inner %}{% endblock %}
+{% endblock %}

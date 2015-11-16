@@ -1160,7 +1160,7 @@
             if(this.options.isTeam){
 
             } else { // mine
-              redirectToUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/project/' + app.config.projectId + '/workreport/daily/mine/' + date_django + '/';
+              redirectToUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/project/' + app.config.projectId + '/workreport/daily/'+ this.options.reportUser +'/' + date_django + '/';
             }
           }
           this.ui.datePicker.maskLoading();

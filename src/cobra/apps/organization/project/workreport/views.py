@@ -4,6 +4,8 @@ from collections import OrderedDict
 import collections
 from braces.views import JSONResponseMixin
 import datetime
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.shortcuts import get_object_or_404
 from django.utils.dates import MONTHS
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
@@ -16,10 +18,15 @@ from cobra.views.generic import ProjectView
 from cobra.views.mixins import DailyMixin
 from cobra.core.utils import date_from_string, get_datetime_now
 from cobra.core.calendar import get_calendar_first_weekday
+from cobra.core.compat import get_user_model
 
+User = get_user_model()
+
+DailyReport = get_model('workreport', 'DailyReport')
 
 class DailyReportView(DailyMixin, ProjectView):
     def get(self, request, organization, team, project, *args, **kwargs):
+        report_user = get_object_or_404(User, username__iexact=self.kwargs['username'])
 
         year = self.get_year()
         month = self.get_month()
@@ -28,15 +35,29 @@ class DailyReportView(DailyMixin, ProjectView):
                                  month, self.get_month_format(),
                                  day, self.get_day_format())
 
+        try:
+            daily_report = DailyReport.objects.get(project=project, owner=report_user, which_date=filter_date)
+        except ObjectDoesNotExist as e:
+            daily_report = None
+        except MultipleObjectsReturned as e:
+            daily_report = DailyReport.objects.filter(project=project, owner=report_user, which_date=filter_date)[0]
+        except Exception as e:
+            daily_report = None
+
         context = {
             'active_nav': 'daily_report',
             'active_tab': 'mine',
             'selected_years': self._get_selected_years(),
             'filter_date': filter_date,
-            'months': self._get_months()
+            'report_user': report_user,
+            'daily_report': daily_report
         }
 
-        return self.respond('organization/project/workreport/daily/my_report.html', context)
+        if request.user == report_user:
+            template_name = 'organization/project/workreport/daily/my_report.html'
+        else:
+            template_name = 'organization/project/workreport/daily/member_calendar_report.html'
+        return self.respond(template_name, context)
 
     def _get_selected_years(self):
         now = get_datetime_now()
@@ -45,17 +66,11 @@ class DailyReportView(DailyMixin, ProjectView):
             years.append(now.year - i)
         return years
 
-    def _get_months(self):
-        return OrderedDict((
-            ('Jan', _('January')), ('Feb', _('February')), ('Mar', _('March')), ('Apr', _('April')), ('May', _('May')), ('Jun', _('June')),
-            ('Jul', _('July')), ('Aug', _('August')), ('Sep', _('September')), ('Oct', _('October')), ('Nov', _('November')),
-            ('Dec', _('December'))
-        ))
-
 
 class AjaxWorkreportStatisticView(JSONResponseMixin, ProjectView):
     def get(self, request, organization, team, project, *args, **kwargs):
-
+        self.report_user = get_object_or_404(User, username__iexact=self.kwargs['username'])
+        self.project = project
         statistic = self.get_work_report_statistic(request)
 
         context = {
@@ -64,11 +79,14 @@ class AjaxWorkreportStatisticView(JSONResponseMixin, ProjectView):
         return self.render_json_response(context)
 
     def get_query(self, start_date, end_date, is_team, report_type):
-        queryset = [
-            {"date":"2015/11/05", "status":3}, {"date":"2015/11/09", "status":1}, {"date":"2015/11/07", "status":2},
-            {"date":"2016/01/07", "status":1}
-        ]
-        return queryset
+        report_status_list = []
+        reports = DailyReport.objects.filter(project=self.project, owner=self.report_user, which_date__range=(start_date, end_date))
+        for report in reports:
+            report_status_list.append({
+                'date': report.which_date.strftime('%Y/%m/%d'),
+                'status': 2
+            })
+        return report_status_list
 
     def get_work_report_statistic(self, request):
         year = int(request.GET.get('year'))

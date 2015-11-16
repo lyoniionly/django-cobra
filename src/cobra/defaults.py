@@ -338,5 +338,7 @@ COBRA_RATELIMITER_OPTIONS = {}
 # User celery
 COBRA_USE_CELERY = False
 
+COBRA_WORKREPORT_DAILY_DEADLINE = '19:00:00'
+
 COBRA_SETTINGS = dict(
     [(k, v) for k, v in locals().items() if k.startswith('COBRA_')])
