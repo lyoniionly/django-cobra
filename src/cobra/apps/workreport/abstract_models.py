@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function
-import datetime
+from datetime import datetime
 from django.conf import settings
 
 from django.db import models
@@ -15,13 +15,15 @@ from cobra.models import fields
 from cobra.models import sane_repr
 from cobra.core.loading import get_model
 
+from cobra.apps.workreport.utils import get_daily_report_deadline
+
 
 @python_2_unicode_compatible
 class AbstractDailyReport(Model):
     """
 
     """
-    project = fields.FlexibleForeignKey('project.Project')
+    organization = fields.FlexibleForeignKey('organization.Organization')
     owner = fields.FlexibleForeignKey(AUTH_USER_MODEL)
     desc = models.TextField(_('Description'), max_length=2048, null=True, blank=True)
     code_content = models.TextField(_('Code Content'), null=True, blank=True)
@@ -33,9 +35,9 @@ class AbstractDailyReport(Model):
         abstract = True
         app_label = 'workreport'
         db_table = 'cobra_workreport_daily'
-        unique_together = (('project', 'owner', 'which_date'),)
+        unique_together = (('organization', 'owner', 'which_date'),)
 
-    __repr__ = sane_repr('project_id', 'owner_id', 'which_date')
+    __repr__ = sane_repr('organization_id', 'owner_id', 'which_date')
 
     def __str__(self):
         return '%s (%s)' % (self.owner, self.which_date.strftime('%Y/%m/%d'))
@@ -56,18 +58,15 @@ class AbstractDailyReport(Model):
             return self.owner.email.split('@', 1)[0]
         return self.owner.username
 
+    def get_deadline(self):
+        deadline = get_daily_report_deadline(self.organization)
+        tz = timezone.get_current_timezone()
+        deadline_time = tz.localize(datetime.strptime(self.which_date.strftime('%Y-%m-%d') + ' ' + deadline, '%Y-%m-%d %H:%M:%S'))
+        return deadline_time
+
     @property
     def is_submit_ontime(self):
-        DailyDeadline = get_model('workreport', 'DailyDeadline')
-        try:
-            dd = DailyDeadline.objects.get(project=self.project)
-            deadline = str(dd.deadline_time)
-        except Exception as e:
-            deadline = settings.COBRA_WORKREPORT_DAILY_DEADLINE
-        from django.utils.timezone import get_current_timezone
-        from datetime import datetime
-        tz = get_current_timezone()
-        deadline_time = tz.localize(datetime.strptime(self.which_date.strftime('%Y-%m-%d') + ' ' + deadline, '%Y-%m-%d %H:%M:%S'))
+        deadline_time = self.get_deadline()
         if self.published_datetime > deadline_time:
             return False
         else:
@@ -75,10 +74,14 @@ class AbstractDailyReport(Model):
 
     @property
     def submit_status_desc(self):
-        if self.is_submit_ontime:
-            return _('Submit On Time')
-        else:
+        deadline_time = self.get_deadline()
+        if self.published_datetime > deadline_time:
+            delta_days = (self.published_datetime - deadline_time).days
+            if delta_days > 0:
+                return _('Late submission for %d days' % delta_days)
             return _('Late submission')
+        else:
+            return _('Submit On Time')
 
     @property
     def report_status(self):
@@ -104,7 +107,8 @@ class AbstractDailyReport(Model):
 
     @property
     def code_line_count(self):
-        lines = [s for s in self.code_content.splitlines() if s]
+        a = self.code_content.splitlines()
+        lines = [s for s in self.code_content.splitlines() if s.strip()]
         return len(lines)
 
 
@@ -146,7 +150,7 @@ class AbstractDailyFinishedTask(Model):
 class AbstractDailyDeadline(Model):
     """
     """
-    project = fields.FlexibleForeignKey('project.Project')
+    organization = fields.FlexibleForeignKey('organization.Organization')
     deadline_time = models.TimeField()
 
     class Meta:
@@ -154,7 +158,7 @@ class AbstractDailyDeadline(Model):
         app_label = 'workreport'
         db_table = 'cobra_workreport_daily_deadline'
 
-    __repr__ = sane_repr('project_id', 'deadline_time')
+    __repr__ = sane_repr('organization_id', 'deadline_time')
 
     def __str__(self):
-        return '%s' % (self.project.name)
+        return '%s' % (self.organization.name)

@@ -1,0 +1,60 @@
+{% extends "layouts/workreport/organization_daily_report.html" %}
+{% load i18n %}
+{% load helper_tags workreport_tags organization_tags %}
+
+{% block report_content %}
+
+  <section class="">
+    <div class="row">
+      <div class="col-sm-3 page-aside-inner">
+        {% comment %}This is for member daily report, members nav{% endcomment %}
+        <ul class="list-group">
+        {% for member in organization|organization_members %}
+          <li class="list-group-item redirect_to" data-url="{% url 'organization:workreport:daily-member' organization.slug member.user.username %}">
+            <div class="media">
+              <div class="media-left">
+                <a class="avatar avatar-online" href="javascript:void(0)">
+                  <img class="img-responsive img-circle" src="{% get_avatar_url member.user %}" alt="...">
+                </a>
+              </div>
+              <div class="media-body">
+                <h4 class="media-heading">{{ member.get_display_name }}</h4>
+                <small>{{ member.get_email }}</small>
+              </div>
+              {% ifequal member.user request.user %}
+                <div class="media-right">
+                  <span class="ui label">{% trans 'Me' %}</span>
+                </div>
+              {% endifequal %}
+            </div>
+          </li>
+        {% endfor %}
+        </ul>
+      </div>
+      <div class="col-sm-9">
+        <div class="empty-box">
+          <div class="empty-box-wrapper">
+            <i class="fa fa-check-circle c-green"></i>
+
+            <div class="empty-box-content">
+
+              <h3>{% trans 'Welcome to come here!' %}</h3>
+
+              <p>
+                {% blocktrans %}
+                  Choose a member at right bar. You will view his daily report everyday.
+                {% endblocktrans %}
+              </p>
+                <p class="links">
+                  <a class="btn btn-primary btn-lg alert-report" href="javascript:void(0);" data-url="">{% trans 'Go to Daily report Statistic' %}</a>
+                </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+{% endblock %}

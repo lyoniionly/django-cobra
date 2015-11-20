@@ -19,6 +19,8 @@ class OrganizationApplication(Application):
 
     project_app = get_class('organization.project.app', 'application')
 
+    workreport_app = get_class('organization.workreport.app', 'application')
+
     def get_urls(self):
         urls = [
             url(r'^(?P<organization_slug>(?!create)[\w_-]+)/$', self.organization_home_view.as_view(),
@@ -45,6 +47,7 @@ class OrganizationApplication(Application):
             #     name='member-create'),
 
             url(r'^(?P<organization_slug>[\w_-]+)/project/', include(self.project_app.urls)),
+            url(r'^(?P<organization_slug>[\w_-]+)/workreport/', include(self.workreport_app.urls)),
         ]
         return self.post_process_urls(urls)
 

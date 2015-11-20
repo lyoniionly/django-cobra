@@ -4,7 +4,7 @@
 {% block body_class %}workreport{% endblock %}
 {% block content_class %}{% endblock %}
 
-{% block main %}
+{% block inner %}
   {% block navigation %}
     <ul class="nav nav-links">
       <li{% if active_tab == 'mine' %} class="active"{% endif %}>
@@ -19,5 +19,5 @@
     </ul>
   {% endblock %}
 
-  {% block inner %}{% endblock %}
+  {% block report_content %}{% endblock %}
 {% endblock %}

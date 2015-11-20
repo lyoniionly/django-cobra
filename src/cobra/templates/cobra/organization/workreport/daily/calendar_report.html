@@ -1,12 +1,42 @@
-{% extends "layouts/workreport/project_daily_report.html" %}
-{% load i18n helper_tags workreport_tags %}
+{% extends "layouts/workreport/organization_daily_report.html" %}
+{% load i18n %}
+{% load helper_tags workreport_tags organization_tags %}
 
-{% block inner %}
-  <section class="report-2-col">
+{% block report_content %}
+  <section class="{% ifequal request.user report_user %}report-2-col{% endifequal %}">
     <div class="row">
-      <div class="col-sm-3">
-        {% report_date_nav is_team=False user=request.user %}
-      </div>
+      {% ifnotequal request.user report_user %}
+        <div class="col-sm-3 page-aside-inner">
+          {% comment %}This is for member daily report, members nav{% endcomment %}
+          <ul class="list-group">
+          {% for member in organization|organization_members %}
+            <li class="list-group-item redirect_to {% ifequal member.user report_user %}active{% endifequal %}" data-url="{% url 'organization:workreport:daily-member' organization.slug member.user.username %}">
+              <div class="media">
+                <div class="media-left">
+                  <a class="avatar avatar-online" href="javascript:void(0)">
+                    <img class="img-responsive img-circle" src="{% get_avatar_url member.user %}" alt="...">
+                  </a>
+                </div>
+                <div class="media-body">
+                  <h4 class="media-heading">{{ member.get_display_name }}</h4>
+                  <small>{{ member.get_email }}</small>
+                </div>
+                {% ifequal member.user request.user %}
+                  <div class="media-right">
+                    <span class="ui label">{% trans 'Me' %}</span>
+                  </div>
+                {% endifequal %}
+              </div>
+            </li>
+          {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="col-sm-3">
+          {% report_date_nav is_team=False user=request.user %}
+        </div>
+      {% endifnotequal %}
+
       <div class="col-sm-9">
         <div class="p-t-25 p-r-15">
           <div class="row">
@@ -60,19 +90,19 @@
                 <div class="highlight-date">
                 </div>
                 <div class="remark">
-                  <h2 data-name="title">个人统计：</h2>
+                  <h2 data-name="title">{% trans 'Pernal Statistic' %}</h2>
 
                   <div class="statics">
-                    <span class="ui red empty circular label"></span>
-                    <span>已交</span>
+                    <span class="ui complete empty circular label"></span>
+                    <span>{% trans 'Submit yet' %}</span>
 
-                    <span class="ui red empty circular label"></span>
+                    <span class="ui incomplete empty circular label"></span>
 
-                    <span>未交</span>
+                    <span>{% trans 'Not submit' %}</span>
 
-                    <span class="ui red empty circular label"></span>
+                    <span class="ui partcomplete empty circular label"></span>
 
-                    <span>补交</span>
+                    <span>{% trans 'Last submit' %}</span>
 
                   </div>
                 </div>
@@ -124,37 +154,43 @@
                 </div>
               </div>
             </div>
-
-
-            {% include 'partials/workreport/_report_daily_content.html' %}
+            
+              {% include 'partials/workreport/_report_daily_content.html' %}
           {% else %}
-            <div class="card">
+            <div class="card report-container">
               <div class="card-header ch-alt">
                 <div class="countdown-box"></div>
-                <h2>{% trans 'You do not write report today' %}</h2>
+                <h2>{% trans 'Do not have report this day' %}</h2>
               </div>
 
-              <div class="card-body card-padding">
+              <div class="card-body card-padding maskable report-body">
                 <div class="empty-box">
                   <div class="empty-box-wrapper">
                     <i class="fa fa-exclamation-circle"></i>
 
                     <div class="empty-box-content">
 
-                      <h3>Yohho!There is no daily report for today!</h3>
+                      <h3>{% trans 'Yahho!There is no daily report for today!' %}</h3>
 
-                      <p>{% blocktrans %}
-                        Every day to write daily less than you can record what you do today, so that you can find in the
-                        future, you can also let colleagues know what you have done today
-                      {% endblocktrans %}</p>
-
-                      <p class="links">
-                        <a class="btn btn-primary btn-lg" href="#">{% trans 'Write Daily Report' %}</a>
+                      <p>
+                        {% blocktrans %}
+                          Every day to write daily less than you can record what you do today, so that you can find in the
+                          future, you can also let colleagues know what you have done today
+                        {% endblocktrans %}
                       </p>
-
+                      {% ifequal request.user report_user %}
+                        <p class="links">
+                          <a class="btn btn-primary btn-lg edit-report" href="javascript:void(0);" data-url="{% url 'organization:workreport:daily-report-edit' organization.slug filter_date|date:'Y' filter_date|date:'b' filter_date|date:'d' %}">{% trans 'Write Daily Report' %}</a>
+                        </p>
+                      {% else %}
+                        <p class="links">
+                          <a class="btn btn-primary btn-lg alert-report" href="javascript:void(0);" data-url="">{% trans 'Alert Him Write Report' %}</a>
+                        </p>
+                      {% endifequal %}
                     </div>
                   </div>
                 </div>
+                <div id="report-edit-box"></div>
               </div>
             </div>
           {% endif %}
@@ -171,17 +207,17 @@
 {% block onbodyload %}
   {{ block.super }}
   new app.WorkReportPage({
-  reportUser: '{{ report_user.username }}',
-  reportType: 'daily',
-  isTeam: false,
-  pollStatisticUrl: '{% url 'organization:project:workreport:ajax-workreport-statistic' organization.slug project.slug report_user.username %}',
-  year: "{{ filter_date|date:'Y' }}",
-  month: "{{ filter_date|date:'m' }}",
-  day: "{{ filter_date|date:'d' }}"
+    reportUser: '{{ report_user.username }}',
+    reportType: 'daily',
+    isTeam: false,
+    pollStatisticUrl: '{% url 'organization:workreport:ajax-workreport-statistic' organization.slug %}',
+    year: "{{ filter_date|date:'Y' }}",
+    month: "{{ filter_date|date:'m' }}",
+    day: "{{ filter_date|date:'d' }}"
   });
 
-  {% if not daily_report %}
-    {% get_deadline_time project as deadline %}
+  {% if not daily_report and report_user == request.user %}
+    {% get_deadline_time organization as deadline %}
     $('.countdown-box').countdown({until: new Date('{{ filter_date|date:'Y/m/d' }} {{ deadline }}'), format: 'HMS'});
   {% endif %}
 

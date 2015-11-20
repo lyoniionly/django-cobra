@@ -25,6 +25,7 @@ from cobra.models.utils import slugify_instance
 from .utils import OrganizationStatus, OrganizationMemberType
 
 OrganizationManager = get_class('organization.managers', 'OrganizationManager')
+OrganizationMemberManager = get_class('organization.managers', 'OrganizationMemberManager')
 
 
 def upload_to_avatar(instance, filename):
@@ -144,6 +145,10 @@ class AbstractOrganizationMember(Model):
     date_added = models.DateTimeField(default=timezone.now)
     has_global_access = models.BooleanField(default=True)
     teams = models.ManyToManyField('team.Team', blank=True)
+
+    objects = OrganizationMemberManager(cache_fields=(
+        'pk',
+    ))
 
     class Meta:
         abstract = True

@@ -1,8 +1,9 @@
 from django.conf import settings
+from django.utils import timezone
 from django.views.generic.dates import YearMixin, MonthMixin, DayMixin
 from cobra.core.constants import EVENTS_PER_PAGE
 from cobra.core.loading import get_model
-from cobra.core.utils import get_datetime_now
+from cobra.core.utils import get_datetime_now, get_local_datetime_now
 
 
 class ExtraContextMixin(object):
@@ -90,7 +91,7 @@ class NiceYearMixin(YearMixin):
             year = None
 
         if year is None:
-            year = get_datetime_now().strftime(self.get_year_format())
+            year = get_local_datetime_now().strftime(self.get_year_format())
         return year
 
 
@@ -105,7 +106,7 @@ class NiceMonthMixin(MonthMixin):
             month = None
 
         if month is None:
-            month = get_datetime_now().strftime(self.get_month_format())
+            month = get_local_datetime_now().strftime(self.get_month_format())
         return month
 
 
@@ -120,7 +121,7 @@ class NiceDayMixin(DayMixin):
             day = None
 
         if day is None:
-            day = get_datetime_now().strftime(self.get_day_format())
+            day = get_local_datetime_now().strftime(self.get_day_format())
         return day
 
 

@@ -1,0 +1,110 @@
+{% extends "layouts/workreport/organization_daily_report.html" %}
+{% load i18n %}
+{% load helper_tags workreport_tags organization_tags %}
+
+{% block report_content %}
+  <section class="{% ifequal request.user report_user %}report-2-col{% endifequal %}">
+    <div class="row">
+      <div class="col-sm-3">
+        {% report_date_nav is_team=True user=request.user %}
+      </div>
+
+      <div class="col-sm-9">
+        <div class="p-t-25 p-r-15">
+          <div class="row">
+            <div class="col-sm-8">
+              <div class="tt_daily_completion">
+                <div class="title_dc">{% trans 'Team Dialy Report' %} - {{ filter_date }} ({{ filter_date|date:'l' }})
+                </div>
+                <div class="cont_cd">
+                  <div class="left_dc">
+                    <div class="action_dc"></div>
+                    <strong>{% trans 'Team Submition Satuation This Day' %}</strong>
+                    <div class="team-submition-statistic p-20" data-submit-count="{{ submit_count }}" data-not-submit-count="{{ not_submit_count }}">
+                      <div class=row>
+                        <div class="col-sm-6"><canvas id="statistic-canvas-bar" height="110" width="150"></canvas></div>
+                        <div class="col-sm-6"><canvas id="statistic-canvas-pie" height="70" width="100"></canvas></div>
+                      </div>
+                    </div>
+                    <p class="m-t-10">
+                      <span>{% trans 'Team Member Count' %}: {{ members|length }} {% trans 'People' %}</span>
+                      <span class="m-l-15">{% trans 'Unit' %}: {% trans 'Umber' %}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="date-statistics maskable">
+                <div class="highlight-date">
+                </div>
+                <div class="remark">
+                  <h2 data-name="title">{% trans 'Team Statistic' %}</h2>
+
+                  <div class="statics">
+                    <span class="ui complete empty circular label"></span>
+                    <span>{% trans 'All Submit' %}</span>
+
+                    <span class="ui incomplete empty circular label"></span>
+
+                    <span>{% trans 'All Not submit' %}</span>
+
+                    <span class="ui partcomplete empty circular label"></span>
+
+                    <span>{% trans 'Not All' %}</span>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr>
+          
+          <div class="">
+            <h2>{% trans 'The submit satuation of this day' %}</h2>
+              <table class="table">
+                
+                <tbody>
+                  {% for member in members %}
+                    {% get_daily_report organization member filter_date as report %}
+                    <tr>
+                      <td width="80px"><img class="img-responsive img-circle" src="{% get_avatar_url member 55 %}" alt="" width=50 height=50></td>
+                      <td width="100px">{{ member|user_display_name }}</td>
+                      <td width="100px">{% if report %}<i class="c-green fa fa-check"></i>{% else %}<i class="c-red fa fa-close"></i>{% endif %}</td>
+                      <td>{% if report %}{{ report.submit_status_desc }}{% else %}{% trans 'Not submit' %}{% endif %}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+          </div>
+          
+          <hr>
+          <div class="timeline">
+            {% for report in team_daily_reports %}
+              {% include 'partials/workreport/_report_daily_content.html' with daily_report=report isTeam=True %}
+            {% endfor %}
+          </div>  
+            
+
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+
+{% endblock %}
+
+{% block onbodyload %}
+  {{ block.super }}
+  new app.WorkReportPage({
+    reportType: 'daily',
+    isTeam: true,
+    pollStatisticUrl: '{% url 'organization:workreport:ajax-workreport-statistic' organization.slug %}',
+    year: "{{ filter_date|date:'Y' }}",
+    month: "{{ filter_date|date:'m' }}",
+    day: "{{ filter_date|date:'d' }}"
+  });
+
+{% endblock %}

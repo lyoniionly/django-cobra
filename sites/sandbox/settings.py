@@ -64,9 +64,13 @@ SILENCED_SYSTEM_CHECKS = ['1_6.W001', ]
 # system time zone.
 TIME_ZONE = 'Asia/Shanghai'
 
+USE_TZ = True
+
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
+
+USE_L10N = True
 
 LANGUAGE_CODE = 'en'
 
@@ -358,6 +362,9 @@ COBRA_ALLOW_ANON_CHECKOUT = True
 COBRA_SYSTEM_NAME = 'Cobra'
 COBRA_SYSTEM_TAGLINE = 'Sandbox'
 
+COBRA_ACCOUNTS_AVATAR_DEFAULT = 'cobra/img/avatar/default_avatar.png'
+COBRA_ACCOUNTS_AVATAR_GRAVATAR = False
+
 # LESS/CSS/statics
 # ================
 
@@ -390,8 +397,6 @@ if not os.path.exists(LOG_ROOT):
     os.mkdir(LOG_ROOT)
 
 DISPLAY_VERSION = False
-
-USE_TZ = True
 
 # Must be within MEDIA_ROOT for sorl to work
 COBRA_MISSING_IMAGE_URL = 'image_not_found.jpg'

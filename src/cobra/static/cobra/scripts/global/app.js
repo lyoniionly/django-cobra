@@ -1083,28 +1083,16 @@
       this.firstComeIn = true;
 
       this._timeBindPicker();
-//      this._addClassDom();
+      this.handleReportEdit();
 
-      /*$('.date-statistics .highlight-date').datetimepicker({
-        format: "YYYY/MM/DD",
-        inline: true
-      });
+      if(this.options.isTeam){
+        this.handleTeamStatisticBar();
+      } else {
+        if(this.options.reportType==='daily') {
+          this.handleSubtasks();
+        }
+      }
 
-      console.log(this.options.reportType);
-      console.log(this.options.isTeam);
-
-      $(".dash-filter").keyup(_.bind(function (e) {
-        this.doFilter($(e.currentTarget).parents('.panel').first());
-      }, this));
-
-      $('.filter-bar .nav-linker').on('click', _.bind(function(e){
-        e.preventDefault();
-        var $this = $(e.currentTarget);
-        var uiBox = $this.parents('.panel').first();
-        uiBox.find('.nav-linker.linker-selected').removeClass('linker-selected');
-        $this.addClass('linker-selected');
-        this.doFilter(uiBox);
-      }, this));*/
     },
 
     _addClassDom: function(data) {
@@ -1158,9 +1146,9 @@
           var date_django = newDate.year() + "/" + month_short_name[newDate.month()] + "/" + newDate.date();
           if(this.options.reportType=='daily'){
             if(this.options.isTeam){
-
+              redirectToUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/workreport/daily/team/report/' + date_django + '/';
             } else { // mine
-              redirectToUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/project/' + app.config.projectId + '/workreport/daily/'+ this.options.reportUser +'/' + date_django + '/';
+              redirectToUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/workreport/daily/'+ this.options.reportUser +'/' + date_django + '/';
             }
           }
           this.ui.datePicker.maskLoading();
@@ -1183,43 +1171,27 @@
       this.ui.datePicker.find('.datepicker-days').on("click", 'td.day.active', _.bind(function(e) { // day change
         e.stopPropagation();
       }, this));
-
-      /*this.ui.datePicker.off("changeDate");
-      this.ui.datePicker.on("changeDate",
-      function(b) {
-          var d = c(b.date),
-          e = d.get("month") + 1,
-          f = d.get("date");
-          a.model.set({
-              year: d.get("year"),
-              month: 10 > e ? "0" + e: e,
-              day: 10 > f ? "0" + f: f
-          },
-          {
-              silent: !0
-          }),
-          setTimeout(function() {
-              a._addClassDom()
-          },
-          0),
-          a.trigger("clickDate", a.model.toJSON())
-      })*/
     },
 
     _getMonthCompleteStatusData: function(date, async) {
       var self = this;
       var sync = typeof async !== 'undefined' ? async : false;
-      $.ajax({
-        dataType: "json",
-        url: this.options.pollStatisticUrl,
-        async: sync,
-        data: {
+      var isTeam = this.options.isTeam?1:0;
+      var d = {
           year: date.year(),
           month: date.month()+1,
           day: 1,
           isTeam: this.options.isTeam?1:0,
           reportType: this.options.reportType
-        },
+      };
+      if(!isTeam) {
+        d['reportUser'] = this.options.reportUser
+      }
+      $.ajax({
+        dataType: "json",
+        url: this.options.pollStatisticUrl,
+        async: sync,
+        data: d,
         success: function(data) {
             self._addClassDom(data.calendar);
         }
@@ -1227,9 +1199,277 @@
     },
     close: function() {
         this.ui.datePicker.data("datetimepicker") && this.ui.datePicker.data("datetimepicker").remove()
+    },
+
+    subtaskTpl: function(data) {
+      return '<li class="list-group-item subtask">'+
+                '<div class="checkbox-custom checkbox-primary">'+
+                  '<h4 class="title list-group-item-heading"><i class="c-green fa fa-check"></i> <span class="title-content">' + data.title + '</span></h4>'+
+                  '<strong class="hour text-truncate list-group-item-text" data-val="'+ data.hour +'">' + data.hour + ' Hours</strong>'+
+                '</div>'+
+                '<div class="subtask-editor">'+
+                  '<div class="form-inline">'+
+                    '<div class="form-group">'+
+                      '<select class="form-control subtask-hour">'+
+                        '<option value="0">0 hour</option>'+
+                        '<option value="1">1 hour</option>'+
+                        '<option value="2">2 hours</option>'+
+                        '<option value="3">3 hours</option>'+
+                        '<option value="4">4 hours</option>'+
+                        '<option value="5">5 hours</option>'+
+                        '<option value="6">6 hours</option>'+
+                        '<option value="7">7 hours</option>'+
+                        '<option value="8">8 hours</option>'+
+                      '</select>'+
+                    '</div>'+
+                    '<div class="form-group">'+
+                      '<input class="form-control subtask-title" type="text" name="title">'+
+                    '</div>'+
+                    '<div class="form-group">'+
+                      '<button class="btn btn-primary subtask-editor-save" type="button">Save</button>'+
+                      '<a class="btn btn-sm btn-white subtask-editor-delete" href="javascript:void(0)">Delete</a>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'+
+              '</li>';
+
+    },
+
+    handleTeamStatisticBar: function() {
+      var randomScalingFactor = function(){
+	      return Math.round(Math.random()*100);
+	    };
+      var $static_el = $('#statistic-canvas-bar').closest('.team-submition-statistic');
+      var not_submit_count = $static_el.data('not-submit-count');
+      var submit_count = $static_el.data('submit-count');
+      var barChartData = {
+	  		labels : [gettext("Not submit"),gettext("Submit Yet")],
+	  		datasets : [
+	  			{
+	  				fillColor : "rgba(220,220,220,0.5)",
+	  				strokeColor : "rgba(220,220,220,0.8)",
+	  				highlightFill: "rgba(220,220,220,0.75)",
+	  				highlightStroke: "rgba(220,220,220,1)",
+	  				data : [not_submit_count,submit_count]
+	  			}
+	  		]
+	  	};
+      var pieChartData = [
+    {
+        value: not_submit_count,
+        color:app.utils.colors("red", 500),
+        highlight: app.utils.colors("red", 600),
+        label: gettext("Not submit")
+    },
+    {
+        value: submit_count,
+        color: app.utils.colors("green", 300),
+        highlight: app.utils.colors("green", 400),
+        label: gettext("Submit Yet")
     }
+];
+      var ctx = document.getElementById("statistic-canvas-bar").getContext("2d");
+      var ctx_pie = document.getElementById("statistic-canvas-pie").getContext("2d");
+	    var chart = new Chart(ctx).Bar(barChartData, {
+	  		responsive: true,
+	      barShowStroke: false
+	  	});
+	    var pie = new Chart(ctx_pie).Doughnut(pieChartData, {
+	  		responsive: true
+	  	});
+      chart.datasets[0].bars[0].fillColor = app.utils.colors("red", 500);
+      chart.datasets[0].bars[1].fillColor = app.utils.colors("green", 300); //bar 1
+      chart.datasets[0].bars[0].highlightFill = app.utils.colors("red", 600);
+      chart.datasets[0].bars[1].highlightFill = app.utils.colors("green", 400); //bar 2
+      chart.update();
+    },
 
+    handleSubtasks: function() {
+        var self = this;
+        $(document).on("click", ".subtask-toggle", function() {
+            var length = $(".subtask").length,
+            $input = $(".subtasks-add .subtask-title"),
+            $subtasks = $(".subtasks");
+            $input.val(""),
+            0 === length && $subtasks.addClass("is-show"),
+            $subtasks.addClass("is-edit"),
+            $input.focus(),
+            $(document).on("click.subtask-add",
+            function(e) {
+                var $target = $(e.target);
+                0 === $target.closest($(".subtasks-add")).length && ($subtasks.removeClass("is-edit"), $(document).off("click.subtask-add"))
+            })
+        }),
+        $(document).on("click", ".subtask-add-save", function() {
+            var length = $(".subtask").length,
+            $subtasks = $(".subtasks"),
+            $input = $(".subtasks-add .subtask-title"),
+            $input_hour = $(".subtasks-add .subtask-hour"),
+            cost_hour = $input_hour.val(),
+            value = $input.val();
+            if (0 === value.length) 0 === length && $subtasks.removeClass("is-show");
+            else {
+                var data = {
+                    title: value,
+                    hour: cost_hour
+                },
+                $subtask = $(self.subtaskTpl(data));
+                $(".subtasks-list").append($subtask)
+            }
+            $input.val("").focus()
+        }),
+        $(document).on("click", ".subtask-add-cancel", function() {
+            $(".subtasks").removeClass("is-edit"),
+            $(document).off("click.subtask-add")
+        }),
+        $(document).on("click", ".subtask input", function() {
+            var $this = $(this),
+            $subtask = $this.closest(".subtask"),
+            index = $subtask.index();
+        }),
+        $(document).on("click", ".subtask .title", function() {
+            var $this = $(this),
+            $subtask = $this.closest(".subtask"),
+            subtask_content = $(".title-content", $subtask).html(),
+            $input = $(".subtask-title", $subtask);
+            $subtask.addClass("is-edit"),
+            $input.val("").focus().val(subtask_content),
+            $(document).on("click.subtask", function(e) {
+                var $target = $(e.target);
+                0 === $target.closest($subtask).length && ($subtask.removeClass("is-edit"), $(document).off("click.subtask"))
+            })
+        }),
+        $(document).on("click", ".subtask-editor-save", function() {
+            var $this = $(this),
+            $subtask = $this.closest(".subtask"),
+            title = $(".subtask-title", $subtask).val(),
+            hour = $(".subtask-hour", $subtask).val();
+            $(".title-content", $subtask).html(title),
+            $(".hour", $subtask).html(hour + " hours"),
+            $(".hour", $subtask).data('val', hour),
+            $subtask.removeClass("is-edit"),
+            $(document).off("click.subtask")
+        }),
+        $(document).on("click", ".subtask-editor-delete", function(e) {
+            var $this = $(this);
+          swal({   title: "Are you sure?",
+                 text: "Your will not be able to recover it!",
+                 type: "warning",
+                 showCancelButton: true,
+                 confirmButtonColor: "#DD6B55",
+                 confirmButtonText: "Yes, delete it!",
+                 closeOnConfirm: false
+          }, function () {
+            var $subtask = $this.closest(".subtask");
+            $subtask.remove(),
+            $(document).off("click.subtask"),
+            0 === $(".subtask").length && $(".subtasks").removeClass("is-show");
+            swal.close();
+          });
+        })
+    },
 
+    handleReportEdit: function() {
+      $(document).on('click', '.edit-report', _.bind(function(e){
+        e.preventDefault();
+        var $this = $(e.currentTarget);
+        var $container = $this.closest('.report-container');
+        var $container_body = $container.find('.report-body');
+        var $edit_box = $('#report-edit-box');
+        var url = $this.data('url');
+        $container_body.maskLoading();
+        $.get(url, function(data){
+          var $h = $(data);
+          $h.find('textarea.need-editor').each(function(index, dom){
+            new Simditor({
+              textarea: $(dom),
+              placeholder: 'Input anything what you want to tell your manager...',
+              toolbar: ['title', 'bold', 'italic', 'color', '|', 'ol', 'ul', 'code', 'table', '|', 'link', 'image', 'hr', '|', 'indent', 'outdent', 'alignment'],
+              pasteImage: true,
+              defaultImage: 'assets/images/image.png'
+            });
+          });
+          $container_body.addClass('is-editing');
+          $edit_box.html($h);
+        }).always(function(){
+          $container_body.unmaskLoading();
+        });
+      }, this));
+
+      $(document).on('keyup', '.code-content', _.bind(function(e){
+        var $this = $(e.currentTarget);
+        var lines = $this.val().split(/\r|\r\n|\n/);
+        var count = 0;
+        for(var i=0;i<lines.length;i++){
+          if($.trim(lines[i])!=""){
+            count ++;
+          }
+        }
+        $this.closest('.form-group').find('.code-line-num strong').html(count);
+      }, this));
+
+      $(document).on('click', '.cancel-report-edit', _.bind(function(e){
+        e.preventDefault();
+        var $this = $(e.currentTarget);
+        var $container = $this.closest('.report-container');
+        var $container_body = $container.find('.report-body');
+        var $edit_box = $('#report-edit-box');
+        swal({
+          title: "Are you sure?",   text: "If you have done some change, it will lost!",   type: "warning",
+          confirmButtonColor: "#DD6B55",   confirmButtonText: "Yes!",   cancelButtonText: "No!",
+          showCancelButton: true,
+          closeOnConfirm: false,
+          showLoaderOnConfirm: true
+        }, function () {
+          $edit_box.find(".simditor").data("simditor").destroy();
+          $edit_box.html('');
+          $container_body.removeClass('is-editing');
+          swal.close();
+        });
+      }, this));
+
+      $(document).on('click', '.report-submit', _.bind(function(e){
+        e.preventDefault();
+        var $this = $(e.currentTarget);
+        var $container = $this.closest('.report-container');
+        var $container_body = $container.find('.report-body');
+        var $edit_box = $('#report-edit-box');
+
+        var is_ok = false;
+
+        var report_desc = $edit_box.find(".simditor").data("simditor").getValue();
+        console.log(report_desc);
+        var code_content = $edit_box.find('textarea[name="code_content"]').val();
+        var $subtask = $('.subtask', $edit_box);
+        var subtasks = [];
+        $subtask.each(function(index, el){
+          if($.trim($(el).find('.title-content').html())){
+            is_ok = true;
+          }
+          var subtask = JSON.stringify({
+            content: $(el).find('.title-content').html(),
+            hour: $(el).find('.hour').data('val')
+          });
+          subtasks.push(subtask);
+        });
+        if($.trim(report_desc)){
+          is_ok = true;
+        }
+
+        if(is_ok){
+          $container_body.maskLoading();
+          $.post($this.data('url'), {
+            'report_desc': report_desc,
+            'code_content': code_content,
+            'tasks[]': subtasks
+          }, function(res, textStatus, jqXHR){
+            location.href = res.redirect_url;
+          });
+        } else {
+          swal("Can not Submit", "Please input some content, and then submit :)", "error");
+        }
+      }, this));
+    }
   });
 
   Backbone.sync = function (method, model, success, error) {

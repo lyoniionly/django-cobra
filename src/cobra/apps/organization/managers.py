@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from django.conf import settings
+from django.db.models import Q
 
 from cobra.models import BaseManager
 from cobra.core.loading import get_model, get_class
@@ -47,3 +48,25 @@ class OrganizationManager(BaseManager):
                 results.append(org)
 
         return results
+
+
+class OrganizationMemberManager(BaseManager):
+    def get_members(self, organization, with_invited=False, exclude_user=None):
+        """
+        """
+        if with_invited:
+            queryset = self.filter(
+                organization=organization,
+            ).select_related('user')
+        else:
+            queryset = self.filter(
+                Q(user__isnull=False) & Q(user__is_active=True),
+                organization=organization,
+            ).select_related('user')
+
+        if exclude_user:
+            queryset = queryset.exclude(user=exclude_user)
+
+        queryset = sorted(queryset, key=lambda x: x.user.get_display_name() or x.email)
+
+        return queryset

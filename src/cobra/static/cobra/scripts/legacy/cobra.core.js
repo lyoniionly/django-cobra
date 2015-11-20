@@ -64,6 +64,12 @@ if (Sentry === undefined) {
                     "<div id=\"popup\">" + content + "</div></body>" +
                 "</html>");
         });
+
+      $(document).on('click', '.redirect_to', function(e){
+        var $this = $(e.currentTarget);
+        location.href = $this.data('url');
+      });
+
     });
 
 }(app, jQuery));

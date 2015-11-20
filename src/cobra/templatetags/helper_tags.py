@@ -85,6 +85,8 @@ def paginator(context, queryset_or_list, request, asvar=None, per_page=EVENTS_PE
 
 @register.simple_tag
 def get_avatar_url(user, size=settings.COBRA_ACCOUNTS_AVATAR_DEFAULT_SIZE):
+    if user is None:
+        return get_default_avatar_url()
     Profile = get_profile_class()
     try:
         instance = Profile.objects.get(user=user)

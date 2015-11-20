@@ -1,0 +1,94 @@
+{% load i18n %}
+
+<form class="report-edit-form p-25">
+  <div class="form-group">
+    <label for="">{% trans 'Report Description' %}</label>
+    <textarea class="form-control need-editor" data-autosave="editor-content" autofocus required>
+      {% if daily_report %}{{ daily_report.desc }}{% endif %}
+    </textarea>
+  </div>
+
+  <div class="m-b-15">
+    <strong>{% trans 'Finished Tasks' %}</strong>
+    <a class="btn btn-info btn-sm pull-right subtask-toggle" aria-hidden="true">
+      <i class="fa fa-plus fa-fw"></i> {% trans 'Add New' %}
+    </a>
+  </div>
+
+  <div class="task-section subtasks {% if daily_report and daily_report.daily_report_finished_tasks.count > 0 %}is-show{% endif %}">
+    <ul class="list-group list-group-full subtasks-list">
+      {% if daily_report %}
+        {% for task in daily_report.daily_report_finished_tasks.all %}
+          <li class="list-group-item subtask">
+            <div class="checkbox-custom checkbox-primary">
+              <h4 class="title list-group-item-heading">
+                <i class="c-green fa fa-check"></i> <span class="title-content">{{ task.desc }}</span>
+              </h4>
+              <strong class="hour text-truncate list-group-item-text" data-val="{{ task.hour }}">{{ task.hour }} {% trans 'hours' %}</strong>
+            </div>
+            <div class="subtask-editor">
+              <div class="form-inline">
+                <div class="form-group">
+                  <select class="form-control subtask-hour">
+                    <option value='0' {% ifequal task.hour 0 %}selected{% endifequal %}>{% trans '0 hour' %}</option>
+                    <option value='1' {% ifequal task.hour 1 %}selected{% endifequal %}>{% trans '1 hour' %}</option>
+                    <option value='2' {% ifequal task.hour 2 %}selected{% endifequal %}>{% trans '2 hours' %}</option>
+                    <option value='3' {% ifequal task.hour 3 %}selected{% endifequal %}>{% trans '3 hours' %}</option>
+                    <option value='4' {% ifequal task.hour 4 %}selected{% endifequal %}>{% trans '4 hours' %}</option>
+                    <option value='5' {% ifequal task.hour 5 %}selected{% endifequal %}>{% trans '5 hours' %}</option>
+                    <option value='6' {% ifequal task.hour 6 %}selected{% endifequal %}>{% trans '6 hours' %}</option>
+                    <option value='7' {% ifequal task.hour 7 %}selected{% endifequal %}>{% trans '7 hours' %}</option>
+                    <option value='8' {% ifequal task.hour 8 %}selected{% endifequal %}>{% trans '8 hours' %}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <input class="form-control subtask-title" type="text" name="title" value="{{ task.desc }}">
+                </div>
+                <div class="form-group">
+                  <a class="btn btn-primary subtask-editor-save" href="javascript:void(0)">{% trans 'Save' %}</a>
+                  <a class="btn btn-sm btn-white subtask-editor-delete" href="javascript:void(0)">{% trans 'Delete' %}</a></div>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+    <div class="subtasks-add">
+      <div class="form-inline">
+        <div class="form-group">
+          <select class="form-control subtask-hour">
+            <option value='0'>{% trans '0 hour' %}</option>
+            <option value='1'>{% trans '1 hour' %}</option>
+            <option value='2'>{% trans '2 hours' %}</option>
+            <option value='3'>{% trans '3 hours' %}</option>
+            <option value='4'>{% trans '4 hours' %}</option>
+            <option value='5'>{% trans '5 hours' %}</option>
+            <option value='6'>{% trans '6 hours' %}</option>
+            <option value='7'>{% trans '7 hours' %}</option>
+            <option value='8'>{% trans '8 hours' %}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <input class="form-control subtask-title" type="text" name="title">
+        </div>
+        <div class="form-group">
+          <a class="btn btn-primary subtask-add-save" href="javascript:void(0);">{% trans 'Save' %}</a>
+          <a class="subtask-add-cancel" href="javascript:void(0)">{% trans 'Cancel' %}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="form-group p-relative">
+    <p class="code-line-num p-absolute" style="right: 0">{% trans 'Code Line' %}: <strong>{% if daily_report %}{{ daily_report.code_line_count }}{% else %}0{% endif %}</strong></p>
+    <label for="">{% trans 'Paste Code Here' %}</label>
+    <textarea class="form-control code-content" name="code_content" rows="7">
+      {% if daily_report %}{{ daily_report.code_content }}{% endif %}
+    </textarea>
+  </div>
+
+  <a class="btn btn-primary report-submit" href="javascript:void(0);" data-url="{% url 'organization:workreport:daily-report-edit' organization.slug report_date|date:'Y' report_date|date:'b' report_date|date:'d' %}">{% trans 'Submit' %}</a>
+  <a class="btn btn-danger cancel-report-edit" href="javascript:void(0);">{% trans 'Cancel' %}</a>
+</form>

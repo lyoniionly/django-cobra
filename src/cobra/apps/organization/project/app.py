@@ -9,13 +9,13 @@ class ProjectOrganizationApplication(Application):
 
     overview_view = get_class('organization.project.views', 'OverviewView')
 
-    workreport_app = get_class('organization.project.workreport.app', 'application')
+    # workreport_app = get_class('organization.project.workreport.app', 'application')
 
     def get_urls(self):
         urls = [
             url(r'^(?P<project_slug>[\w_-]+)/overview/$', self.overview_view.as_view(), name='overview'),
 
-            url(r'^(?P<project_slug>[\w_-]+)/workreport/', include(self.workreport_app.urls)),
+            # url(r'^(?P<project_slug>[\w_-]+)/workreport/', include(self.workreport_app.urls)),
         ]
         return self.post_process_urls(urls)
 

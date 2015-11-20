@@ -8,3 +8,7 @@
     {{ block.super }}
     {% include 'partials/nav_project.html' %}
 {% endblock %}
+
+{% block main %}
+  {% block inner %}{% endblock %}
+{% endblock %}

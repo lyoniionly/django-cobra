@@ -40,6 +40,14 @@ def get_datetime_now():
         return datetime.datetime.now()
 
 
+def get_local_datetime_now():
+    try:
+        from django.utils import timezone
+        return timezone.localtime(timezone.now())
+    except ImportError:
+        return datetime.datetime.now()
+
+
 def date_from_string(year, year_format, month='', month_format='', day='', day_format='', delim='__'):
     """
     Helper: get a datetime.date object given a format string and a year,

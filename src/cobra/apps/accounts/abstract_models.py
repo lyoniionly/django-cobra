@@ -186,7 +186,7 @@ class AbstractProfile(Model):
                                 settings.COBRA_ACCOUNTS_AVATAR_DEFAULT)
         # Gravatar not used, check for a default image.
         else:
-            if settings.MONICA_ACCOUNTS_AVATAR_DEFAULT not in ['404', 'mm',
+            if settings.COBRA_ACCOUNTS_AVATAR_DEFAULT not in ['404', 'mm',
                                                                 'identicon',
                                                                 'monsterid',
                                                                 'wavatar']:

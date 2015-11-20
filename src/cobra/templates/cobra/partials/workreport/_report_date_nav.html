@@ -11,7 +11,8 @@
           <h3 class="media-heading">
             {{ report_user|user_display_name }}
           </h3>
-              <span class="str-truncated">
+          <span class="text-truncate">{{ report_user.email }}</span>
+              {% comment %}<span class="text-truncate">
                 <span class="namespace-name">
                   {{ project.organization.name }}
                   {% ifnotequal project.organization.owner request.user %}
@@ -21,9 +22,11 @@
                 <span class="project-name filter-title">
                   {{ project.name }}
                 </span>
-              </span>
+              </span>{% endcomment %}
         </div>
       </div>
+    {% else %}
+      <h2 class="p-l-15"><i class="fa fa-users"></i> {% trans 'My Team' %}</h2>
     {% endif %}
     <hr>
     <div class="dropdown years">
@@ -34,8 +37,12 @@
       </a>
       <ul class="dropdown-menu">
         {% for year in selected_years %}
-          <li><a
-              href="{% url 'organization:project:workreport:daily-member-year' organization.slug project.slug report_user.username year %}">{{ year }}</a>
+          <li>
+            {% if is_team %}
+              <a href="{% url 'organization:workreport:daily-team-report-year' organization.slug year %}">{{ year }}</a>
+            {% else %}
+              <a href="{% url 'organization:workreport:daily-member-year' organization.slug report_user.username year %}">{{ year }}</a>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>
@@ -44,7 +51,11 @@
     <ul class="nav nav-list nav-github">
       {% for abbr_name, full_name in months.items %}
         <li class="{% ifequal filter_date|date:'M' abbr_name %}active{% endifequal %}">
-          <a href="{% url 'organization:project:workreport:daily-member-month' organization.slug project.slug report_user.username filter_date.year abbr_name %}">{{ full_name }}</a>
+          {% if is_team %}
+            <a href="{% url 'organization:workreport:daily-team-report-month' organization.slug filter_date.year abbr_name %}">{{ full_name }}</a>
+          {% else %}
+            <a href="{% url 'organization:workreport:daily-member-month' organization.slug report_user.username filter_date.year abbr_name %}">{{ full_name }}</a>
+          {% endif %}
         </li>
       {% endfor %}
     </ul>

@@ -1,7 +1,7 @@
 {% load i18n helper_tags %}
 
-<div class="">
-  <div class="t-view">
+
+  <div class="t-view report-container" data-tv-type="{% if daily_report.is_submit_ontime %}ontime{% else %}late{% endif %}">
     <div class="tv-header media">
       <a href="" class="tvh-user pull-left">
         <img class="img-responsive" src="{% get_avatar_url daily_report.owner 55 %}" alt="">
@@ -20,100 +20,104 @@
       </div>
 
       <ul class="actions m-t-20 hidden-xs">
-        <li>
-          <a href="">
-            <i class="glyphicon glyphicon-pencil"></i>
-          </a>
-        </li>
+        {% if daily_report.owner == request.user and not isTeam %}
+          {% if not can_not_edit %}
+          <li>
+            <a class="edit-report" href="javascript:void(0);" data-url="{% url 'organization:workreport:daily-report-edit' organization.slug daily_report.which_date|date:'Y' daily_report.which_date|date:'b' daily_report.which_date|date:'d' %}">
+              <i class="glyphicon glyphicon-pencil"></i>
+            </a>
+          </li>
+          {% endif %}
+        {% endif %}
       </ul>
     </div>
-    <div class="tv-body">
-      {{ daily_report.desc|safe }}
+    <div class="report-body maskable">
+      <div class="tv-body">
+        <div class="simditor-content">
+          {{ daily_report.desc|safe }}
+        </div>
 
-      <div class="clearfix"></div>
+        <div class="clearfix"></div>
 
-      {% if daily_report.finished_tasks_count %}
-        <h3 class="m-t-20 m-b-20">{% trans 'Finished Tasks' %}</h3>
-        <table class="table table-condensed">
-          <tbody>
-            {% for task in daily_report.get_finished_tasks %}
-            <tr>
-              <td width="30px"><i class="c-green fa fa-check"></i></td>
-              <td width="100px">{{ task.hour }} {% trans 'hours' %}</td>
-              <td>{{ task.desc }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% endif %}
+        {% if daily_report.finished_tasks_count %}
+          <h3 class="m-t-20 m-b-20">{% trans 'Finished Tasks' %}</h3>
+          <table class="table table-condensed">
+            <tbody>
+              {% for task in daily_report.get_finished_tasks %}
+              <tr>
+                <td width="30px"><i class="c-green fa fa-check"></i></td>
+                <td width="100px">{{ task.hour }} {% trans 'hours' %}</td>
+                <td>{{ task.desc }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
 
-      {% comment %}<ul class="tvb-stats">
-        <li class="tvbs-comments">54 Comments</li>
-        <li class="tvbs-likes">254 Likes</li>
-        <li class="tvbs-views">23K Views</li>
-      </ul>
+        <ul class="tvb-stats">
+          <li class="tvbs-comments">54 Comments</li>
+          <li class="tvbs-likes">254 Likes</li>
+          <li class="tvbs-views">23K Views</li>
+        </ul>
 
-      <a class="tvc-more" href=""><i class="zmdi zmdi-mode-comment"></i> View all 54 Comments</a>{% endcomment %}
+        <a class="tvc-more" href=""><i class="zmdi zmdi-mode-comment"></i> View all 54 Comments</a>
+      </div>
+
+      <div class="tv-comments">
+        <ul class="tvc-lists">
+          <li class="media">
+            <a href="" class="tvh-user pull-left">
+              <img class="img-responsive" src="{% get_avatar_url daily_report.owner 55 %}" alt="">
+            </a>
+
+            <div class="media-body">
+              <strong class="d-block">who who</strong>
+              <small class="c-gray">April 23, 2014 at 05:10</small>
+
+              <div class="m-t-10">Comment Comment Comment Comment Comment Comment Comment Comment Comment Comment</div>
+
+            </div>
+          </li>
+
+          <li class="media">
+            <a href="" class="tvh-user pull-left">
+              <img class="img-responsive" src="{% get_avatar_url daily_report.owner 55 %}" alt="">
+            </a>
+
+            <div class="media-body">
+              <strong class="d-block">who who</strong>
+              <small class="c-gray">April 22, 2014 at 13:00</small>
+
+              <div class="m-t-10">Comment Comment Comment Comment Comment Comment Comment Comment Comment Comment
+              </div>
+
+            </div>
+          </li>
+
+          <li class="media">
+            <a href="" class="tvh-user pull-left">
+              <img class="img-responsive" src="{% get_avatar_url daily_report.owner 55 %}" alt="">
+            </a>
+
+            <div class="media-body">
+              <strong class="d-block">who who</strong>
+              <small class="c-gray">April 19, 2014 at 10:10</small>
+
+              <div class="m-t-10">Comment Comment Comment Comment Comment Comment Comment Comment Comment Comment
+              </div>
+            </div>
+          </li>
+
+          <li class="p-20">
+            <div class="fg fg-line">
+              <textarea class="form-control auto-size" placeholder="Write a comment..."></textarea>
+            </div>
+
+            <button class="m-t-15 btn btn-primary btn-sm">Post</button>
+          </li>
+        </ul>
+      </div>
+
+      <div id="report-edit-box"></div>
     </div>
-
-    {% comment %}<div class="tv-comments">
-      <ul class="tvc-lists">
-        <li class="media">
-          <a href="" class="tvh-user pull-left">
-            <img class="img-responsive" src="img/profile-pics/1.jpg" alt="">
-          </a>
-
-          <div class="media-body">
-            <strong class="d-block">David Peiterson</strong>
-            <small class="c-gray">April 23, 2014 at 05:10</small>
-
-            <div class="m-t-10">Maecenas fermentum tellus ex, ac aliquet nisl malesuada id.</div>
-
-          </div>
-        </li>
-
-        <li class="media">
-          <a href="" class="tvh-user pull-left">
-            <img class="img-responsive" src="img/profile-pics/2.jpg" alt="">
-          </a>
-
-          <div class="media-body">
-            <strong class="d-block">Wernall Parnell</strong>
-            <small class="c-gray">April 22, 2014 at 13:00</small>
-
-            <div class="m-t-10">Nulla vehicula erat nec odio dignissim, sit amet porttitor lorem auctor. Maecenas
-              fermentum tellus ex, ac aliquet nisl malesuada id.
-            </div>
-
-          </div>
-        </li>
-
-        <li class="media">
-          <a href="" class="tvh-user pull-left">
-            <img class="img-responsive" src="img/profile-pics/3.jpg" alt="">
-          </a>
-
-          <div class="media-body">
-            <strong class="d-block">Shane Lee Yong</strong>
-            <small class="c-gray">April 19, 2014 at 10:10</small>
-
-            <div class="m-t-10">Sit amet porttitor lorem auctor. Maecenas fermentum tellus ex, ac aliquet nisl
-              malesuada idwoon lorem ipsum.
-            </div>
-          </div>
-        </li>
-
-        <li class="p-20">
-          <div class="fg fg-line">
-            <textarea class="form-control auto-size" placeholder="Write a comment..."></textarea>
-          </div>
-
-          <button class="m-t-15 btn btn-primary btn-sm">Post</button>
-        </li>
-      </ul>
-    </div>{% endcomment %}
   </div>
-
-  <div class="clearfix"></div>
-
-</div>

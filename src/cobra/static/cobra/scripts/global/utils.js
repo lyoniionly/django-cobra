@@ -159,6 +159,18 @@
           return s;
         }
       });
+    },
+
+    colors: function(name, level) {
+      if ("primary" === name && (name = app.config.primaryColor, name || (name = "red")), "undefined" == typeof app.config.colors)
+        return null;
+      if ("undefined" != typeof app.config.colors[name]) {
+        if (level && "undefined" != typeof app.config.colors[name][level])
+          return app.config.colors[name][level];
+        if ("undefined" == typeof level)
+          return app.config.colors[name]
+      }
+      return null;
     }
 
   };
@@ -194,6 +206,8 @@
         }
       });
     }, 5000);
+
+    $('.simditor-content table').addClass('table');
   });
 
 }(app, jQuery, _, moment));

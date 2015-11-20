@@ -1,0 +1,56 @@
+{% extends "layouts/workreport/organization_daily_report.html" %}
+{% load i18n %}
+{% load helper_tags workreport_tags organization_tags %}
+
+{% block report_content %}
+  <section class="">
+    <div class="row">
+
+      <div class="col-sm-3 page-aside-inner">
+        <ul class="list-group">
+          {% for member in organization|organization_members %}
+            <li class="list-group-item redirect_to {% ifequal member.user report_user %}active{% endifequal %}"
+                data-url="{% url 'organization:workreport:daily-member' organization.slug member.user.username %}">
+              <div class="media">
+                <div class="media-left">
+                  <a class="avatar avatar-online" href="javascript:void(0)">
+                    <img class="img-responsive img-circle" src="{% get_avatar_url member.user %}" alt="...">
+                  </a>
+                </div>
+                <div class="media-body">
+                  <h4 class="media-heading">{{ member.get_display_name }}</h4>
+                  <small>{{ member.get_email }}</small>
+                </div>
+                {% ifequal member.user request.user %}
+                  <div class="media-right">
+                    <span class="ui label">{% trans 'Me' %}</span>
+                  </div>
+                {% endifequal %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+
+      <div class="col-sm-9 p-t-30">
+        {% for report in daily_reports %}
+        <div class="p-timeline">
+          <div class="pt-line c-gray text-right">
+            <span class="d-block">{{ report.which_date|date:"Y / m" }}</span> <span class="big-day">{{ report.which_date|date:"d" }}</span>
+          </div>
+
+          <div class="pt-body p-r-20">
+            {% include 'partials/workreport/_report_daily_content.html' with daily_report=report isTeam=False can_not_edit=True %}
+            
+          </div>
+
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </section>
+
+
+{% endblock %}

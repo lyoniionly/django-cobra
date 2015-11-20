@@ -34,7 +34,12 @@
   <ul class="nav nav-list">
     <li class="{% block org_teams_nav %}{% endblock %}">
       <a href="{% url 'organization:home' organization.slug %}">
-        {% trans "Teams" %}
+        {% trans "Projects" %}
+      </a>
+    </li>
+    <li class="{% block org_daily_report_nav %}{% endblock %}">
+      <a href="{% url 'organization:workreport:daily-member' organization.slug request.user.username %}">
+        {% trans "Daily Report" %}
       </a>
     </li>
     {% if ACCESS.org_read %}
@@ -69,7 +74,7 @@
 {% endblock %}
 
 {% block main %}
-  <section class="body">
+  <section class="body maskable">
     {% if request.user|needs_access_group_migration:organization %}
       <div class="alert alert-block alert-info">
         <p>You have access groups that need to be migrated into the new organization structure. <a href="{% comment %}{% url 'sentry-organization-access-group-migration' organization.slug %}{% endcomment %}">Get Started</a></p>
