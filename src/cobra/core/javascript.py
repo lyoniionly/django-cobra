@@ -8,15 +8,15 @@ from django.utils import timezone
 from django.utils.html import escape
 
 from cobra.singleton import env#, tsdb
-# from sentry.constants import TAG_LABELS
-# from sentry.models import (
+# from cobra.constants import TAG_LABELS
+# from cobra.models import (
 #     Group, GroupBookmark, GroupMeta, GroupTagKey, GroupSeen, GroupStatus,
 #     ProjectOption
 # )
-# from sentry.templatetags.sentry_plugins import get_legacy_annotations
+# from cobra.templatetags.cobra_plugins import get_legacy_annotations
 from . import json
-# from sentry.utils.db import attach_foreignkey
-# from sentry.utils.http import absolute_uri
+# from cobra.utils.db import attach_foreignkey
+# from cobra.utils.http import absolute_uri
 
 
 transformers = {}
@@ -65,7 +65,7 @@ class Transformer(object):
 # @register(Group)
 # class GroupTransformer(Transformer):
 #     def attach_metadata(self, objects, request=None):
-#         from sentry.templatetags.sentry_plugins import handle_before_events
+#         from cobra.templatetags.cobra_plugins import handle_before_events
 #
 #         attach_foreignkey(objects, Group.project, ['team'])
 #
@@ -101,11 +101,11 @@ class Transformer(object):
 #             historical_data = {}
 #
 #         project_list = set(o.project for o in objects)
-#         tag_keys = set(['sentry:user'])
+#         tag_keys = set(['cobra:user'])
 #         project_annotations = {}
 #         for project in project_list:
 #             enabled_annotations = ProjectOption.objects.get_value(
-#                 project, 'annotations', ['sentry:user'])
+#                 project, 'annotations', ['cobra:user'])
 #             project_annotations[project] = enabled_annotations
 #             tag_keys.update(enabled_annotations)
 #
@@ -164,7 +164,7 @@ class Transformer(object):
 #             'level': obj.level,
 #             'levelName': escape(obj.get_level_display()),
 #             'logger': escape(obj.logger),
-#             'permalink': absolute_uri(reverse('sentry-group', args=[obj.organization.slug, obj.project.slug, obj.id])),
+#             'permalink': absolute_uri(reverse('cobra-group', args=[obj.organization.slug, obj.project.slug, obj.id])),
 #             'firstSeen': self.localize_datetime(obj.first_seen, request=request),
 #             'lastSeen': self.localize_datetime(obj.last_seen, request=request),
 #             'timeSpent': obj.avg_time_spent,

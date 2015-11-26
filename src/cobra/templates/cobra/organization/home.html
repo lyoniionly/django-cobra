@@ -15,7 +15,7 @@
             <div class="pull-right action-bar">
               <a href="{% url 'team:manage' team.slug organization.slug %}"><span class="icon-cog"></span>{% trans 'Team Settings' %}</a>
             </div>
-            <a href="{% comment %}{% url 'sentry-team-dashboard' organization.slug team.slug %}{% endcomment %}">{{ team.name }}</a>
+            <a href="#">{{ team.name }}</a>
           </h3>
           {% if not project_list %}
             <p>There are no projects in this team. Would you like to <a href="{% url 'project:create' organization.slug %}?team={{ team.slug }}">create a project</a>?</p>

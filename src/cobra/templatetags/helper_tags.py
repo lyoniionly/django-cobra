@@ -22,6 +22,7 @@ from cobra.core.constants import EVENTS_PER_PAGE
 from cobra.core.utils import multi_get_letter
 from cobra.apps.accounts.utils import get_gravatar, get_default_avatar_url, get_user
 from cobra.core.compat import get_user_model
+from cobra.core.http import absolute_uri
 
 register = template.Library()
 
@@ -163,3 +164,8 @@ def timesince_ago(value, now=None):
     if value == _('1 day'):
         return _('yesterday')
     return value + _(' ago')
+
+
+@register.filter
+def absolute_url(url):
+    return absolute_uri(url)

@@ -277,7 +277,7 @@ COBRA_SMTP_HOSTNAME = 'localhost'
 COBRA_SMTP_HOST = 'localhost'
 COBRA_SMTP_PORT = 1025
 
-# Absolute URL to the sentry root directory. Should not include a trailing slash.
+# Absolute URL to the cobra root directory. Should not include a trailing slash.
 COBRA_URL_PREFIX = ''
 
 # Default to not sending the Access-Control-Allow-Origin header on api/store

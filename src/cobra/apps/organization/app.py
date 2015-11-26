@@ -1,4 +1,5 @@
 from django.conf.urls import url, include
+from django.contrib.auth.decorators import login_required
 
 from cobra.core.application import Application
 from cobra.core.loading import get_class
@@ -16,6 +17,10 @@ class OrganizationApplication(Application):
     organization_member_settings_view = get_class('organization.views', 'OrganizationMemberSettingsView')
     organization_member_accept_view = get_class('organization.views', 'OrganizationMemberAcceptView')
     # organization_member_create_view = get_class('organization.views', 'OrganizationMemberCreateView')
+
+    organization_my_list_view = get_class('organization.views', 'OrganizationMyListView')
+    organization_all_list_view = get_class('organization.views', 'OrganizationAllListView')
+    organization_join_view = get_class('organization.views', 'OrganizationJoinView')
 
     project_app = get_class('organization.project.app', 'application')
 
@@ -48,6 +53,17 @@ class OrganizationApplication(Application):
 
             url(r'^(?P<organization_slug>[\w_-]+)/project/', include(self.project_app.urls)),
             url(r'^(?P<organization_slug>[\w_-]+)/workreport/', include(self.workreport_app.urls)),
+
+            url(r'^my/list/$', login_required(self.organization_my_list_view.as_view()),
+                name='my-list'),
+            url(r'^all/list/$', self.organization_all_list_view.as_view(),
+                name='all-list'),
+
+            url(r'^(?P<organization_slug>[\w_-]+)/join/$', self.organization_join_view.as_view(),
+                name='join'),
+
+
+
         ]
         return self.post_process_urls(urls)
 

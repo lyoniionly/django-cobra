@@ -21,7 +21,7 @@ class PluginMount(type):
         if not new_cls.slug:
             new_cls.slug = new_cls.title.replace(' ', '-').lower()
         if not hasattr(new_cls, 'logger'):
-            new_cls.logger = logging.getLogger('sentry.plugins.%s' % (new_cls.slug,))
+            new_cls.logger = logging.getLogger('cobra.plugins.%s' % (new_cls.slug,))
         return new_cls
 
 
@@ -238,7 +238,7 @@ class IPlugin2(local):
         An example of an annotation might be "Needs Fix" or "Task #123".
 
         The properties of each tag must match the constructor for
-        :class:`sentry.plugins.Annotation`
+        :class:`cobra.plugins.Annotation`
 
         >>> def get_annotations(self, request, group, **kwargs):
         >>>     task_id = GroupMeta.objects.get_value(group, 'myplugin:tid')
@@ -252,7 +252,7 @@ class IPlugin2(local):
         """
         Return a list of notifiers to append to the registry.
 
-        Notifiers must extend :class:`sentry.plugins.Notifier`.
+        Notifiers must extend :class:`cobra.plugins.Notifier`.
 
         >>> def get_notifiers(self, **kwargs):
         >>>     return [MyNotifier]

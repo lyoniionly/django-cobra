@@ -390,8 +390,9 @@ class BaseView(View, OrganizationMixin):
     def handle_auth_required(self, request, *args, **kwargs):
         request.session['_next'] = request.get_full_path()
         if 'organization_slug' in kwargs:
-            redirect_to = reverse('auth:organization',
-                                  args=[kwargs['organization_slug']])
+            # redirect_to = reverse('auth:organization',
+            #                       args=[kwargs['organization_slug']])
+            redirect_to = get_login_url()
         else:
             redirect_to = get_login_url()
         return self.redirect(redirect_to)
@@ -491,7 +492,7 @@ class OrganizationView(BaseView):
                 request, messages.ERROR,
                 ERR_MISSING_SSO_LINK,
             )
-            redirect_uri = reverse('sentry-auth-link-identity',
+            redirect_uri = reverse('cobra-auth-link-identity',
                                    args=[organization.slug])
         else:
             redirect_uri = self.get_no_permission_url(request, *args, **kwargs)

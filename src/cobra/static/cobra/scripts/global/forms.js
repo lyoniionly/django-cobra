@@ -90,6 +90,27 @@
       });
     },*/
 
+    select2: function (el) {
+      var $el = $(el);
+      // Change all select boxes to select2 elements.
+      $el.find('select:not(".no-select2")').each(function () {
+        var $this = $(this),
+          options = {
+            width: 'element',
+            allowClear: false,
+            minimumResultsForSearch: 10
+          };
+
+        if ($this.attr('data-allowClear')) {
+          options.allowClear = $this.attr('data-allowClear');
+        }
+
+        if (!$this.hasClass('self-control')) {
+          $this.select2(options);
+        }
+      });
+    },
+
     datepicker: function(el) {
       var $el = $(el);
       $el.find('[data-toggle="datepicker"]').datetimepicker({
@@ -211,6 +232,9 @@
     app.forms.datepicker($("body"));
     app.modals.addModalInitFunction(app.forms.datetimepicker);
     app.forms.datetimepicker($("body"));
+
+    app.forms.select2($("body"));
+    app.modals.addModalInitFunction(app.forms.select2);
 
     app.modals.addModalInitFunction(app.forms.autosize);
     app.forms.autosize($("body"));

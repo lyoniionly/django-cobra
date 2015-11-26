@@ -177,7 +177,7 @@
 
   $(function () {
     // Change all select boxes to select2 elements.
-    $('.body select').each(function () {
+    /*$('.body select').each(function () {
       var $this = $(this),
         options = {
           width: 'element',
@@ -190,7 +190,7 @@
       }
 
       $this.select2(options);
-    });
+    });*/
 
     // Update date strings periodically
     setInterval(function () {

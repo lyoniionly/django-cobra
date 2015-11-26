@@ -10,7 +10,7 @@
         <ul class="list-group">
           {% for member in organization|organization_members %}
             <li class="list-group-item redirect_to {% ifequal member.user report_user %}active{% endifequal %}"
-                data-url="{% url 'organization:workreport:daily-member' organization.slug member.user.username %}">
+                data-url="{% url 'organization:workreport:daily-member-report-list' organization.slug member.user.username %}">
               <div class="media">
                 <div class="media-left">
                   <a class="avatar avatar-online" href="javascript:void(0)">
@@ -41,8 +41,13 @@
           </div>
 
           <div class="pt-body p-r-20">
-            {% include 'partials/workreport/_report_daily_content.html' with daily_report=report isTeam=False can_not_edit=True %}
-            
+            <div class="track-box">
+              {% include 'partials/workreport/_report_daily_content.html' with daily_report=report isTeam=False can_not_edit=False %}
+
+              <div class="view-more text-center">
+                <a class="cursor">view more</a>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -53,4 +58,10 @@
   </section>
 
 
+{% endblock %}
+
+{% block onbodyload %}
+  {{ block.super }}
+
+  new app.DailyReportListPage();
 {% endblock %}

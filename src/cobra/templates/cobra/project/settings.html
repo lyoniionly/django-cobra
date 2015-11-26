@@ -82,7 +82,7 @@
             {% if not project.is_internal_project %}
               <a href="{% url 'project:remove' project.slug project.organization.slug %}" class="btn btn-danger">{% trans "Remove Project" %}</a>
             {% else %}
-              <a class="btn btn-danger disabled tip" title="{% trans "This project cannot be removed. It is used internally by the Sentry server." %}">{% trans "Remove Project" %}</a>
+              <a class="btn btn-danger disabled tip" title="{% trans "This project cannot be removed. It is used internally by the Cobra server." %}">{% trans "Remove Project" %}</a>
             {% endif %}
           {% else %}
             <a class="btn btn-danger disabled tip" title="{% trans "You do not have the required permission to remove this project." %}">{% trans "Remove Project" %}</a>
@@ -105,29 +105,29 @@
 
     {% comment %}
         <li{% if page == 'quotas' %} class="active"{% endif %}>
-            <a href="{% url 'sentry-manage-project-quotas' project.organization.slug project.slug %}">{% trans "Rate Limits" %}</a>
+            <a href="{% url 'cobra-manage-project-quotas' project.organization.slug project.slug %}">{% trans "Rate Limits" %}</a>
         </li>
         <li{% if page == 'rules' %} class="active"{% endif %}>
-            <a href="{% url 'sentry-project-rules' project.organization.slug project.slug %}">{% trans "Rules" %}</a>
+            <a href="{% url 'cobra-project-rules' project.organization.slug project.slug %}">{% trans "Rules" %}</a>
         </li>
         <li{% if page == 'tags' %} class="active"{% endif %}>
-            <a href="{% url 'sentry-manage-project-tags' project.organization.slug project.slug %}">{% trans "Tags" %}</a>
+            <a href="{% url 'cobra-manage-project-tags' project.organization.slug project.slug %}">{% trans "Tags" %}</a>
         </li>
         <li{% if page == 'keys' %} class="active"{% endif %}>
-            <a href="{% url 'sentry-manage-project-keys' project.organization.slug project.slug %}">{% trans "API Keys" %}</a>
+            <a href="{% url 'cobra-manage-project-keys' project.organization.slug project.slug %}">{% trans "API Keys" %}</a>
         </li>
         <li class="nav-header">{% trans "Help" %}</li>
         <li>
-            <a href="{% url 'sentry-help-platform-list' %}?pid={{ project.id }}">{% trans "Setup &amp; Installation" %}</a>
+            <a href="{% url 'cobra-help-platform-list' %}?pid={{ project.id }}">{% trans "Setup &amp; Installation" %}</a>
         </li>
     {% with project|get_plugins as plugins %}
         <li class="nav-header">{% trans "Integrations" %}</li>
         <li class="{% if page == 'plugins' %} active{% endif %}">
-            <a href="{% url 'sentry-manage-project-plugins' project.organization.slug project.slug %}">{% trans "Manage Integrations" %} ({{ PLUGINS|length }})</a>
+            <a href="{% url 'cobra-manage-project-plugins' project.organization.slug project.slug %}">{% trans "Manage Integrations" %} ({{ PLUGINS|length }})</a>
         </li>
         {% for p in plugins %}
             <li{% if page == 'plugin' and plugin.slug == p.slug %} class="active"{% endif %}>
-                <a href="{% url 'sentry-configure-project-plugin' project.organization.slug project.slug p.slug %}">{{ p.get_title }}</a>
+                <a href="{% url 'cobra-configure-project-plugin' project.organization.slug project.slug p.slug %}">{{ p.get_title }}</a>
             </li>
         {% endfor %}
     {% endwith %}

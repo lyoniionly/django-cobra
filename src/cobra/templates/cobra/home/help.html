@@ -10,7 +10,7 @@
   <section class="body">
     <div id="help-blank-slate">
       <section id="help-get-started">
-        <h1>{% trans 'Auto Testing System' %}</h1>
+        <h1>{% trans 'Project Manage System' %}</h1>
         <div class="row get-started-links">
           <div class="col-sm-4">
             <a class="get-started-link document" href="" target="_blank">
@@ -22,17 +22,17 @@
           </div>
           <div class="col-sm-4">
             <a class="get-started-link getting-git" href="" target="_blank">
-              <span class="title">Git tutorials</span>
+              <span class="title">{% trans 'Git tutorials' %}</span>
               <span class="description">
-                Guides to workflows and commands, with examples.
+                {% trans 'Version controll use git, if you want to contribute, enjoy it.' %}
               </span>
             </a>
           </div>
           <div class="col-sm-4">
             <a class="get-started-link sourcetree" href="" target="_blank">
-              <span class="title">SourceTree</span>
+              <span class="title">{% trans 'Daily Report' %}</span>
               <span class="description">
-                A free Git &amp; Mercurial client for Windows or Mac.
+                {% trans 'One important function for this system.' %}
               </span>
             </a>
           </div>
@@ -40,10 +40,10 @@
       </section>
       <section id="help-create-first-org">
         <h1>{% trans 'Create or join an organization' %}</h1>
-        <p>{% trans 'Thanks for choosing ATS. Start by Create or join an organization.' %}</p>
+        <p>{% trans 'Thanks for choosing Us. Start by Create or join an organization.' %}</p>
         <div class="buttons">
           <a href="{% url 'organization:create' %}" title="Create organization" id="create-org" class="btn btn-primary">{% trans 'Create a organization' %}</a>
-          <a href="#" title="Join organization" id="join-org" class="btn btn-default">{% trans 'Join an existing organization' %}</a>
+          <a href="{% url 'organization:all-list' %}" title="Join organization" id="join-org" class="btn btn-default">{% trans 'Join an existing organization' %}</a>
         </div>
       </section>
     </div>

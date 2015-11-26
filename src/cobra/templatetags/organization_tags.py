@@ -14,7 +14,20 @@ def list_organizations(user):
 
 
 @register.filter
-def organization_members(organization, with_invited=False):
+def organization_members(organization):
+
+    queryset = OrganizationMember.objects.filter(
+        Q(user__isnull=False) & Q(user__is_active=True),
+        organization=organization,
+    ).select_related('user')
+
+    queryset = sorted(queryset, key=lambda x: x.user.get_display_name() or x.email)
+
+    return queryset
+
+
+@register.assignment_tag
+def organization_members_with_filter(organization, with_invited=False, limit=None):
     if with_invited:
         queryset = OrganizationMember.objects.filter(
             organization=organization,
@@ -26,5 +39,7 @@ def organization_members(organization, with_invited=False):
         ).select_related('user')
 
     queryset = sorted(queryset, key=lambda x: x.user.get_display_name() or x.email)
+    if limit:
+        queryset = queryset[0:limit]
 
     return queryset

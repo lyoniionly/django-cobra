@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.forms.models import modelform_factory
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.views.generic import ListView
 
 from cobra.core.loading import get_model, get_class, get_classes
 from cobra.views.generic import OrganizationView, BaseView
@@ -402,6 +403,113 @@ class OrganizationMemberAcceptView(BaseView):
                 om.user = request.user
                 om.email = None
                 om.save()
+
+                AuditLogEntry.objects.create(
+                    organization=organization,
+                    actor=request.user,
+                    ip_address=request.META['REMOTE_ADDR'],
+                    target_object=om.id,
+                    target_user=request.user,
+                    event=AuditLogEntryEvent.MEMBER_ACCEPT,
+                    data=om.get_audit_log_data(),
+                )
+
+                messages.add_message(
+                    request, messages.SUCCESS,
+                    _('You have been added to the %r organization.') % (
+                        organization.name.encode('utf-8'),
+                    )
+                )
+
+            request.session.pop('can_register', None)
+
+            return self.redirect(reverse('organization:home', args=[organization.slug]))
+
+        context['form'] = form
+
+        return self.respond('organization/member-accept-invite.html', context)
+
+
+class OrganizationMyListView(ListView):
+    model = Organization
+    context_object_name = 'organizations'
+    template_name = 'organization/my_organizations.html'
+
+    def get_queryset(self):
+        return Organization.objects.get_for_user(user=self.request.user)
+        
+        
+class OrganizationAllListView(ListView):
+    model = Organization
+    context_object_name = 'organizations'
+    template_name = 'organization/all_organizations.html'
+
+    def get_queryset(self):
+        return Organization.objects.all()
+
+
+class AcceptJoinForm(forms.Form):
+    pass
+class OrganizationJoinView(BaseView):
+    auth_required = False
+
+    def get_form(self, request):
+        if request.method == 'POST':
+            return AcceptJoinForm(request.POST)
+        return AcceptJoinForm()
+
+    def handle(self, request, organization_slug):
+        assert request.method in ['POST', 'GET']
+
+        context = {}
+        
+        try:
+            organization = Organization.objects.get_from_cache(
+                slug=organization_slug,
+            )
+            if organization.status != OrganizationStatus.VISIBLE:
+                context['message'] = _('The Organization [%s] not found'%organization_slug)
+                return self.respond('organization/error.html', context)
+        except Organization.DoesNotExist:
+            context['message'] = _('The Organization [%s] not found'%organization_slug)
+            return self.respond('organization/error.html', context)
+
+        qs = Project.objects.filter(
+            team__organization=organization,
+        )
+
+        qs = qs.select_related('team')
+
+        project_list = list(qs)
+
+        context.update({
+            'organization': organization,
+            'project_list': project_list,
+            'needs_authentication': not request.user.is_authenticated(),
+        })
+
+        if not request.user.is_authenticated():
+            # Show login or register form
+            request.session['_next'] = request.get_full_path()
+            request.session['can_register'] = True
+
+            return self.respond('organization/member-accept-invite.html', context)
+
+        form = self.get_form(request)
+        if form.is_valid():
+            if OrganizationMember.objects.filter(organization=organization, user=request.user).exists():
+                messages.add_message(
+                    request, messages.SUCCESS,
+                    _('You are already a member of the %r organization.') % (
+                        organization.name,
+                    )
+                )
+            else:
+                om = OrganizationMember.objects.create(
+                    organization=organization,
+                    user=request.user,
+                    type=OrganizationMemberType.MEMBER,
+                    email=request.user.email)
 
                 AuditLogEntry.objects.create(
                     organization=organization,

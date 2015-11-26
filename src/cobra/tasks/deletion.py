@@ -94,11 +94,11 @@ def delete_project(object_id, **kwargs):
     p.delete()
 
 
-# @instrumented_task(name='sentry.tasks.deletion.delete_group', queue='cleanup',
+# @instrumented_task(name='cobra.tasks.deletion.delete_group', queue='cleanup',
 #                    default_retry_delay=60 * 5, max_retries=None)
 # @retry
 # def delete_group(object_id, **kwargs):
-#     from sentry.models import (
+#     from cobra.models import (
 #         Group, GroupHash, GroupRuleStatus, GroupTagKey, GroupTagValue,
 #         EventMapping
 #     )
@@ -126,11 +126,11 @@ def delete_project(object_id, **kwargs):
 #     group.delete()
 #
 #
-# @instrumented_task(name='sentry.tasks.deletion.delete_tag_key', queue='cleanup',
+# @instrumented_task(name='cobra.tasks.deletion.delete_tag_key', queue='cleanup',
 #                    default_retry_delay=60 * 5, max_retries=None)
 # @retry
 # def delete_tag_key(object_id, **kwargs):
-#     from sentry.models import (
+#     from cobra.models import (
 #         GroupTagKey, GroupTagValue, TagKey, TagKeyStatus, TagValue
 #     )
 #

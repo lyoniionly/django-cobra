@@ -1,7 +1,7 @@
 /*global jQuery:true*/
 
-if (Sentry === undefined) {
-    var Sentry = {};
+if (Cobra === undefined) {
+    var Cobra = {};
 }
 
 (function(app, jQuery){

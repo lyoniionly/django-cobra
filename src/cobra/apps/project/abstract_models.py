@@ -150,7 +150,7 @@ class AbstractProject(Model):
             if tags is None:
                 tags = [
                     t for t in TagKey.objects.all_keys(self)
-                    if with_internal or not t.startswith('sentry:')
+                    if with_internal or not t.startswith('cobra:')
                 ]
             self._tag_cache = tags
         return self._tag_cache

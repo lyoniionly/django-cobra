@@ -34,7 +34,7 @@
       <a href="{% url 'accounts:appearance-settings' %}">{% trans "Appearance" %}</a>
     </li>
     <li{% if active_tab == 'notifications' %} class="active"{% endif %}>
-      <a href="{% comment %}{% url 'sentry-account-settings-notifications' %}{% endcomment %}">{% trans "Notifications" %}</a>
+      <a href="#">{% trans "Notifications" %}</a>
     </li>
   </ul>
 {% endblock %}

@@ -7,11 +7,11 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from social_auth.models import UserSocialAuth
 
-from sentry.models import GroupMeta, Activity
-from sentry.plugins import Plugin
-from sentry.utils.auth import get_auth_providers
-from sentry.utils.http import absolute_uri
-from sentry.utils.safe import safe_execute
+from cobra.models import GroupMeta, Activity
+from cobra.plugins import Plugin
+from cobra.utils.auth import get_auth_providers
+from cobra.utils.http import absolute_uri
+from cobra.utils.safe import safe_execute
 
 
 class NewIssueForm(forms.Form):
@@ -23,9 +23,9 @@ class IssuePlugin(Plugin):
     # project_conf_form = BaseIssueOptionsForm
     new_issue_form = NewIssueForm
 
-    create_issue_template = 'sentry/plugins/bases/issue/create_issue.html'
-    not_configured_template = 'sentry/plugins/bases/issue/not_configured.html'
-    needs_auth_template = 'sentry/plugins/bases/issue/needs_auth.html'
+    create_issue_template = 'cobra/plugins/bases/issue/create_issue.html'
+    not_configured_template = 'cobra/plugins/bases/issue/not_configured.html'
+    needs_auth_template = 'cobra/plugins/bases/issue/needs_auth.html'
     auth_provider = None
 
     def _get_group_body(self, request, group, event, **kwargs):

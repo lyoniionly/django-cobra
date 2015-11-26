@@ -41,7 +41,7 @@
           </fieldset>
         </form>
       </div>
-      {% if socialaccount.providers %}
+      {% comment %}{% if socialaccount.providers %}
         <div class="col-sm-6">
           <fieldset>
             <legend>
@@ -58,7 +58,7 @@
           </ul>
           {% include "socialaccount/snippets/login_extra.html" %}
         </div>
-      {% endif %}
+      {% endif %}{% endcomment %}
     </div>
   </section>
 {% endblock %}

@@ -8,20 +8,25 @@
   <li{% if active_nav == 'code' %} class="active"{% endif %}>
     <a href="{% url 'svnkit:node' organization.slug project.slug '/' %}">{% trans "Source" %}</a>
   </li>
-  <li{% if active_nav == 'weekly_report' %} class="active"{% endif %}>
-    <a href="">{% trans "Weekly Report" %}</a>
+  
+  <li{% if active_nav == 'tasks' %} class="active"{% endif %}>
+    <a href="">{% trans "Tasks" %}</a>
   </li>
-  <li{% if active_nav == 'daily_report' %} class="active"{% endif %}>
-    <a href="{% url 'organization:project:workreport:daily-member' organization.slug project.slug request.user.username %}">{% trans "Daily Report" %}</a>
+  <li{% if active_nav == 'documents' %} class="active"{% endif %}>
+    <a href="">{% trans "Documents" %}</a>
   </li>
-  <li{% if active_nav == 'members' %} class="active"{% endif %}>
-    <a href="">{% trans "Members" %}</a>
+  <li{% if active_nav == 'statistic' %} class="active"{% endif %}>
+    <a href="">{% trans "Statistic" %}</a>
   </li>
+
   {% if request.user|can_manage_project:project %}
-    <li{% if active_nav == 'settings' %} class="active"{% endif %}>
+    <li class="pull-right {% if active_nav == 'settings' %}active{% endif %}">
       <a href="{% url 'project:settings' project.slug project.organization.slug %}">
         {% trans "Settings" %}
       </a>
     </li>
   {% endif %}
+  <li class="pull-right {% if active_nav == 'members' %}active{% endif %}">
+    <a href="">{% trans "Members" %}</a>
+  </li>
 </ul>

@@ -1,35 +1,34 @@
-{% extends "layout.html" %}
+{% extends "layouts/modal.html" %}
 
 {% load i18n %}
 
-{% block title %}{% trans "Team Invite" %} | {{ block.super }}{% endblock %}
+{% block title %}{% trans "Member Invite" %} | {{ block.super }}{% endblock %}
 
 {% block page_header_block %}{% endblock %}
 {% block content_class %}{% endblock %}
 
 {% block main %}
   <section class="body">
+    <h2>{% trans "Join Organization" %}</h2><hr>
+    
     <div class="row">
-      <div class="col-sm-6">
-        <div class="page-header">
-          <h2>{% trans "Organization Invite" %}</h2>
-        </div>
+      <div class="col-sm-8">
 
         <p style="font-size: 1.3em;">
           {% blocktrans with org_name=organization.name %}<strong>{{ org_name }}</strong> is using Cobra to manage projects.{% endblocktrans %}
         </p>
 
-        <p>{% blocktrans with project_count=project_list|length %}You have been invited to join this organization, which manages <strong>{{ project_count }}</strong> project(s):{% endblocktrans %}</p>
-        <ul>
+        <p>{% blocktrans with project_count=project_list|length %}You can join to this organization, which manages <strong>{{ project_count }}</strong> project(s):{% endblocktrans %}</p>
+        <ol class="p-l-20 m-b-10">
           {% for project in project_list|slice:"5" %}
             <li>
               {{ project.name }}
             </li>
           {% endfor %}
-        </ul>
+        </ol>
 
         {% if needs_authentication %}
-          <p>{% trans "To continue, you must either login to your existing account, or create a new one." %}</p>
+          <p class="text-warning">{% trans "To continue, you must either login to your existing account, or create a new one." %}</p>
 
           <fieldset class="form-actions">
             <div class="pull-right" style="margin-top: 5px;">
@@ -40,11 +39,11 @@
         {% else %}
           <form method="POST">
             {% csrf_token %}
-            <p>
+            <fieldset class="form-actions">
               <button type="submit" class="btn btn-primary">
                 {% blocktrans with org_name=organization.name %}Join the {{ org_name }} organization{% endblocktrans %}
               </button>
-            </p>
+            </fieldset>
           </form>
         {% endif %}
       </div>

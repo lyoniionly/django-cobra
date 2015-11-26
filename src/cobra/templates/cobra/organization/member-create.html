@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load crispy_forms_tags %}
+{% load helper_tags %}
 
 {% block title %}{% trans "Add Member to Organization" %} | {{ block.super }}{% endblock %}
 
@@ -9,12 +10,30 @@
   <div class="create-flow">
     <div class="page-header">
       <div class="pull-right">
-        <a class="go-back" href="{% url 'organization:home' organization.slug %}">{% trans 'Back to Organization Home' %}</a>
+        <a class="go-back"
+           href="{% url 'organization:home' organization.slug %}">{% trans 'Back to Organization Home' %}</a>
       </div>
       <h2>{% trans "Add Member to Organization" %}</h2>
     </div>
+    <hr>
+    <div class="section">
+      <h2 class="title">{% trans 'Through public invited link, quick!' %}</h2>
+
+      <p class="desc">{% trans 'Send the public link to your colleague or partner through QQ or WeChart, visit the link to join your organization.We will Assign the user member authority' %}</p>
+
+      <p class="join-link">{% url 'organization:join' organization.slug as join_url %}
+        <input type="text" value="{{ join_url|absolute_url }}" class="clipboard-text" readonly="" style="color: #cf372b;">
+      </p>
+
+      <p class="caution">
+        <em>{% trans 'Attention:' %} </em>
+        {% trans 'Anyone who sees the invitation to link, can apply to join the team!' %}
+      </p>
+    </div>
+    <hr>
 
     <fieldset>
+      <h2 class="title">{% trans 'Invited through email' %}</h2>
       {% if is_invite %}
         <p>{% trans "Invite a member to join this organization via their email address. If they do not already have an account, they will first be asked to create one." %}</p>
         <p>{% trans "You will be able to configure permissions and team access on the following page." %}</p>

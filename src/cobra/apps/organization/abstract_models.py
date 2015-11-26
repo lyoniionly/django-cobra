@@ -159,7 +159,7 @@ class AbstractOrganizationMember(Model):
     __repr__ = sane_repr('organization_id', 'user_id', 'type')
 
     def __str__(self):
-        return '%s - %s' % (self.organization.name, self.user.username)
+        return '%s - %s' % (self.organization.name, self.email)
 
     def save(self, *args, **kwargs):
         assert self.user_id or self.email, \

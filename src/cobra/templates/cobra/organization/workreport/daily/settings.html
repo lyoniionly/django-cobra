@@ -1,0 +1,21 @@
+{% load i18n %}
+<form class="form-inline" action="{% url 'organization:workreport:daily-report-settings' organization.slug %}" method="post" id="daily-report-setting-form" >
+  {% csrf_token %}
+  <div class="form-group">
+    <select class="form-control">
+      <option>{% trans 'Everyday' %}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <div class="input-group clockpicker">
+      {{ form.deadline_time }}
+      <span class="input-group-addon">
+        <span class="glyphicon glyphicon-time"></span>
+      </span>
+    </div>
+  </div>
+
+  <fieldset class="form-actions">
+    <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+  </fieldset>
+</form>

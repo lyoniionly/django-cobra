@@ -1,0 +1,76 @@
+{% extends "layouts/modal.html" %}
+{% load i18n %}
+{% load helper_tags organization_tags permissions_tags %}
+
+{% block title %}
+  {% trans 'All Organizations' %} | {{ block.super }}
+{% endblock %}
+
+{% block main %}
+  {% if request.user.is_authenticated %}
+    <ul class="nav nav-links">
+      <li>
+        <a href="{% url 'organization:my-list' %}">{% trans 'My organizations' %}</a>
+      </li>
+      <li class="active">
+        <a href="{% url 'organization:all-list' %}">{% trans 'All organizations' %}</a>
+      </li>
+    </ul>
+  {% endif %}
+  <section class="body">
+    <div class="row project-list">
+
+    {% for organization in organizations %}
+		<div class="project">
+			<div class="info">
+        <div class="name">
+          {% if request.user.is_authenticated and request.user|can_visit_organization:organization %}
+            <a href="{% url 'organization:home' organization.slug %}">{{ organization.name }}</a>
+          {% else %}
+            {{ organization.name }}
+          {% endif %}
+				</div>
+				<div class="category">{% trans 'Owner is' %} {{ organization.owner|user_display_name }}</div>
+				<div class="last-update">
+					{% trans 'Created at' %} {{ organization.date_added|timesince_ago }}
+				</div>
+			</div>
+			<div class="members">
+        {% organization_members_with_filter organization limit=4 as organization_members %}
+        {% for member in organization_members %}
+            <img alt="{{ member.user|user_display_name }}" src="{% get_avatar_url member.user %}" title="{{ member.user|user_display_name }}">
+        {% endfor %}
+				
+				<a href="#" class="add-more">
+					<i class="fa fa-plus"></i>
+				</a>
+				<ul class="menu">
+          {% if request.user.is_authenticated %}
+            {% if request.user|can_visit_organization:organization %}
+              {% if request.user|can_manage_org:organization %}
+                <li><a href="{% url 'organization:member-create' organization.slug %}">{% trans 'Invite a new member' %}</a></li>
+                <li><a href="{% url 'organization:settings' organization.slug %}">{% trans 'Change name' %}</a></li>
+                <li><a href="{% url 'organization:settings' organization.slug %}#delete-org">{% trans 'Delete organization' %}</a></li>
+              {% else %}
+                <li><a href="{% url 'organization:home' organization.slug %}">{% trans 'Visit it' %}</a></li>
+              {% endif %}
+            {% else %}
+              <li><a href="{% url 'organization:join' organization.slug %}">{% trans 'Join in' %}</a></li>
+            {% endif %}
+          {% else %}
+            <li><a href="{% url 'organization:join' organization.slug %}">{% trans 'Join in' %}</a></li>
+          {% endif %}
+				</ul>
+			</div>
+		</div>
+    {% endfor %}
+		
+	</div>
+  </section>
+{% endblock %}
+
+{% block onbodyload %}
+  {{ block.super }}
+
+  new app.OrganizationPage();
+{% endblock %}

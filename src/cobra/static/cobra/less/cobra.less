@@ -34,7 +34,9 @@
 @import url("statistic.less");
 @import url("widget.less");
 @import url("simditor.less");
+@import url("project-list.less");
 @import (less) url("sweetalert.css");
+@import (less) url("bootstrap-clockpicker.css");
 
 /* =============================  Global  ============================== */
 
@@ -303,8 +305,8 @@ h3 {
 }
 
 .popover * {
-  font-size: 11px;
-  line-height: 14px;
+  //font-size: 11px;
+  //line-height: 14px;
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -2145,7 +2147,7 @@ small {
 }
 
 .select2-container {
-  margin-bottom: 9px;
+  //margin-bottom: 9px;
   &.form-control {
     height: auto;
     padding: 0;
@@ -5119,18 +5121,18 @@ h2 {
     position: relative;
 
     &.document {
-      background-image: url('https://d3oaxc4q5k2d6q.cloudfront.net/m/fc0cb8a00976/img/ads/book.svg?10c6dd6762b9');
-      background-size: 50px;
+      background-image: url('../img/icon/book.png');
+//      background-size: 50px;
     }
 
     &.getting-git {
-      background-image: url('https://d3oaxc4q5k2d6q.cloudfront.net/m/fc0cb8a00976/img/logos/git.svg?69d197d2785c');
-      background-size: 45px;
+      background-image: url('../img/icon/git.png');
+//      background-size: 45px;
     }
 
     &.sourcetree {
-      background-image: url('https://d3oaxc4q5k2d6q.cloudfront.net/m/fc0cb8a00976/img/logos/sourcetree.svg?aa44312d9dab');
-      background-size: 45px;
+      background-image: url('../img/icon/sourcetree.png');
+//      background-size: 45px;
     }
 
     .title {
@@ -5984,6 +5986,7 @@ table.commit-list td > div {
   .timeline {
     padding-left: 70px;
     padding-top: 10px;
+    padding-right: 0;
   }
   
   .p-timeline {
@@ -6300,4 +6303,39 @@ padding-right: 280px;
     }
   }
 
+}
+
+.track-box {
+  height: 225px;
+  overflow: hidden;
+  background: white;
+  position: relative;
+  .view-more {
+    background: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, #fff 50%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(255,255,255,0)), color-stop(50%, #fff));
+    background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, #fff 50%);
+    background: -o-linear-gradient(top, rgba(255,255,255,0) 0%, #fff 50%);
+    background: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, #fff 50%);
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,#ffffff 50%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 );
+    position: absolute;
+    height: 40px;
+    bottom: 0;
+    width: 100%;
+    padding-top: 20px;
+    .opacity(0.9);
+    .transition(0.3s all ease-in-out);
+
+    a {
+      color: #979faf;
+      font-size: 18px;
+      &:hover {
+        color: #626b7f;
+      }
+    }
+  }
+}
+
+.clockpicker {
+  width: 150px;
 }

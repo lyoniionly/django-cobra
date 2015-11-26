@@ -240,107 +240,6 @@
     }
   });
 
-  app.PregnancyProfilePage = BasePage.extend({
-
-    initialize: function (data) {
-      BasePage.prototype.initialize.apply(this, arguments);
-
-      $('#chart').height('150px');
-      Sentry.charts.init('#chart');
-
-
-    }
-
-  });
-
-  app.SelectRolesPage = BasePage.extend({
-
-    initialize: function (data) {
-      BasePage.prototype.initialize.apply(this, arguments);
-
-      $('.choose-roles input[name="role"]').on('change', function(){
-        var $this = $(this);
-        var $form = $this.parents('form');
-        $form.find("[type='submit']").removeAttr("disabled");
-      });
-    }
-
-  });
-
-  app.MedicineUpdatePage = BasePage.extend({
-    initialize: function (data) {
-      BasePage.prototype.initialize.apply(this, arguments);
-
-      $("input[name='birth_date']").jSelectDate({
-        css:"birthdate",
-        yearBegin: 1960,
-        yearEnd: 1999,
-        disabled : false,
-        isShowLabel : false
-      });
-      $("input[name='lastMenses_date']").jSelectDate({
-        css:"lastMensesdate",
-        yearBegin: 2013,
-        yearEnd: 2015,
-        disabled : false,
-        isShowLabel : false
-      });
-      /*$("[type='checkbox']").bootstrapSwitch({
-        size: 'small',
-        onColor: 'info',
-        onText: 'Yes',
-        offText: 'No'
-      });*/
-
-      $('#id_yun_c').on('change', function () {
-        var selected_value = $(this).val();
-        var collapse_target = $(this).data('target');
-        if (collapse_target) {
-          if (selected_value > 1 || selected_value == 'M') {
-            if ($(collapse_target).is(":hidden")) {
-              $(collapse_target).collapse('show');
-//              $(collapse_target).slideDown();
-            }
-          } else {
-            if ($(collapse_target).is(":visible")) {
-              $(collapse_target).collapse('hide');
-//              $(collapse_target).slideUp();
-              $(collapse_target).find("input[type='checkbox']").prop('checked', false).change();
-            }
-          }
-        }
-      });
-
-      $("input[type='checkbox']").on('change', function (e) {
-        var $this = $(this);
-        var checked = $this.prop('checked');
-        var collapse_target = $this.data('target');
-        if (collapse_target) {
-          if (checked) {
-            $(collapse_target).collapse('show');
-          } else {
-            $(collapse_target).collapse('hide');
-            $(collapse_target).find('select').select2("val", "0");
-            $(collapse_target).find('textarea').val('');
-          }
-        }
-      });
-
-      $('.toggle-choose').on('click', function () {
-        var s_t = $(this).data('select-status');
-        if (s_t == 'all') {
-          $(this).parents('div.share-panel').find('input[type="checkbox"]').prop('checked', true).change();
-          $(this).data('select-status', 'notselect');
-          $(this).html('<i class="fa fa-toggle-on"></i>');
-        } else {
-          $(this).parents('div.share-panel').find('input[type="checkbox"]').prop('checked', false).change();
-          $(this).data('select-status', 'all');
-          $(this).html('<i class="fa fa-toggle-off"></i>');
-        }
-      });
-    }
-  });
-
   app.SelectTeamPage = BasePage.extend({
 
     initialize: function () {
@@ -1053,8 +952,47 @@
 
   });
 
+  var WorkReportBasePage = BasePage.extend({
+    initialize: function (data) {
+      BasePage.prototype.initialize.apply(this, arguments);
 
-  app.WorkReportPage = BasePage.extend({
+      _.bindAll(this, 'showViewMoreButton', 'viewHiddenMedicineInfo');
+
+      $('.view-more').on('click', _.bind(function (e) {
+        e.preventDefault();
+        var target = $(e.target);
+        if(target.hasClass("expanded") || target.parent().hasClass("expanded")) {
+          this.showViewMoreButton(e);
+        } else {
+          this.viewHiddenMedicineInfo(e);
+        }
+      },this));
+    },
+
+    viewHiddenMedicineInfo: function(e) {
+      var parent, target;
+      return target = $(e.target),
+      parent = target.hasClass(".track-box") ? target: target.parents(".track-box"),
+      parent.find(".view-more").addClass("expanded"),
+      parent.find(".view-more a").text("view less"),
+      parent.animate({
+        height: "100%"
+      })
+    },
+
+    showViewMoreButton: function (e) {
+      var target, viewmore;
+      return target = $(e.target).parents(".track-box"),
+      viewmore = target.find(".view-more"),
+      viewmore.removeClass("expanded").find("a").text("view more"),
+      target.animate({
+        height: "225px"
+      })
+    }
+  });
+
+
+  app.WorkReportPage = WorkReportBasePage.extend({
 
     default_settings: {
       reportType: 'daily',
@@ -1375,7 +1313,7 @@
         var $this = $(e.currentTarget);
         var $container = $this.closest('.report-container');
         var $container_body = $container.find('.report-body');
-        var $edit_box = $('#report-edit-box');
+        var $edit_box = $container.find('.report-edit-box');
         var url = $this.data('url');
         $container_body.maskLoading();
         $.get(url, function(data){
@@ -1413,7 +1351,7 @@
         var $this = $(e.currentTarget);
         var $container = $this.closest('.report-container');
         var $container_body = $container.find('.report-body');
-        var $edit_box = $('#report-edit-box');
+        var $edit_box = $container.find('.report-edit-box');
         swal({
           title: "Are you sure?",   text: "If you have done some change, it will lost!",   type: "warning",
           confirmButtonColor: "#DD6B55",   confirmButtonText: "Yes!",   cancelButtonText: "No!",
@@ -1433,7 +1371,7 @@
         var $this = $(e.currentTarget);
         var $container = $this.closest('.report-container');
         var $container_body = $container.find('.report-body');
-        var $edit_box = $('#report-edit-box');
+        var $edit_box = $container.find('.report-edit-box');
 
         var is_ok = false;
 
@@ -1470,6 +1408,45 @@
         }
       }, this));
     }
+  });
+
+  app.DailyReportListPage = WorkReportBasePage.extend({
+
+  });
+  
+  app.OrganizationPage = BasePage.extend({
+    initialize: function (data) {
+      BasePage.prototype.initialize.apply(this, arguments);
+
+
+          var t = $(".project");
+          t.each(function(t, e) {
+            
+            var n, i = $(e).find(".add-more"),
+            s = i.siblings(".menu");
+            i.click(function(t) {
+              t.preventDefault()
+            }),
+            $(e).on("mouseenter", ".add-more, .menu",
+            function() {
+              clearTimeout(n),
+              n = null,
+              s.addClass("active")
+            }),
+            $(e).on("mouseleave", ".add-more, .menu",
+            function() {
+              n = setTimeout(function() {
+                s.removeClass("active")
+              },
+              400)
+            })
+          })
+
+
+      
+    }
+
+    
   });
 
   Backbone.sync = function (method, model, success, error) {

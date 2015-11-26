@@ -1,15 +1,15 @@
 /*jshint browser:true */
 
-if (Sentry === undefined) {
-    var Sentry = {};
+if (Cobra === undefined) {
+    var Cobra = {};
 }
 (function(app, jQuery){
     "use strict";
 
     var $ = jQuery;
 
-    Sentry.stream = {};
-    Sentry.stream.clear = function() {
+    Cobra.stream = {};
+    Cobra.stream.clear = function() {
         if (window.confirm("Are you sure you want to mark all your record as resolved?")) {
             $.ajax({
                 url: app.config.urlPrefix + '/api/' + app.config.teamId + '/' + app.config.projectId + '/clear/',
@@ -21,7 +21,7 @@ if (Sentry === undefined) {
             });
         }
     };
-    Sentry.stream.resolve = function(gid, remove){
+    Cobra.stream.resolve = function(gid, remove){
         if (typeof(remove) == 'undefined') {
             remove = true;
         }
@@ -43,7 +43,7 @@ if (Sentry === undefined) {
             }
         });
     };
-    Sentry.stream.bookmark = function(project_id, gid, el){
+    Cobra.stream.bookmark = function(project_id, gid, el){
         $.ajax({
             url: app.config.urlPrefix + '/api/' + app.config.teamId + '/' + app.config.projectId + '/bookmark/',
             type: 'post',

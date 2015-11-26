@@ -1,66 +1,124 @@
 {% extends "layouts/organization.html" %}
 
-{% load crispy_forms_tags %}
 {% load i18n %}
+{% load crispy_forms_tags workreport_tags %}
 
 {% block org_settings_nav %}active{% endblock %}
 
 {% block inner %}
   <div class="page-header">
-    <h2>{% trans 'Settings' %}</h2>
+    <h2>{% trans 'Organization Settings' %}</h2>
   </div>
-
-
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">{% trans "Organization Detail Information" %}</h3>
+    </div>
+    <div class="panel-body">
       <form class="form-stacked" action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-
         {% if form.errors %}
           <div class="alert alert-error">{% trans "Please correct the errors below." %}</div>
         {% endif %}
-
         {{ form|as_crispy_errors }}
         <div class="row">
-          <div class="col-sm-5">
-        <fieldset>
-            {{ form.name|as_crispy_field }}
-            {{ form.slug|as_crispy_field }}
-        </fieldset>
-        </div>
-  </div>
-      <hr>
-        <div class="form-group">
-          <label class="control-label ">{{ form.avatar.label }}</label>
-                  <div class="fileinput fileinput-new" data-provides="fileinput">
-                    <div class="fileinput-new thumbnail" style="width: 170px; height: 170px;">
-{#                      {% get_project_avatar project 'avatar project-avatar s160' %}#}
-                      <img src="{{ organization.get_avatar_url }}">
-                    </div>
-                    <div class="fileinput-preview fileinput-exists thumbnail"
-                         style="max-width: 170px; max-height: 170px;"></div>
-                    <div>
-                      <p class="light">
-                        You can change your project avatar here.
-                      </p>
-                      <p class="light">
-                        {{ form.avatar.help_text }}
-                      </p>
-
-                      <span class="btn btn-primary btn-file">
-                        <span class="fileinput-new">{% trans 'Choose avatar' %}</span>
-                        <span class="fileinput-exists">{% trans 'Change avatar' %}</span>
-                        <input id="id_avatar" name="avatar" type="file">
-                      </span>
-                      <a href="#" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">{% trans 'Clear' %}</a>
-                    </div>
-                  </div>
+          <div class="col-sm-6">
+            <fieldset>
+              {{ form.name|as_crispy_field }}
+              {{ form.slug|as_crispy_field }}
+            </fieldset>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label class="control-label ">{{ form.avatar.label }}</label>
+              <div class="fileinput fileinput-new" data-provides="fileinput">
+                <div class="fileinput-new thumbnail" style="width: 170px; height: 170px;">
+                  <img src="{{ organization.get_avatar_url }}">
                 </div>
+                <div class="fileinput-preview fileinput-exists thumbnail"
+                     style="max-width: 170px; max-height: 170px;"></div>
+                <div>
+                  <p class="light">
+                    {% trans 'You can change your organization avatar here.' %}
+                  </p>
+
+                  <p class="light">
+                    {{ form.avatar.help_text }}
+                  </p>
+                  <span class="btn btn-default btn-file">
+                    <span class="fileinput-new">{% trans 'Choose avatar' %}</span>
+                    <span class="fileinput-exists">{% trans 'Change avatar' %}</span>
+                    <input id="id_avatar" name="avatar" type="file">
+                  </span>
+                  <a href="#" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">{% trans 'Clear' %}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
         <fieldset class="form-actions">
-          <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
-          {% if ACCESS.is_owner and ACCESS.is_global %}
-            <a href="{% url 'organization:remove' organization.slug %}" class="btn btn-danger">{% trans "Remove Organization" %}</a>
-          {% endif %}
+          <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
         </fieldset>
       </form>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">{% trans "Daily Report Settings" %}</h3>
+    </div>
+    <div class="panel-body maskable">
+      <div id="daily-report-settings-msg"></div>
+      <p class="font-size-16">
+        {% trans 'If the time of report submition is over this time point below, We consider that it is late.' %}
+      </p>
+      <div id="daily-report-settings" data-timeout="200" data-url="{% url 'organization:workreport:daily-report-settings' organization.slug %}" data-replace-ext="#daily-report-settings">
+
+      </div>
+    </div>
+  </div>
+
+  {% if ACCESS.org_delete and not organization.is_default %}
+    <div class="panel panel-default" id="delete-org">
+      <div class="panel-heading">
+        <h3 class="panel-title">{% trans "Remove Organization" %}</h3>
+      </div>
+      <div class="panel-body">
+        <p>{% trans 'Removing this organization will delete all data including projects and their associated anything.' %}</p>
+        <a href="{% url 'organization:remove' organization.slug %}"
+           class="btn btn-danger">{% trans "Remove Organization" %}
+        </a>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block onbodyload %}
+  {{ block.super }}
+  $(document).on('eldarion-ajax:success', '[data-replace-ext]', function(e, $el, data) {
+    var $html = $(data.html);
+    $html.find('.clockpicker').clockpicker();
+    app.forms.select2($html);
+    $($el.data('replace-ext')).replaceWith($html);
+    $('#daily-report-setting-form').submit(function() {
+      $('#daily-report-setting-form').maskLoading();
+      $(this).ajaxSubmit({
+          dataType:  'json',
+          success:   function(data){
+            if(data.success){
+              $('#daily-report-settings-msg').html('<div class="alert alert-success" role="alert">'+ data.msg +'</div>');
+            } else {
+              $('#daily-report-settings-msg').html('<div class="alert alert-danger" role="alert">'+ data.msg +'</div>');
+            }
+          },
+          complete: function(){
+            $('#daily-report-setting-form').unmaskLoading();
+          }
+      });
+      return false;
+    });
+  });
+
 
 {% endblock %}

@@ -1,4 +1,4 @@
-/*global Sentry:true*/
+/*global Cobra:true*/
 
 (function (app, Backbone, jQuery, moment) {
   "use strict";

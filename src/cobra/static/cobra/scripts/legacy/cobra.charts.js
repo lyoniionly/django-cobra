@@ -1,5 +1,5 @@
-if (Sentry === undefined) {
-    var Sentry = {};
+if (Cobra === undefined) {
+    var Cobra = {};
 }
 (function(jQuery, moment){
     "use strict";
@@ -61,9 +61,9 @@ if (Sentry === undefined) {
         return d.format(fmt);
     };
 
-    Sentry.charts = {};
-    Sentry.charts.init = function(el){
-      Sentry.charts.render(el);
+    Cobra.charts = {};
+    Cobra.charts.init = function(el){
+      Cobra.charts.render(el);
 
       if($(el).hasClass('has-carousel')){
         var $parent = $(el).parent();
@@ -74,11 +74,11 @@ if (Sentry === undefined) {
           $(el).attr('data-since', $this.attr('data-since'));
           $(el).attr('data-until', $this.attr('data-until'));
           $(el).maskLoading();
-          Sentry.charts.render(el);
+          Cobra.charts.render(el);
         });
       }
     };
-    Sentry.charts.render = function(el){
+    Cobra.charts.render = function(el){
         var $sparkline = $(el);
 
         var unit = $(el).attr('data-unit') || 'beats/minute';

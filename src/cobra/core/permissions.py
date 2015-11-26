@@ -63,6 +63,16 @@ def is_project_admin(user, project):
 
 @cached_for_request
 @requires_login
+def can_visit_organization(user, organization):
+    return organization.member_set.filter(
+        user=user,
+        type__lte=OrganizationMemberType.MEMBER,
+        has_global_access=True,
+    ).exists()
+
+
+@cached_for_request
+@requires_login
 def can_create_organizations(user):
     """
     Returns a boolean describing whether a user has the ability to

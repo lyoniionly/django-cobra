@@ -106,7 +106,7 @@ class NotificationPlugin(Plugin):
         )
 
         if rate_limited:
-            logger = logging.getLogger('sentry.plugins.{0}'.format(self.get_conf_key()))
+            logger = logging.getLogger('cobra.plugins.{0}'.format(self.get_conf_key()))
             logger.info('Notification for project %s dropped due to rate limiting', project.id)
 
         return not rate_limited

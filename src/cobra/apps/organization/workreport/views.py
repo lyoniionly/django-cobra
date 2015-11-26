@@ -18,19 +18,22 @@ from django.views.generic import View
 from cobra.apps.workreport.constants import WORKREPORT_STATUS_INCOMPLETE, WORKREPORT_STATUS_DEFAULT, \
     WORKREPORT_STATUS_TEAM_COMPLETE, WORKREPORT_STATUS_TEAM_PARTCOMPLETE, WORKREPORT_STATUS_TEAM_INCOMPLETE
 from cobra.core.loading import get_model, get_class
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 from django.views import generic
 from cobra.views.generic import ProjectView, OrganizationView
 from cobra.views.mixins import DailyMixin
 from cobra.core.utils import date_from_string, get_datetime_now, get_local_datetime_now
 from cobra.core.calendar import get_calendar_first_weekday
 from cobra.core.compat import get_user_model
+from cobra.core.render import render_to_string
 
 User = get_user_model()
 
 OrganizationMember = get_model('organization', 'organizationMember')
 DailyReport = get_model('workreport', 'DailyReport')
 DailyFinishedTask = get_model('workreport', 'DailyFinishedTask')
+
+DailyReportDeadlineForm = get_class('organization.workreport.forms', 'DailyReportDeadlineForm')
 
 
 class DailyReportView(DailyMixin, OrganizationView):
@@ -67,7 +70,7 @@ class DailyReportView(DailyMixin, OrganizationView):
             'daily_report': daily_report,
             'can_switch_view_model': True,
             'is_calendar': True,
-            'view_model_url': reverse('organization:workreport:daily-member-report-list', args=[organization.slug, request.user.username])
+            'view_model_url': reverse('organization:workreport:daily-member-report-list', args=[organization.slug, report_user.username])
         }
         template_name = 'organization/workreport/daily/calendar_report.html'
         return self.respond(template_name, context)
@@ -94,7 +97,7 @@ class DailyReportListView(OrganizationView):
             'daily_reports': daily_reports,
             'can_switch_view_model': True,
             'is_calendar': False,
-            'view_model_url': 'ssss'#reverse('organization:workreport:daily-member-day', args=[organization.slug, request.user.username, year, month, day])
+            'view_model_url': reverse('organization:workreport:daily-member', args=[organization.slug, report_user.username])
         }
         template_name = 'organization/workreport/daily/list_report.html'
         return self.respond(template_name, context)
@@ -271,3 +274,35 @@ class AjaxWorkreportStatisticView(JSONResponseMixin, OrganizationView):
             statistic.append(obj)
 
         return statistic
+
+
+class AjaxDailyReportSettingsView(JSONResponseMixin, OrganizationView):
+    def get_form(self, request, organization):
+        return DailyReportDeadlineForm(organization, request.POST or None)
+
+    def get(self, request, organization, *args, **kwargs):
+        form = self.get_form(request, organization)
+
+        context = {
+            'form': form,
+            'organization': organization
+        }
+        html = render_to_string('organization/workreport/daily/settings.html', context, request)
+        data = {
+            'html': html
+        }
+        return self.render_json_response(data)
+
+    def post(self, request, organization, *args, **kwargs):
+        form = self.get_form(request, organization)
+        data = {}
+        if form.is_valid():
+            form.save()
+            data['success'] = True
+            data['msg'] = ugettext('Save successfully!')
+        else:
+            data['success'] = False
+            data['msg'] = ugettext('Save failed! Please Check your input time is right.')
+
+        return self.render_json_response(data)
+
