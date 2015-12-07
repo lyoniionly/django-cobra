@@ -1,0 +1,153 @@
+.time-circle {
+  display: inline-block;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  font-size: 0;
+  border: 2px solid #fff;
+  background: #b6b9c4;
+  box-shadow: 0 0 0 1px #dcdfdf;
+}
+.timetree-head.active .time-circle,
+.timetree-weeklist>li.active>.time-circle {
+  background: #62a8ea!important;
+  box-shadow: 0 0 0 1px #98ccef!important;
+}
+.timetree-head.month .time-circle,
+.timetree-head.season .time-circle,
+.timetree-head.halfyear .time-circle,
+.timetree-head.endyear .time-circle {
+  background: #5cd29d;
+  box-shadow: 0 0 0 1px #87D8B4;
+}
+.timetree-head {
+  border-right: 1px solid #5cd29d;
+  position: relative;
+  right: 114px;
+  text-align: right;
+  padding-right: 18px;
+  height: 46px;
+  &.season {
+    .time-circle {
+      width: 16px;
+      height: 16px;
+      right: -9px;
+    }
+    .time-text {
+      padding-top: 6px;
+    }
+  }
+  &.active {
+    border-color: #d0d3de;
+    color: #62a8ea;
+  }
+  &.endyear {
+    border-color: transparent;
+  }
+  .time-text {
+    display: block;
+    position: relative;
+    top: -10px;
+    cursor: pointer;
+    &:hover {
+      color: #62a8ea;
+    }
+    strong {
+      position: relative;
+      top: 1px;
+    }
+  }
+  .time-circle {
+    right: -6px;
+    top: 0;
+  }
+  strong {
+    font-size: 20px;
+    margin-right: 3px;
+  }
+}
+.timetree-head.halfyear .time-circle,
+.timetree-head.endyear .time-circle {
+  width: 20px;
+  height: 20px;
+  right: -11px;
+}
+.reports-timetree {
+  width: 240px;
+  padding: 5px 5px 0 120px;
+  float: right;
+  .time-circle {
+    position: absolute;
+    cursor: pointer;
+  }
+}
+.timetree-head.halfyear .time-text,
+.timetree-head.endyear .time-text {
+  padding-top: 7px;
+}
+
+.timetree-weeklist>li>a:hover,
+.timetree-weeklist>li.active>a {
+  color: #62a8ea;
+}
+.timetree-weeklist>li>a .arrow-s,
+.timetree-weeklist>li>a .arrow-b {
+  content: "";
+  height: 0;
+  width: 0;
+  position: absolute;
+  top: 14px;
+  left: -6px;
+  border-top: 6px solid rgba(0,0,0,0);
+  border-bottom: 6px solid rgba(0,0,0,0);
+  border-right: 6px solid #73b7e4;
+  display: none;
+}
+.timetree-weeklist>li.active>a .arrow-s,
+.timetree-weeklist>li.active>a .arrow-b {
+  display: block;
+}
+
+.timetree-weeklist {
+  padding: 0;
+  margin: 0;
+  display: none;
+  list-style: none;
+  border-left: 1px solid #d0d3de;
+  & > li {
+    position: relative;
+    & > a {
+      height: 42px;
+      line-height: 40px;
+      display: block;
+      margin: 0 7px 0 16px;
+      text-align: center;
+      position: relative;
+      top: -21px;
+      color: #666;
+      text-decoration: none;
+      border: 1px solid rgba(0,0,0,0);
+      span {
+        margin: 0 5px;
+      }
+      .arrow-b {
+        left: -5px;
+        top: 15px;
+        border-width: 5px;
+        border-right-color: #fff;
+      }
+    }
+    &.active {
+      & > a {
+        background-color: #fff;
+        border-color: #80c1ed;
+        border-radius: 3px;
+      }
+    }
+  }
+  .time-circle {
+    top: -6px;
+    left: -6px;
+  }
+}
+

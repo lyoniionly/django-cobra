@@ -32,6 +32,11 @@
 
 {% block sidebar %}
   <ul class="nav nav-list">
+    <li class="{% block work_bench_nav %}{% endblock %}">
+      <a href="#">
+        {% trans "Work Bench" %}
+      </a>
+    </li>
     <li class="{% block org_teams_nav %}{% endblock %}">
       <a href="{% url 'organization:home' organization.slug %}">
         {% trans "Projects" %}
@@ -40,6 +45,16 @@
     <li class="{% block org_daily_report_nav %}{% endblock %}">
       <a href="{% url 'organization:workreport:daily-member' organization.slug request.user.username %}">
         {% trans "Daily Report" %}
+      </a>
+    </li>
+    <li class="{% block org_summary_report_nav %}{% endblock %}">
+      <a href="{% url 'organization:summary:summary-member' organization.slug request.user.username %}">
+        {% trans "Summary" %}
+      </a>
+    </li>
+    <li class="{% block org_plan_nav %}{% endblock %}">
+      <a href="#">
+        {% trans "Plan" %}
       </a>
     </li>
     {% if ACCESS.org_read %}
@@ -77,7 +92,7 @@
   <section class="body maskable">
     {% if request.user|needs_access_group_migration:organization %}
       <div class="alert alert-block alert-info">
-        <p>You have access groups that need to be migrated into the new organization structure. <a href="{% comment %}{% url 'sentry-organization-access-group-migration' organization.slug %}{% endcomment %}">Get Started</a></p>
+        <p>You have access groups that need to be migrated into the new organization structure. <a href="{% comment %}{% url 'organization-access-group-migration' organization.slug %}{% endcomment %}">Get Started</a></p>
       </div>
     {% endif %}
     {% block inner %}{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "layouts/organization.html" %}
+{% load i18n helper_tags %}
+
+{% block body_class %}summary{% endblock %}
+
+{% block inner %}
+  <div class="reports-panel" id="yearPanel">
+    <div class="row">
+      <div class="col-sm-3">
+        <div id="reports-left" class="reports-left p-15"></div>
+      </div>
+      <div class="col-sm-9">
+        <div id="reports-right" class="reports-right p-15"></div>
+      </div>
+    </div>
+
+  </div>
+
+{% endblock %}
+
+{% block onbodyload %}
+  {{ block.super }}
+
+  new app.SummaryPage({
+    'userId': '4524880285524164148',
+    'year': 2015,
+    'type': 1,
+    'serialNumber': 1
+  }).render();
+{% endblock %}

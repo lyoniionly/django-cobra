@@ -25,6 +25,7 @@ class OrganizationApplication(Application):
     project_app = get_class('organization.project.app', 'application')
 
     workreport_app = get_class('organization.workreport.app', 'application')
+    summary_app = get_class('organization.summary.app', 'application')
 
     def get_urls(self):
         urls = [
@@ -53,6 +54,7 @@ class OrganizationApplication(Application):
 
             url(r'^(?P<organization_slug>[\w_-]+)/project/', include(self.project_app.urls)),
             url(r'^(?P<organization_slug>[\w_-]+)/workreport/', include(self.workreport_app.urls)),
+            url(r'^(?P<organization_slug>[\w_-]+)/summary/', include(self.summary_app.urls)),
 
             url(r'^my/list/$', login_required(self.organization_my_list_view.as_view()),
                 name='my-list'),

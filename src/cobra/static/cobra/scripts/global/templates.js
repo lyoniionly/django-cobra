@@ -110,6 +110,55 @@
             '</div>' +
           '</div>' +
         '</div>' +
+      '</div>',
+    time_line: '' +
+      '<div class="reports-selectyear text-center">' +
+        '<div class="dropdown dropdown-menu-toggle">' +
+          '<a class="dropdown-toggle" data-toggle="dropdown">' +
+            '<span id="curYear">2015</span><b class="caret"></b>' +
+          '</a>' +
+          '<ul class="dropdown-menu border-dropdown">' +
+            '<li><a>2013</a></li>' +
+            '<li><a>2014</a></li>' +
+            '<li><a>2015</a></li>' +
+          '</ul>' +
+        '</div>' +
+      '</div>' +
+      '<div class="js_reportleft_scroll scrollwrapper" marginbottom="24" id="timeline">' +
+        '<div class="reports-timetree"></div>' +
+      '</div>' +
+      '<div id="month" class="hide">' +
+        '<div class="timetree-month">' +
+          '<div class="timetree-head month">' +
+            '<span class="j_timetree_spread time-text"><strong>1</strong>月</span>' +
+            '<span class="j_timetree_spread"><em class="time-circle"></em></span>' +
+          '</div>' +
+          '<ul class="timetree-weeklist"></ul>' +
+        '</div>' +
+      '</div>' +
+      '<div id="week" class="hide">' +
+        '<li class="j_week">' +
+          '<a class="router" href="">第<span></span>周<em class="arrow-s"></em><em class="arrow-b"></em></a>' +
+          '<em class="time-circle"></em>' +
+        '</li>' +
+      '</div>' +
+      '<div id="season" class="hide">' +
+        '<div class="timetree-head season">' +
+          '<span class="time-text"></span>' +
+          '<em class="time-circle"></em>' +
+        '</div>' +
+      '</div>' +
+      '<div id="halfyear" class="hide">' +
+        '<div class="timetree-head halfyear">' +
+          '<span class="time-text">年中</span>' +
+          '<em class="time-circle"></em>' +
+        '</div>' +
+      '</div>' +
+      '<div id="endyear" class="hide">' +
+        '<div class="timetree-head endyear">' +
+          '<span class="time-text"></span>' +
+          '<em class="time-circle"></em>' +
+        '</div>' +
       '</div>'
   };
 }(app));

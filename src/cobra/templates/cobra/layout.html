@@ -119,6 +119,7 @@
     <script type="text/javascript" src="{% static "cobra/scripts/lib/autosize.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/underscore.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/backbone.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/sugar.min.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/Chart.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/Chart.HorizontalBar.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/select2/select2.js" %}"></script>
@@ -175,22 +176,46 @@
       fade_duration: {{ COBRA_CONFIG.auto_fade_alerts.fade_duration|default:"1500" }},
       types: {{ COBRA_CONFIG.auto_fade_alerts.types|default:"[]"|safe }}
     };
+    app.config.noSubordinates = true;
+    app.config.currentUser = {
+      activeDate: 1048802869000,
+      id: 12
+    };
     {% if project %}
       app.config.projectId = {{ project.slug|to_json|safe }};
       app.config.teamId = {{ project.team.slug|to_json|safe }};
       app.config.organizationId = {{ project.organization.slug|to_json|safe }};
+      app.config.organization = {
+        nowTime: 1209113529826,
+        currentUser: {
+          activeDate: 1048802869000
+        }
+      };
     {% elif team %}
       app.config.projectId = null;
       app.config.teamId = {{ team.slug|to_json|safe }};
       app.config.organizationId = {{ team.organization.slug|to_json|safe }};
+      app.config.organization = {
+        nowTime: 1209113529826,
+        currentUser: {
+          activeDate: 1048802869000
+        }
+      };
     {% elif organization %}
       app.config.projectId = null;
       app.config.teamId = null;
       app.config.organizationId = {{ organization.slug|to_json|safe }};
+      app.config.organization = {
+        nowTime: 1209113529826,
+        currentUser: {
+          activeDate: 1048802869000
+        }
+      };
     {% else %}
       app.config.projectId = null;
       app.config.teamId = null;
       app.config.organizationId = null;
+      app.config.organization = null;
     {% endif %}
   </script>
 {% endblock %}

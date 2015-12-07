@@ -24,6 +24,8 @@
 
       this.options = $.extend({}, this.defaults, this.options, data);
 
+      this.el = "#mainContainer";
+
       this.views = {};
       this.initializeAjaxTabs();
     },
@@ -89,6 +91,68 @@
       var view = this.views[id];
       view.options.pollUrl = uri;
       return view;
+    },
+
+    render: function () {
+      console.error("you need to rewrite the method : render")
+    },
+    renderSubview: function () {
+      console.error("you need to rewrite the method : renderSubview")
+    },
+    _render: function (d) {
+      $(".modal-backdrop,.modal").remove();
+      d && ($(d).parents("aside.aside").find(".active").removeClass("active"), $(d).addClass("active"), $("body").find(".aside-nav").data("nav") && $(".aside-nav>li>ul").find(".active").parents(".sub-nav").show().prev().addClass("on"), $("body").trigger("sideNav"));
+      this.mainView.render();
+    },
+    _renderSubview: function () {
+      var d = this;
+      if (this.mainView.subView = this.subView) {
+        this.subView.on("all", function (c, b) {d.trigger(c, b)});
+        this.subView.render();
+      }
+    },
+    initLayout: function (d, c) {
+      this.pageActive = 'tas';
+      $(this.el);
+      $("body").trigger("slideClose");
+      var b = false, a = "j_modnav-" + this.pageActive;
+      $("#navigation .j_nav_ul li").removeClass("active");
+      for (var e = $("#navigation .j_nav_ul .j_baseautolis li"), h = 0, g = e.length; h < g; h++)
+        if ($(e[h]).find("a").hasClass(a)) {
+          b = true;
+          break;
+        }
+      b ? ($("#navigation").find(".j_modnav-" + this.pageActive).parent().addClass("active"), $("#navigation .j_activeli").empty()) : (b = $(".j_pageActive").find(".j_modnav-" + this.pageActive).clone(), b.find("span").eq(1).remove(), $("#navigation .j_activeli").addClass("active").html(b || ""));
+      null == this.pageActive ? $("#navigation .j_activeli,#navigation .j_homeli").removeClass("active") : "portal" == this.pageActive ? ($("#navigation .j_activeli").removeClass("active"), $("#navigation .j_homeli").addClass("active")) : ($("#navigation .j_activeli").addClass("active"), $("#navigation .j_homeli").removeClass("active"));
+      this.browserTit();
+      this.template && (
+        $("#mainContainer").html(_.template(this.template)(d)),
+        /*TEAMS.blogUser*/'' && c && c(),
+        app.config.noSubordinates && $("#mainContainer").find(".j_subordinates,.j_subordinate").remove(),
+        null != this.userId && this.userId != app.config.currentUser.id && $("#mainContainer").find(".aside-nav>li").not(":first").remove()
+      )
+    },
+    browserTit: function () {
+      var d, c = $(".j_pageActive").find(".j_modnav-" + this.pageActive + " span:eq(0)").text() || "cobra";
+      oldbt = document.title;
+      d = oldbt.slice(oldbt.indexOf(" - "));
+      c && (document.title = "portal" == this.pageActive || null == this.pageActive ? "cobra" + d : c + d);
+      /*if (this.isPrintPage) switch (this.pageKey) {
+        case "flow":
+          document.title = "w" + d;
+          break;
+        case "task":
+          document.title = "t" + d;
+          break;
+        case "workreport":
+          document.title = "w" + d
+      }*/
+    },
+    remove: function () {
+      this.off();
+      this.undelegateEvents();
+      this.subView && (this.subView.off(), this.subView.remove(), this.subView = null);
+      this.mainView && (this.mainView.off(), this.mainView.remove(), this.mainView = null)
     }
 
   });
@@ -1441,12 +1505,83 @@
               400)
             })
           })
-
-
-      
     }
+  });
 
-    
+  app.SummaryPage = BasePage.extend({
+    /*initialize: function (data) {
+      BasePage.prototype.initialize.apply(this, arguments);
+      this.timelineView = new app.TimelineView({
+          userId: this.userId,
+          year: this.year,
+          type: this.type,
+          serialNumber: this.serialNumber,
+          container: "#reports-left"
+      });
+      this.render();
+    },
+
+    render: function() {
+      this.timelineView.render();
+    }*/
+
+    initialize: function(c) {
+        this.userId = c.userId;
+        this.year = c.year;
+        this.type = c.type;
+        this.serialNumber = c.serialNumber;
+        this.editable = c.editable;
+        this.pageKey = "workreportpage";
+        this.template = "workreport.workreportpage";
+        this.pageActive = "workreport";
+        this.mainView && (this.year = this.year ? this.year : $(".reports-panel").data("year"), this.type = this.type ? this.type : $(".reports-panel").data("type"), this.serialNumber = this.serialNumber ? this.serialNumber : $(".reports-panel").data("serialNumber"), this.mainView.update(this.userId, this.year, this.type, this.serialNumber, this.editable))
+    },
+    delegateEvents: function() {
+        this.on("synTimeLine",
+            function(c) {
+                this.mainView.timelineView.genTimeLineByYear(c.year, c.week, c.month)
+            });
+        this.on("unreadCount",
+            function() {
+                this.mainView.getUnreadCount()
+            })
+    },
+    render: function() {
+        /*this.initLayout({
+            flag: !1
+        });*/
+        $(".aside").find("li.j_mine").addClass("active");
+        $(".goto-top").remove();
+        this.mainView = new app.views.WorkReportView({
+            userId: this.userId,
+            year: this.year,
+            type: this.type,
+            serialNumber: this.serialNumber,
+            editable: this.editable
+        });
+        this._render();
+        this.subView = new app.views.WorkReportContentView({
+            userId: this.userId,
+            year: this.year,
+            type: this.type,
+            serialNumber: this.serialNumber,
+            editable: this.editable,
+            container: "#reports-right"
+        });
+        this._renderSubview()
+    },
+    renderSubview: function() {
+        this.mainView && (this.year = this.year ? this.year : $(".reports-panel").data("year"), this.type = this.type ? this.type : $(".reports-panel").data("type"), this.serialNumber = this.serialNumber ? this.serialNumber : $(".reports-panel").data("serialNumber"), this.mainView.update(this.userId, this.year, this.type, this.serialNumber, this.editable));
+        this.subView = new d({
+            userId: this.userId,
+            year: this.year,
+            type: this.type,
+            serialNumber: this.serialNumber,
+            editable: this.editable,
+            container: "#reports-right"
+        });
+        this._renderSubview()
+    }
   });
 
   Backbone.sync = function (method, model, success, error) {
