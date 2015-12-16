@@ -48,7 +48,7 @@
       </a>
     </li>
     <li class="{% block org_summary_report_nav %}{% endblock %}">
-      <a href="{% url 'organization:summary:summary-member' organization.slug request.user.username %}">
+      <a href="{% url 'organization:summary:summary-member' organization.slug request.user.username %}#workreport">
         {% trans "Summary" %}
       </a>
     </li>

@@ -23,7 +23,8 @@
           this.page = {
               pageNo: 1,
               pageSize: 10
-          }
+          };
+        this.baseUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/summary/ajax/';
       },
       loadDepartment: function(f) {
           $.ajax({
@@ -36,9 +37,10 @@
           })
       },
       queryWorkReport: function(f, d) {
+        var url = this.baseUrl + 'view.json';
           $.ajax({
-              type: "post",
-              url: "/workreport/view.json",
+              type: "get",
+              url: url,
               dataType: "json",
               data: f,
               success: function(c) {

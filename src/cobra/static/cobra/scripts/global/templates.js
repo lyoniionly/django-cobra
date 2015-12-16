@@ -159,6 +159,84 @@
           '<span class="time-text"></span>' +
           '<em class="time-circle"></em>' +
         '</div>' +
+      '</div>',
+    workreport_reportcontent: '' +
+      '<div class="reports-head">' +
+        '<span class="reports-caption" id="title"> </span>' +
+        '<span id="weekDay" class="ml-5"></span>' +
+        '<span id="createTime" class="time"></span>' +
+        '<span>' +
+          '<a title="打印" id="wr-print" data-toggle="tooltip" data-placement="top" class="mh-5 fs-14 hide">' +
+            '<i class="icon-print"></i>' +
+          '</a>' +
+        '</span>' +
+        '<span>' +
+          '<a title="导出" data-toggle="tooltip" data-placement="top" id="wr-export" class="fs-14 hide">' +
+            '<i class="icon-file-word"></i>' +
+          '</a>' +
+        '</span>' +
+
+        '<div class="btn-group pull-right hide" id="switch">' +
+          '<a class="btn router " id="prev"></a>' +
+          '<a class="btn router" id="current"></a>' +
+          '<a class="btn router" id="next"></a>' +
+        '</div>' +
+      '</div>' +
+      '<div id="workreportcontent" class="scrollwrapper" marginbottom="20">' +
+        '<div class="loading_large hide"></div>' +
+        '<div>' +
+          '<div class="reports-body">' +
+            '<div class="reports-input">' +
+              '<div class="reports-input-tit">' +
+                '<i class="graph graph-task"></i>' +
+                '<span id="contentTitle">完成工作</span>' +
+                '<span class="pull-right">' +
+                  '<a class="entitybox-toggle"  data-module="weeklyblog" id="weeklyblog">' +
+                    '<strong id="dayReport"></strong>' +
+                  '</a>' +
+                '</span>' +
+              '</div>' +
+              '<textarea class="form-control" placeholder="此处填写工作成效..." id="effect-content"></textarea>' +
+            '</div>' +
+            '<div class="reports-input">' +
+              '<div class="reports-input-tit">' +
+                '<i class="graph graph-idea"></i>总结心得' +
+              '</div>' +
+              '<textarea class="form-control" placeholder="此处填写总结心得..." id="experience-summary"></textarea>' +
+            '</div>' +
+            '<div class="reports-input">' +
+              '<div class="reports-input-tit">' +
+                '<i class="graph graph-plan"></i>' +
+                '<span id="planTitle">下周计划</span>' +
+              '</div>' +
+              '<textarea class="form-control" placeholder="此处填写工作计划..." id="work-plan"></textarea>' +
+            '</div>' +
+            '<div class="report-moreinfo mt-20">' +
+              '<div class="detail-block entity-info nomg">' +
+                '<div id="report-share" class="control-group hide" icon="#i-share"></div>' +
+                '<div id="report-attachment" class="control-group"></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div id="extend-panel"></div>' +
+          '<div id="blog-panel" class="reports-input hide">' +
+            '<h5>本周工作日报</h5>' +
+            '<div id="week-blog"></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>',
+    component_attachment: '' +
+      '<div class="control-label">' +
+        '<i class="graph graph-16-attach"></i>附　　件:' +
+      '</div>' +
+      '<div class="controls">' +
+        '<div id="upload-wrap" class="upload-widget-wrap upload-btn-wrap acl-hide">' +
+          '<a id="pickFiles" class="btn btn-xs btn-info">' +
+            '<i class="icon-upload-alt"></i> 上传附件' +
+          '</a>' +
+          '<span class="upload-tip">点击左侧上传按钮选择文件或将文件拖拽到此</span>' +
+        '</div>' +
+        '<div class="entity-container" data-url="/base/upload/{id}.json"></div>' +
       '</div>'
   };
 }(app));

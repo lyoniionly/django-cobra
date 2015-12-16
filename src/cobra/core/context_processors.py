@@ -6,6 +6,8 @@ from django.utils.six.moves.urllib import parse
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
+from cobra.apps.accounts.utils import get_user_info
+
 
 def strip_language_code(request):
     """
@@ -45,7 +47,7 @@ def metadata(request):
     """
     Add some generally useful metadata to the template context
     """
-    return {'display_version': getattr(settings, 'DISPLAY_VERSION', False),
+    meta = {'display_version': getattr(settings, 'DISPLAY_VERSION', False),
             'version': getattr(settings, 'VERSION', 'N/A'),
             'system_name': settings.COBRA_SYSTEM_NAME,
             'system_tagline': settings.COBRA_SYSTEM_TAGLINE,
@@ -57,3 +59,7 @@ def metadata(request):
             'language_neutral_url_path': strip_language_code(request),
             'google_analytics_id': getattr(settings,
                                            'GOOGLE_ANALYTICS_ID', None)}
+    if request.user and request.user.pk > 0:
+        meta.update({'currentUser': get_user_info(request.user.pk)})
+
+    return meta

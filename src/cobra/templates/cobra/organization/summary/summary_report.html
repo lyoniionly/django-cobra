@@ -21,10 +21,15 @@
 {% block onbodyload %}
   {{ block.super }}
 
-  new app.SummaryPage({
+  {% comment %}ROUTER.navigate('/workreport', {
+    trigger: true
+  });{% endcomment %}
+
+
+  {% comment %}new app.SummaryPage({
     'userId': '4524880285524164148',
     'year': 2015,
     'type': 1,
     'serialNumber': 1
-  }).render();
+  }).render();{% endcomment %}
 {% endblock %}

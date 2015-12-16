@@ -3,6 +3,7 @@ import urllib
 from django.conf import settings
 
 from cobra.core.compat import md5_constructor
+from cobra.core.dates import epoch
 
 try:
     from django.contrib.auth import get_user_model
@@ -34,6 +35,9 @@ def get_user(username):
         return get_user_model().objects.get_by_natural_key(username)
     else:
         return get_user_model().objects.get(username=username)
+
+def get_user_by_pk(pk):
+    return get_user_model().objects.get(pk=pk)
 
 def get_default_avatar_url():
     base_url = getattr(settings, 'STATIC_URL', None)
@@ -98,3 +102,12 @@ def get_gravatar(email, size=80, default='identicon'):
     gravatar_url += urllib.urlencode({'s': str(size),
                                       'd': default})
     return gravatar_url
+
+
+def get_user_info(user_pk):
+    user = get_user_model().objects.get(pk=user_pk)
+    info = {
+        'activeDate': epoch(user.date_joined, msec=True),
+        'id': user.pk
+    }
+    return info

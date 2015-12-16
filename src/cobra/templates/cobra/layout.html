@@ -148,11 +148,14 @@
     <script type="text/javascript" src="{% static "cobra/scripts/global/collections.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/charts.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/waveline.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/components.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/views.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/router.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/app.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/communication.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/messages.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/copy.js" %}"></script>
+
     <!-- Legacy -->
     <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.core.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/legacy/cobra.charts.js" %}"></script>
@@ -177,39 +180,27 @@
       types: {{ COBRA_CONFIG.auto_fade_alerts.types|default:"[]"|safe }}
     };
     app.config.noSubordinates = true;
-    app.config.currentUser = {
-      activeDate: 1048802869000,
-      id: 12
-    };
+    app.config.currentUser = {{ currentUser|to_json|safe }};
     {% if project %}
       app.config.projectId = {{ project.slug|to_json|safe }};
       app.config.teamId = {{ project.team.slug|to_json|safe }};
       app.config.organizationId = {{ project.organization.slug|to_json|safe }};
       app.config.organization = {
-        nowTime: 1209113529826,
-        currentUser: {
-          activeDate: 1048802869000
-        }
+        nowTime: 1450062758121
       };
     {% elif team %}
       app.config.projectId = null;
       app.config.teamId = {{ team.slug|to_json|safe }};
       app.config.organizationId = {{ team.organization.slug|to_json|safe }};
       app.config.organization = {
-        nowTime: 1209113529826,
-        currentUser: {
-          activeDate: 1048802869000
-        }
+        nowTime: 1450062758121
       };
     {% elif organization %}
       app.config.projectId = null;
       app.config.teamId = null;
       app.config.organizationId = {{ organization.slug|to_json|safe }};
       app.config.organization = {
-        nowTime: 1209113529826,
-        currentUser: {
-          activeDate: 1048802869000
-        }
+        nowTime: 1450062758121
       };
     {% else %}
       app.config.projectId = null;
@@ -218,6 +209,7 @@
       app.config.organization = null;
     {% endif %}
   </script>
+  <script type="text/javascript" src="{% static "cobra/scripts/global/main.js" %}"></script>
 {% endblock %}
 
 {% block extrascripts %}

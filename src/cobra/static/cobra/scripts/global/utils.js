@@ -8,6 +8,60 @@
     [1000, 'k']
   ];
 
+  var scrollbar = {
+    setLayout: function(a, b, c) {
+      if (0 == a.indexOf("#print")) $(a).removeClass("scrollwrapper");
+      else {
+        var d = $(a);
+        if (d) {
+          var f = d.attr("height"),
+          g = d.attr("auto-scroll");
+          if (!f) var f = d.attr("marginbottom") || 0,
+          q = d.offset().top,
+          f = $(window).height() - q - f;
+          if (null != d.parents("#entitybox").get(0)) var m = d.parents("#entitybox").find(".modal-content"),
+          q = m.height(),
+          m = m.offset().top,
+          q = $(window).height() - q - m,
+          f = f - q;
+          q = d.attr("theme") ? d.attr("theme") : "darkblue";
+          if (!d.hasClass("mCustomScrollbar")) {
+            m = {
+              onScroll: function() {
+                $("body .goto-top").removeClass("hide")
+              },
+              onTotalScrollBack: function() {
+                $("body .goto-top").addClass("hide")
+              }
+            };
+            if (b) {
+              $.isArray(b) && (c = b);
+              c && !c[0].gotoTopButton && (m.onScroll = null, m.onTotalScrollBack = null);
+              var s = $.extend(m, b)
+            }
+            b = {
+              theme: q,
+              callbacks: s ? s: m
+            };
+            if (c) var u = $.extend(b, c[0]);
+            c && "x" == c[0].axis && (g = "yes");
+            f && "yes" != g && d.css("height", f);
+            d.mCustomScrollbar(u ? u: b);
+            c && !c[0].bottomBlank && null != d.parents("#entitybox").get(0) && d.children().children(".mCSB_container").addClass("pb-0");
+            "#chat-container" == a && (d.mCustomScrollbar("update"), d.mCustomScrollbar("scrollTo", "bottom"));
+            setTimeout(function() {
+              $("body .goto-top").addClass("hide")
+            },
+            200)
+          }
+        }
+      }
+    },
+    destroy: function(a) {
+      $(a).mCustomScrollbar("destroy")
+    }
+  };
+
   app.utils = {
     getQueryParams: function () {
 
@@ -171,6 +225,10 @@
           return app.config.colors[name]
       }
       return null;
+    },
+
+    layout: function(a, b, d) {
+//      scrollbar.setLayout(a, b, d)
     }
 
   };
