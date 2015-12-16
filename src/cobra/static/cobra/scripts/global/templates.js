@@ -237,6 +237,52 @@
           '<span class="upload-tip">点击左侧上传按钮选择文件或将文件拖拽到此</span>' +
         '</div>' +
         '<div class="entity-container" data-url="/base/upload/{id}.json"></div>' +
-      '</div>'
+      '</div>',
+    share_simpleshare: '' +
+      '<% if(panel=="participants"){%>' +
+        '<div id="participants-component">' +
+          '<div class="control-label">' +
+            '<i class="graph graph-16-mans"></i>参与人员:' +
+          '</div>' +
+          '<div class="controls">' +
+            '<div id="participants" class="entity-container" data-url="/share/{id}.json"></div>' +
+            '<span class="typeahead-wrapper hide">' +
+              '<input type="text" id="typeahead-participants" class="control-input typeahead search" data-entity="employee" data-multi="true" placeholder="输入姓名"/>' +
+              '<a class="btn typeahead-search"><i class="icon-search"></i></a>' +
+            '</span>' +
+            '<span id="editParticipant" class="control-btn entity-item-add acl-hide j_add_participants" title="添加参与人，可添加多个">' +
+              '<i title="添加" data-placement="top" data-toggle="tooltip" class="icon-plus-thin"></i>' +
+            '</span>' +
+          '</div>' +
+        '</div>' +
+      '<%}%>' +
+      '<% if(panel=="share"){%>' +
+        '<div id="share-component">' +
+          '<div class="control-label"><i class="graph graph-16-share"></i>共　　享:</div>' +
+          '<div class="controls">' +
+          '<div class="entity-simpleshare">' +
+            '<div id="shareentrys" class="entity-container" data-url="/share/{id}.json"></div>' +
+            '<div class="typeahead-wrapper hide">' +
+              '<select id="share-select" class="form-control control-input hide">' +
+                '<option value="user">指定用户</option>' +
+                '<option value="department">部门内共享</option>' +
+                '<option value="secLevel">所有人</option>' +
+              '</select>' +
+              '<div class="sharetype-dept hide">' +
+                '<input type="text" class="control-input typeahead search" data-entity="department" placeholder="输入部门">' +
+                '<a class="btn typeahead-search"><i class="icon-search"></i></a>' +
+              '</div>' +
+              '<div class="sharetype-user">' +
+                '<input type="text" class="control-input typeahead search" data-entity="employee" data-multi="true" placeholder="输入姓名">' +
+                '<a class="btn typeahead-search"><i class="icon-search"></i></a>' +
+              '</div>' +
+            '</div>' +
+            '<span id="editShare" class="control-btn entity-item-add j_add_shareentrys">' +
+              '<i title="添加" data-placement="top" data-toggle="tooltip" class="icon-plus-thin"></i>' +
+            '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<%}%>'
   };
 }(app));

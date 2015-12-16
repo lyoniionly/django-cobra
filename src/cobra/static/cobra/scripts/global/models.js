@@ -144,4 +144,109 @@
       }
   });
 
+  app.models.Share = Backbone.Model.extend({
+    id: 1,
+    entityId: 1,
+    entityIds: "",
+    sids: "",
+    shareType: "sharer",
+    original: !1,
+    initialize: function(f) {
+      this.entityId = f.entityId;
+      this.entityIds = f.entityIds;
+      this.serverPath = f.serverPath ? f.serverPath: "";
+      this._module = f.module
+    },
+    save: function(f) {
+      $.ajax({
+        type: "post",
+        url: this.serverPath + "/share/editUser.json",
+        dataType: "json",
+        data: {
+          sids: this.sids,
+          entityIds: this.entityIds,
+          entryType: this.entryType,
+          module: this._module,
+          shareType: this.shareType
+        },
+        success: function(d) {
+          f && f(d)
+        }
+      })
+    },
+    saveAll: function(f) {
+      $.ajax({
+        type: "post",
+        url: this.serverPath + "/share/addUser.json",
+        dataType: "json",
+        data: {
+          sids: this.sids,
+          entityIds: this.entityIds,
+          entryType: this.entryType,
+          module: this._module,
+          shareType: this.shareType
+        },
+        success: function(d) {
+          f && f(d)
+        }
+      })
+    },
+    saveAllSearch: function(f, d) {
+      $.ajax({
+        contentType: "application/json;charset\x3dUTF-8",
+        type: "post",
+        url: this.serverPath + "/share/addUser.json",
+        dataType: "json",
+        data: f,
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    saveShareAll: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: this.serverPath + "/share/shareAll.json",
+        dataType: "json",
+        data: f,
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    getProcess: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: this.serverPath + "/share/getBatchShareProcess.json",
+        dataType: "json",
+        data: f,
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    query: function(f) {
+      $.ajax({
+        type: "get",
+        url: this.serverPath + "/share/" + this.entityId + ".json",
+        dataType: "json",
+        success: function(d) {
+          f && f(d)
+        }
+      })
+    },
+    querySuperior: function(f, d) {
+      $.ajax({
+        type: "get",
+        url: "/users/superiors.json",
+        data: {
+          userIds: f.join(",")
+        },
+        dataType: "json",
+        success: function(c) {
+          d(c)
+        }
+      })
+    }
+  });
 }(app, Backbone));
