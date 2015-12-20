@@ -522,516 +522,639 @@
   });
 
   app.WorkReportView = Backbone.View.extend({
-      initialize: function(b) {
-          this.userId = b.userId;
-          this.year = b.year;
-          this.type = b.type;
-          this.serialNumber = b.serialNumber;
-          this.model = new app.models.WorkReportModel;
-          /*this.userSliderView = new f({
-              userId: TEAMS.currentUser.id,
-              module: "workreport",
-              dataType: "subordinate"
-          });*/
-          this.timelineView = new app.components.Timeline({
-              userId: this.userId,
-              year: this.year,
-              type: this.type,
-              serialNumber: this.serialNumber,
-              container: "#reports-left"
-          })
-      },
-      render: function() {
-          true == app.config.noSubordinates && $("#member-layer").last().addClass("hide");
-          this.timelineView.render();
-//          this.userSliderView.render();
-//          this.getUnreadCount()
-      },
-      getUnreadCount: function() {
-          this.model.getUnreadCount(function(b) {
-              0 < b.unReadCount && ($(".j_unreadCount").addClass("badge"), $(".j_unreadCount").text(b.unReadCount));
-              0 < b.commentMeCount && ($(".j_commentCount").addClass("badge"), $(".j_commentCount").text(b.commentMeCount));
-              0 < b.replayMeCount && ($(".j_replayCount").addClass("badge"), $(".j_replayCount").text(b.replayMeCount))
-          })
-      },
-      update: function(b, a, c, d, f) {
-          this.userId = b;
-          this.year = a;
-          this.type = c;
-          this.serialNumber = d;
-          this.editable = f;
-          this.timelineView && this.timelineView.update(this.userId, this.year, this.type, this.serialNumber, this.editable)
-      },
-      remove: function() {}
+    initialize: function(data) {
+      this.userId = data.userId;
+      this.year = data.year;
+      this.type = data.type;
+      this.serialNumber = data.serialNumber;
+      this.model = new app.models.WorkReportModel;
+      /*this.userSliderView = new app.components.Userslider({
+          userId: TEAMS.currentUser.id,
+          module: "workreport",
+          dataType: "subordinate"
+      });*/
+      this.timelineView = new app.components.Timeline({
+        userId: this.userId,
+        year: this.year,
+        type: this.type,
+        serialNumber: this.serialNumber,
+        container: "#reports-left"
+      })
+    },
+    render: function() {
+      if(app.config.noSubordinates) {
+        $("#member-layer").last().addClass("hide");
+      }
+      this.timelineView.render();
+//    this.userSliderView.render();
+//    this.getUnreadCount()
+    },
+    getUnreadCount: function() {
+      this.model.getUnreadCount(function(res) {
+        if(0 < res.unReadCount) {
+          $(".j_unreadCount").addClass("badge");
+          $(".j_unreadCount").text(res.unReadCount);
+        }
+        if(0 < res.commentMeCount) {
+          $(".j_commentCount").addClass("badge");
+          $(".j_commentCount").text(res.commentMeCount);
+        }
+        if(0 < res.replayMeCount) {
+          $(".j_replayCount").addClass("badge");
+          $(".j_replayCount").text(res.replayMeCount);
+        }
+      })
+    },
+    update: function(userId, year, type, serialNumber, editable) {
+      this.userId = userId;
+      this.year = year;
+      this.type = type;
+      this.serialNumber = serialNumber;
+      this.editable = editable;
+      if(this.timelineView) {
+        this.timelineView.update(this.userId, this.year, this.type, this.serialNumber, this.editable);
+      }
+    },
+    remove: function() {}
   });
 
   app.WorkReportContentView = Backbone.View.extend({
-      initialize: function(a) {
-          this.userId = a.userId;
-          this.year = a.year;
-          this.type = a.type;
-          this.serialNumber = a.serialNumber;
-          this.editable = a.editable;
-          this.reportType = a.reportType;
-          this.id = a.id;
-          this.hideBlog = a.hideBlog;
-          this.el = (this.container = a.container) || "#reports-right";
-          this.extendView = null;
-          this.unreadFlag = a.unreadFlag;
-          this.isStat = a.isStat;
-          this.model = new app.models.WorkReportModel;
-          this.isDisable() && (this.editable = false, this.flag = true);
-          "#print" == this.container && $("#print").addClass("fs-m print-report");
-        if (this.editable) {
-          $(this.el).html(_.template(app.templates.workreport_reportcontent)());
-        } else if (this.isStat) {
-          $(this.el).html(_.template("workreport.readonlyreportcontentstat")());
-        } else {
-          $(this.el).html(_.template("workreport.readonlyreportcontent")())
+    initialize: function(a) {
+      this.userId = a.userId;
+      this.year = a.year;
+      this.type = a.type;
+      this.serialNumber = a.serialNumber;
+      this.editable = a.editable;
+      this.reportType = a.reportType;
+      this.id = a.id;
+      this.hideBlog = a.hideBlog;
+      this.el = (this.container = a.container) || "#reports-right";
+      this.extendView = null;
+      this.unreadFlag = a.unreadFlag;
+      this.isStat = a.isStat;
+      this.model = new app.models.WorkReportModel;
+      this.isDisable() && (this.editable = false, this.flag = true);
+      if("#print" == this.container) {
+        $("#print").addClass("fs-m print-report");
+      }
+      if (this.editable) {
+        $(this.el).html(_.template(app.templates.workreport_reportcontent)());
+      } else if (this.isStat) {
+        $(this.el).html(_.template(app.templates.workreport_readonlyreportcontentstat)());
+      } else {
+        $(this.el).html(_.template(app.templates.workreport_readonlyreportcontent)())
+      }
+    },
+    delegateEvents: function() {
+      var self = this, $el = $(this.el);
+      $el.on("click.workreportcontent", "#current", function(evt) {
+        var nowTime = new Date(app.config.organization.nowTime);
+        var year = nowTime.getFullYear(),
+            week = nowTime.getISOWeek(),
+            month = nowTime.getMonth() + 1;
+        if(1 == nowTime.getISOWeek() && 12 == nowTime.getMonth() + 1) {
+          year += 1;
+          month = 1;
         }
-      },
-      delegateEvents: function() {
-          var a = this,
-              b = $(this.el);
-          b.on("click.workreportcontent", "#current", function(b) {
-                  b = new Date(app.config.organization.nowTime);
-                  var c = b.getFullYear(),
-                      d = b.getISOWeek(),
-                      e = b.getMonth() + 1;
-                  1 == b.getISOWeek() && 12 == b.getMonth() + 1 && (c += 1, e = 1);
-                  $(".reports-selectyear span").text(c);
-                  "month" == a.type ? (a.trigger("synTimeLine", {
-                      year: c,
-                      month: e
-                  }), $(".reports-panel").data("year", c).data("type", "month").data("serialNumber", e)/*, ROUTER.navigate("/workreport/" + a.userId + "/" + c + "/month/" + e, {
-                      trigger: !0
-                  })*/) : (a.trigger("synTimeLine", {
-                      year: c,
-                      week: d
-                  }), $(".reports-panel").data("year", c).data("type", "week").data("serialNumber", d)/*, ROUTER.navigate("/workreport/" + a.userId + "/" + c + "/week/" + d, {
-                      trigger: !0
-                  })*/)
-              });
-          b.on("click.workreportcontent", "#prev", function(b) {
-                  var c = new Date(app.config.organization.nowTime);
-                  b = a.year ? a.year : c.getFullYear();
-                  var d = a.serialNumber ? a.serialNumber : c.getISOWeek(),
-                      c = a.serialNumber ? a.serialNumber : c.getMonth() + 1;
-                  if ("month" == a.type) {
-                      d = c - 1;
-                      if (1 > d) {
-                          if (2013 > b - 1) {
-                              $(this).addClass("disabled");
-                              return
-                          }
-                          b--;
-                          d = 12;
-                          $(".reports-selectyear span").text(b)
-                      }
-                      a.trigger("synTimeLine", {
-                          year: b,
-                          month: d
-                      });
-                      $(".reports-panel").data("year", b).data("type", "month").data("serialNumber", d);
-                      /*ROUTER.navigate("/workreport/" + a.userId + "/" + b + "/month/" + d, {
-                          trigger: !0
-                      })*/
-                  } else {
-                      d -= 1;
-                      c = b;
-                      if (1 > d) {
-                          if (2013 > c - 1) {
-                              $(this).addClass("disabled");
-                              return
-                          }
-                          c--;
-                          d = a.getWeeksOfYear(a.getWeekDayDate(b - 1, 0, 1), b - 1);
-                          $(".reports-selectyear span").text(c)
-                      }
-                      a.trigger("synTimeLine", {
-                          year: c,
-                          week: d
-                      });
-                      $(".reports-panel").data("year", c).data("type", "week").data("serialNumber", d);
-                      /*ROUTER.navigate("/workreport/" + a.userId + "/" + c + "/week/" + d, {
-                          trigger: !0
-                      })*/
-                  }
-              });
-          b.on("click.workreportcontent", "#next", function(b) {
-                  var c = new Date(app.config.organization.nowTime);
-                  b = a.year ? a.year : c.getFullYear();
-                  var d = a.serialNumber ? a.serialNumber : c.getISOWeek(),
-                      c = a.serialNumber ? a.serialNumber : c.getMonth() + 1;
-                  if ("month" == a.type) {
-                      c = parseInt(c) + 1;
-                      d = parseInt(b);
-                      if (12 < c) {
-                          if (2015 < d + 1) {
-                              $(this).addClass("disabled");
-                              return
-                          }
-                          d++;
-                          c = 1;
-                          $(".reports-selectyear span").text(d)
-                      }
-                      a.trigger("synTimeLine", {
-                          year: d,
-                          month: c
-                      });
-                      $(".reports-panel").data("year", d).data("type", "month").data("serialNumber", c);
-                      /*ROUTER.navigate("/workreport/" + a.userId + "/" + d + "/month/" + c, {
-                          trigger: !0
-                      })*/
-                  } else {
-                      c = parseInt(d) + 1;
-                      d = parseInt(b);
-                      if (c > a.getWeeksOfYear(a.getWeekDayDate(b, 0, 1), b)) {
-                          if (2015 < d + 1) {
-                              $(this).addClass("disabled");
-                              return
-                          }
-                          d++;
-                          c = 1;
-                          $(".reports-selectyear span").text(d)
-                      }
-                      a.trigger("synTimeLine", {
-                          year: d,
-                          week: c
-                      });
-                      $(".reports-panel").data("year", d).data("type", "week").data("serialNumber", c);
-                      /*ROUTER.navigate("/workreport/" + a.userId + "/" + d + "/week/" + c, {
-                          trigger: !0
-                      })*/
-                  }
-              });
-          b.on("FileUploaded.workreportcontent", "#report-attachment", function(a, c) {
-                  var d = b.find("#effect-content");
-                  if (!d.val() || d.data("text") == d.val()) {
-                      var e = (d.data("text") ? d.data("text") + "," : "上传了附件：") + c.name;
-                      d.val(e);
-                      d.data("text", e)
-                  }
-                  d.focus()
-              });
-          b.off("click.workreportcontent", "#wr-print").on("click.workreportcontent", "#wr-print",
-              function(b) {
-                  window.open("/print/" + a.id + "/workreport")
-              })
-      },
-      delegateEditEvents: function() {
-          var a = this;
-          $(this.el).on("focusout.workreportcontent", "#effect-content,#experience-summary,#work-plan",
-              function(b) {
-                  b = $(this);
-                  if (b.val() && b.val() != $(this).data(b.attr("id"))) {
-                      var c = $(".reports-body").data("reportId"),
-                          d = {};
-                      c ? (d["workReport." + b.attr("id")] = b.val(), d["workReport.id"] = c) : (d = a.genParam(c, a.userId, a.year, a.type, a.serialNumber), d["workReport." + b.attr("id")] = b.val());
-                      a.save(d, c);
-                      $(this).data(b.attr("id"), b.val())
-                  }
-              })
-      },
-      initComponent: function(workreport) {
-        var $el = $(this.el);
-        if(workreport.id) {
-          this.extendView = new d({
-              targetId: workreport.id,
-              module: "workreport",
-              parentEl: this.el,
-              container: "#extend-panel"
-          });
-          this.extendView.render(workreport);
-          if(app.config.currentUser.id == workreport.creator.id) {
-            $el.find("#report-share").removeClass("hide");
-            this.shareView = new e({
-              entityId: workreport.id,
-              module: "workreport",
-              shareContainer: "#report-share",
-              parentEl: this.el
-            });
-            this.shareView.render(workreport.shareEntrys);
-          }
-        }
-        this.attachment = new b({
-            targetId: workreport.id,
-            module: "workreport",
-            container: "#report-attachment",
-            parentEl: this.el,
-            readonly: !this.editable
-        });
-        this.attachment.render(workreport.attachments || []);
-      },
-      render: function() {
-        var b = this;
-        var c = $(b.el);
-        if ("#print" == b.container) {
-          c.find("#workreportcontent").removeClass("scrollwrapper");
-          c.find("#switch").remove();
-        } else {
-          app.utils.layout("#workreportcontent");
-        }
-        c.find(".loading_large").show();
-        var d = b.id;
-        b.editable && b.delegateEditEvents();
-        if(b.reportType && !$(".reports-panel").data("id")){
-          $(".reports-panel").html("<div class='no-result'>没有数据</div>");
-          $("#unread").parents(".pull-right").addClass("hide");
-          $(".j_mine").siblings().removeClass("hide");
-        } else {
-          if(this.reportType && !b.id){
-            d = $(".reports-panel").data("id");
-          }
-          d = b.genParam(d, b.userId, b.year, b.type, b.serialNumber);
-          b.model.queryWorkReport(d, function(d) {
-            if (d.actionMsg && d.actionMsg.message) {
-              $(b.el).html(_.template("base.nopermission")({
-                msg: d.actionMsg,
-                module: "workreport",
-                id: b.id
-              }));
-              $(b.el).find(".scrollwrapper").trigger("resizeSroll");
-              return false;
-            }
+        $(".reports-selectyear span").text(year);
 
-            var e = d.workReport, g = d.employee, k = $(".j_mine a");
-            if(g && !b.reportType){
-              if(g.id != app.config.currentUser.id) {
-                if("female" == g.sex){
-                  k.text("她的报告")
-                } else {
-                  k.text("他的报告");
-                  k.attr("href", "/workreport/" + g.id);
-                  $(".j_mine").siblings().addClass("hide");
-                }
+        if("month" == self.type) {
+          self.trigger("synTimeLine", {
+            year: year,
+            month: month
+          });
+          $(".reports-panel").data("year", year).data("type", "month").data("serialNumber", month);
+          ROUTER.navigate("/workreport/" + self.userId + "/" + year + "/month/" + month, {
+            trigger: true
+          });
+        } else {
+          self.trigger("synTimeLine", {
+              year: year,
+              week: week
+          });
+          $(".reports-panel").data("year", year).data("type", "week").data("serialNumber", week);
+          ROUTER.navigate("/workreport/" + self.userId + "/" + year + "/week/" + week, {
+              trigger: true
+          })
+        }
+      });
+      $el.on("click.workreportcontent", "#prev", function(evt) {
+        var nowTime = new Date(app.config.organization.nowTime);
+        var year = self.year ? self.year : nowTime.getFullYear();
+        var serialNumberWeek = self.serialNumber ? self.serialNumber : nowTime.getISOWeek(),
+            serialNumberMonth = self.serialNumber ? self.serialNumber : nowTime.getMonth() + 1;
+        if ("month" == self.type) {
+          var month = serialNumberMonth - 1;
+          if (1 > month) {
+            if (2013 > year - 1) {
+              $(this).addClass("disabled");
+              return;
+            }
+            year--;
+            month = 12;
+            $(".reports-selectyear span").text(year);
+          }
+          self.trigger("synTimeLine", {
+            year: year,
+            month: month
+          });
+          $(".reports-panel").data("year", year).data("type", "month").data("serialNumber", month);
+          ROUTER.navigate("/workreport/" + self.userId + "/" + year + "/month/" + month, {
+            trigger: true
+          });
+        } else {
+          var week = serialNumberWeek - 1;
+          var realYear = year;
+          if (1 > week) {
+            if (2013 > realYear - 1) {
+              $(this).addClass("disabled");
+              return;
+            }
+            realYear--;
+            week = self.getWeeksOfYear(self.getWeekDayDate(year - 1, 0, 1), year - 1);
+            $(".reports-selectyear span").text(realYear);
+          }
+          self.trigger("synTimeLine", {
+            year: realYear,
+            week: week
+          });
+          $(".reports-panel").data("year", realYear).data("type", "week").data("serialNumber", week);
+          ROUTER.navigate("/workreport/" + self.userId + "/" + realYear + "/week/" + week, {
+            trigger: true
+          });
+        }
+      });
+      $el.on("click.workreportcontent", "#next", function(evt) {
+        var nowTime = new Date(app.config.organization.nowTime);
+        var year = self.year ? self.year : nowTime.getFullYear();
+        var serialNumberWeek = self.serialNumber ? self.serialNumber : nowTime.getISOWeek(),
+            serialNumberMonth = self.serialNumber ? self.serialNumber : nowTime.getMonth() + 1;
+        var realYear;
+        if ("month" == self.type) {
+          var realMonth = parseInt(serialNumberMonth) + 1;
+          realYear = parseInt(year);
+          if (12 < realMonth) {
+            if (2015 < realYear + 1) {
+              $(this).addClass("disabled");
+              return
+            }
+            realYear++;
+            realMonth = 1;
+            $(".reports-selectyear span").text(realYear)
+          }
+          self.trigger("synTimeLine", {
+            year: realYear,
+            month: realMonth
+          });
+          $(".reports-panel").data("year", realYear).data("type", "month").data("serialNumber", realMonth);
+          ROUTER.navigate("/workreport/" + self.userId + "/" + realYear + "/month/" + realMonth, {
+            trigger: true
+          });
+        } else {
+          var realWeek = parseInt(serialNumberWeek) + 1;
+          realYear = parseInt(year);
+          if (realWeek > self.getWeeksOfYear(self.getWeekDayDate(year, 0, 1), year)) {
+            if (2015 < realYear + 1) {
+              $(this).addClass("disabled");
+              return;
+            }
+            realYear++;
+            realWeek = 1;
+            $(".reports-selectyear span").text(realYear);
+          }
+          self.trigger("synTimeLine", {
+            year: realYear,
+            week: realWeek
+          });
+          $(".reports-panel").data("year", realYear).data("type", "week").data("serialNumber", realWeek);
+          ROUTER.navigate("/workreport/" + self.userId + "/" + realYear + "/week/" + realWeek, {
+            trigger: true
+          });
+        }
+      });
+      $el.on("FileUploaded.workreportcontent", "#report-attachment", function(e, attachment) {
+        var $content = $el.find("#effect-content");
+        if (!$content.val() || $content.data("text") == $content.val()) {
+          var content = ($content.data("text") ? $content.data("text") + "," : "上传了附件：") + attachment.name;
+          $content.val(content);
+          $content.data("text", content);
+        }
+        $content.focus();
+      });
+      $el.off("click.workreportcontent", "#wr-print").on("click.workreportcontent", "#wr-print", function(evt) {
+        window.open("/print/" + self.id + "/workreport")
+      });
+    },
+    delegateEditEvents: function() {
+      var self = this;
+      $(this.el).on("focusout.workreportcontent", "#effect-content,#experience-summary,#work-plan", function(e) {
+        var $this = $(this);
+        if ($this.val() && $this.val() != $(this).data($this.attr("id"))) {
+          var reportId = $(".reports-body").data("reportId"), report = {};
+          if(reportId) {
+            report["workReport." + $this.attr("id")] = $this.val();
+            report["workReport.id"] = reportId;
+          } else {
+            report = self.genParam(reportId, self.userId, self.year, self.type, self.serialNumber);
+            report["workReport." + $this.attr("id")] = $this.val();
+          }
+          self.save(report, reportId);
+          $(this).data($this.attr("id"), $this.val());
+        }
+      });
+    },
+    initComponent: function(workreport) {
+      /*var $el = $(this.el);
+      if(workreport.id) {
+        this.extendView = new d({
+          targetId: workreport.id,
+          module: "workreport",
+          parentEl: this.el,
+          container: "#extend-panel"
+        });
+        this.extendView.render(workreport);
+        if(app.config.currentUser.id == workreport.creator.id) {
+          $el.find("#report-share").removeClass("hide");
+          this.shareView = new e({
+            entityId: workreport.id,
+            module: "workreport",
+            shareContainer: "#report-share",
+            parentEl: this.el
+          });
+          this.shareView.render(workreport.shareEntrys);
+        }
+      }
+      this.attachment = new b({
+          targetId: workreport.id,
+          module: "workreport",
+          container: "#report-attachment",
+          parentEl: this.el,
+          readonly: !this.editable
+      });
+      this.attachment.render(workreport.attachments || []);*/
+    },
+    render: function() {
+      var self = this;
+      var $el = $(self.el);
+      if ("#print" == self.container) {
+        $el.find("#workreportcontent").removeClass("scrollwrapper");
+        $el.find("#switch").remove();
+      } else {
+        app.utils.layout("#workreportcontent");
+      }
+      $el.find(".loading_large").show();
+      var report = self.id;
+      if(self.editable) {
+        self.delegateEditEvents();
+      }
+      if(self.reportType && !$(".reports-panel").data("id")){
+        $(".reports-panel").html("<div class='no-result'>没有数据</div>");
+        $("#unread").parents(".pull-right").addClass("hide");
+        $(".j_mine").siblings().removeClass("hide");
+      } else {
+        if(this.reportType && !self.id){
+          report = $(".reports-panel").data("id");
+        }
+        report = self.genParam(report, self.userId, self.year, self.type, self.serialNumber);
+        self.model.queryWorkReport(report, function(res) {
+          if (res.actionMsg && res.actionMsg.message) {
+            $(self.el).html(_.template("base.nopermission")({
+              msg: res.actionMsg,
+              module: "workreport",
+              id: self.id
+            }));
+            $(self.el).find(".scrollwrapper").trigger("resizeSroll");
+            return false;
+          }
+          var workReport = res.workReport, employee = res.employee, $mineNav = $(".j_mine a");
+          if(employee && !self.reportType){
+            if(employee.id != app.config.currentUser.id) {
+              if("female" == employee.sex){
+                $mineNav.text("她的报告")
               } else {
-                k.text("我的报告");
-                k.attr("href", "/workreport");
-                $(".j_mine").siblings().removeClass("hide");
+                $mineNav.text("他的报告");
+                $mineNav.attr("href", "/workreport/" + employee.id);
+                $(".j_mine").siblings().addClass("hide");
               }
             } else {
-              k.text("我的报告");
-              k.attr("href", "/workreport");
+              $mineNav.text("我的报告");
+              $mineNav.attr("href", "/workreport");
               $(".j_mine").siblings().removeClass("hide");
             }
+          } else {
+            $mineNav.text("我的报告");
+            $mineNav.attr("href", "/workreport");
+            $(".j_mine").siblings().removeClass("hide");
+          }
 
-            if (e) {
-              b.id = e.id;
-              b.userId = e.creator.id;
-              g = e.creator.name ? e.creator.name : g.name;
-              if(0 == e.permission){
-                $("#reports-right").html('<div class="p-10"><div class="alert alert-warning alert-block  fade in"><h4 class="alert-heading">对不起! </h4><p>您不具有对当前对象的访问权限。</p></div>\t\t</div>');
-              }
-              b.renderHeader(e.type, e.year, e.serialNumber, g);
-              b.renderReport(e);
-              if ("comment" == b.reportType) {
-                var u = 0 < d.commentMeCount ? d.commentMeCount : "";
-                setTimeout(function() {
-                  $(".j_commentCount").html(u)
-                }, 1000)
-              }
-              "replay" == b.reportType && (u = 0 < d.replayMeCount ? d.replayMeCount : "", setTimeout(function() {
-                      $(".j_replayCount").html(u)
-                  },
-                  1E3));
-              "unread" == b.reportType && (u = 0 < d.unReadCount ? d.unReadCount : "", setTimeout(function() {
-                      $(".j_unreadCount").html(u)
-                  },
-                  1E3));
-              "#print" == b.container ? (c.find("#wr-export").remove(), c.find("#wr-print").remove(), "week" == e.type && (b.weekblog = new a({
+          if (workReport) {
+            self.id = workReport.id;
+            self.userId = workReport.creator.id;
+            employee = workReport.creator.name ? workReport.creator.name : employee.name;
+            if(0 == workReport.permission){
+              $("#reports-right").html('<div class="p-10"><div class="alert alert-warning alert-block  fade in"><h4 class="alert-heading">对不起! </h4><p>您不具有对当前对象的访问权限。</p></div>\t\t</div>');
+            }
+            self.renderHeader(workReport.type, workReport.year, workReport.serialNumber, employee);
+            self.renderReport(workReport);
+            var count = 0;
+            if ("comment" == self.reportType) {
+              count = 0 < res.commentMeCount ? res.commentMeCount : "";
+              setTimeout(function() {
+                $(".j_commentCount").html(count)
+              }, 1000);
+            }
+            if("replay" == self.reportType) {
+              count = 0 < res.replayMeCount ? res.replayMeCount : "";
+              setTimeout(function() {
+                $(".j_replayCount").html(count)
+              }, 1000);
+            }
+            if("unread" == self.reportType) {
+              count = 0 < res.unReadCount ? res.unReadCount : "";
+              setTimeout(function() {
+                $(".j_unreadCount").html(count)
+              }, 1000);
+            }
+            if("#print" == self.container) {
+              $el.find("#wr-export").remove();
+              $el.find("#wr-print").remove();
+              if("week" == workReport.type) {
+                self.weekblog = new a({
                   container: "#week-blog",
-                  userId: b.userId,
-                  date: Date.create(b.getWeekDayDate(e.year, parseInt(e.serialNumber) + 1, 7)).format("{yyyy}-{MM}-{dd}"),
+                  userId: self.userId,
+                  date: Date.create(self.getWeekDayDate(workReport.year, parseInt(workReport.serialNumber) + 1, 7)).format("{yyyy}-{MM}-{dd}"),
                   print: !0
-              }), b.weekblog.render(), $("#js_printblog").show(), $("#printFont").show(), c.find("#blog-panel").show())) : (c.find("#wr-print").removeClass("hide"), c.find("#wr-export").attr("href", "/workreport/export.json?id=" + e.id + "&userId=" + e.creator.id).removeClass("hide"))
-            } else {
-              if(b.type) {
-                b.renderHeader(b.type, b.year, b.serialNumber, g.name);
-              } else {
-                d = new Date(app.config.organization.nowTime);
-                b.renderHeader("week", d.getFullYear(), d.getISOWeek(), g.name);
+                });
+                self.weekblog.render();
+                $("#js_printblog").show();
+                $("#printFont").show();
+                $el.find("#blog-panel").show();
               }
-              b.renderReport({});
-            }
-            b.trigger("unreadCount");
-            c.find(".loading_large").hide();
-            autosize(c.find("#effect-content,#experience-summary,#work-plan"))
-          }), b.trigger("beforeOpen", b.id), $("body").trigger("printLoaded");
-        }
-      },
-      save: function(a, b) {
-          var c = this;
-          if (b) this.model.update(a,
-              function(a) {
-                  f.notify("报告内容保存成功")
-              });
-          else {
-              var d = c.attachment.getLinkIds();
-              a.ids = d.join(",");
-              this.model.create(a, function(a) {
-                      a = a.workReport;
-                      $(".reports-body").data("reportId", a.id);
-                      f.notify("报告创建成功");
-                      $("#extend-panel").html("");
-                      c.initComponent(a);
-                      c.id = a.id;
-                      $(c.el).find("#wr-print").removeClass("hide");
-                      $(c.el).find("#wr-export").attr("href", "/workreport/export.json?id=" + a.id + "&userId=" + a.creator.id).removeClass("hide")
-                  })
-          }
-      },
-      renderHeader: function(a, b, c, d) {
-          var e = $(this.el);
-          if ("week" == a) {
-            $("#planTitle").text("下周工作计划");
-            $("#contentTitle").text("本周工作成效");
-            var f = this.getWeekDayDate(b, c, 1),
-                g = this.getWeekDayDate(b, c, 6).addDays(1),
-                f = Date.create(f).format("{MM}-{dd}"),
-                u = g.format("{MM}-{dd}"),
-                w = d + "的第" + c + "周的工作报告";
-            $("#title").text(w);
-            $("#weekDay").html("[<i>" + f + "~" + u + "</i>]");
-            if(!this.reportType) {
-              $("#prev").text("上一周");
-              $("#next").text("下一周");
-              $("#current").text("本周");
-              $("#switch").removeClass("hide");
-            }
-            if(app.config.currentUser.activeDate < g.getTime()) {
-              $("#dayReport").text("本周工作日报");
             } else {
-              $("#dayReport").addClass("hide");
+              $el.find("#wr-print").removeClass("hide");
+              $el.find("#wr-export").attr("href", "/workreport/export.json?id=" + e.id + "&userId=" + e.creator.id).removeClass("hide");
             }
-            e.find("#weeklyblog").attr("data-id", this.userId).attr("data-value", Date.create(this.getWeekDayDate(b, parseInt(c) + 1, 7)).format("{yyyy}-{MM}-{dd}"))
+          } else {
+            if(self.type) {
+              self.renderHeader(self.type, self.year, self.serialNumber, employee.name);
+            } else {
+              var nowTime = new Date(app.config.organization.nowTime);
+              self.renderHeader("week", nowTime.getFullYear(), nowTime.getISOWeek(), employee.name);
+            }
+            self.renderReport({});
           }
-        if("month" == a){
-          w = d + "的" + b + "年" + c + "月份工作报告";
-          $("#title").text(w);
-          $("#planTitle").text("下月工作计划");
-          $("#contentTitle").text("本月工作成效");
-          $("#weekDay").addClass("hide");
-          if(!this.reportType) {
-            $("#prev").text("上一月");
-            $("#next").text("下一月");
-            $("#current").text("本月");
-            $("#switch").removeClass("hide");
-          }
-        }
-        if("season" == a){
-          w = d + "的" + b + "年第" + c + "季度工作报告";
-          $("#title").text(w);
-          $("#contentTitle").text("本季度工作成效");
-          $("#planTitle").text("下季度工作计划");
-          $("#weekDay").addClass("hide");
-          $("#switch").addClass("hide");
-        }
-        if("year" == a) {
-          w = d + "的" + b + "年年度工作报告";
-          $("#title").text(w);
-          $("#contentTitle").text("本年工作成效");
-          $("#planTitle").text("下一年工作计划");
-          $("#weekDay").addClass("hide");
-          $("#switch").addClass("hide");
-        }
-        if("halfYear" == a) {
-          w = d + "的" + b + "年年中工作报告";
-          $("#title").text(w);
-          $("#contentTitle").text("上半年工作成效");
-          $("#planTitle").text("下半年工作计划");
-          $("#weekDay").addClass("hide");
-          $("#switch").addClass("hide");
-        }
-        if(this.hideBlog) {
-          e.find("#dayReport").addClass("hide");
-          e.find("#switch").addClass("hide");
-        }
-      },
-      renderReport: function(a) {
-          a.content ? this.editable ? $("#effect-content").val(a.content).data("content", a.content) : $("#effect-content").html(f.convert2Html(a.content)) : $("#effect-content").val("").data("content", "");
-          a.summary ? this.editable ? $("#experience-summary").val(a.summary).data("summary", a.summary) : $("#experience-summary").html(f.convert2Html(a.summary)) : $("#experience-summary").val("").data("summary", "");
-          a.plan ? this.editable ? $("#work-plan").val(a.plan).data("plan", a.plan) : $("#work-plan").html(f.convert2Html(a.plan)) : $("#work-plan").val("").data("plan", "");
-          this.editable && $(".reports-body").data("reportId", a.id);
-          a.lastUpdateTime && $("#createTime").text("  最后提交于" + Date.create(a.lastUpdateTime).format("{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}"));
-          $("#extend-panel").html("");
-          this.initComponent(a);
-          (!this.editable && !a.attachments || !this.editable && 0 == a.attachments.length) && $("#report-attachment").css("display", "none");
-          this.flag && this.userId == app.config.currentUser.id && ($("#effect-content").html("不可填写"), $("#experience-summary").html("不可填写"), $("#work-plan").html("不可填写"))
-      },
-      genParam: function(a, b, c, d, e) {
-          if (!a) {
-              var f = new Date(app.config.organization.nowTime);
-              c = c ? c : f.getFullYear();
-              d = d ? d : "week";
-              "year" != d && "halfYear" != d && (e = e ? e : f.getISOWeek())
-          }
-          f = {};
-          f["workReport.id"] = a;
-          f["workReport.year"] = c;
-          f["workReport.serialNumber"] = e;
-          f["workReport.type"] = d;
-          f["workReport.creator.userId"] = b;
-          return f
-      },
-      getWeekDayDate: function(a, b, c) {
-          a = new Date(a, "0", "1");
-          var d = a.getTime();
-          a.setTime(d + 6048E5 * (b - 1));
-          return this.getNextDate(a, c)
-      },
-      getNextDate: function(a, b) {
-          b %= 7;
-          var c = a.getDay(),
-              d = a.getTime();
-          a.setTime(d + 864E5 * (b - c));
-          return a
-      },
-      getWeeksOfYear: function(a, b) {
-          return Math.ceil(((0 == b % 4 && 0 != b % 100 || 0 == b % 400 ? 366 : 365) - a.getDay()) / 7)
-      },
-      isDisable: function() {
-          var a = Date.create(app.config.organization.nowTime),
-              b = a.getFullYear(),
-              c = a.getMonth() + 1,
-              d = a.getISOWeek();
-          a.getISOWeek();
-          1 == a.getISOWeek() && 12 == a.getMonth() + 1 && (b = parseInt(b) + 1, c = 1);
-          if (this.year && (a = parseInt(this.year), 2015 < a || 2013 > a)) return !0;
-          if (this.year == b) switch (this.type) {
-              case "year":
-                  if (12 > c) return !0;
-                  break;
-              case "season":
-                  if (1 == this.serialNumber && 3 > c || 3 == this.serialNumber && 9 > c) return !0;
-                  break;
-              case "halfYear":
-                  if (6 > c) return !0;
-                  break;
-              case "month":
-                  if (this.serialNumber > c) return !0;
-                  break;
-              case "week":
-                  if (this.serialNumber > d) return !0
-          }
-          switch (this.type) {
-              case "season":
-                  if (1 != this.serialNumber && 3 != this.serialNumber) return !0;
-                  break;
-              case "month":
-                  if (12 < this.serialNumber) return !0;
-                  break;
-              case "week":
-                  if (this.serialNumber > this.getWeeksOfYear(this.getWeekDayDate(this.year, 0, 1), this.year)) return !0
-          }
-          return !1
-      },
-      remove: function() {
-          $(this.el).off(".workreportcontent");
-          this.header && (this.header.remove(), this.header = null);
-          this.extendView && (this.extendView.remove(), this.extendView = null);
-          this.shareView && (this.shareView.remove(), this.shareView = null)
+          self.trigger("unreadCount");
+          $el.find(".loading_large").hide();
+          autosize($el.find("#effect-content,#experience-summary,#work-plan"));
+        });
+        self.trigger("beforeOpen", self.id);
+        $("body").trigger("printLoaded");
       }
+    },
+    save: function(report, reportId) {
+      var self = this;
+      if (reportId) {
+        this.model.update(report, function() {
+          f.notify("报告内容保存成功");
+        });
+      }
+      else {
+        // 附件的链接ID，暂时不考虑附件
+        /*var linkIds = self.attachment.getLinkIds();
+        report.ids = linkIds.join(",");*/
+        this.model.create(report, function(res) {
+          var workReport = res.workReport;
+          $(".reports-body").data("reportId", workReport.id);
+          f.notify("报告创建成功");
+          $("#extend-panel").html("");
+          self.initComponent(workReport);
+          self.id = workReport.id;
+          $(self.el).find("#wr-print").removeClass("hide");
+          $(self.el).find("#wr-export").attr("href", "/workreport/export.json?id=" + workReport.id + "&userId=" + workReport.creator.id).removeClass("hide");
+        })
+      }
+    },
+    renderHeader: function(reportType, year, serialNumber, userName) {
+      var $el = $(this.el);
+      if ("week" == reportType) {
+        $("#planTitle").text("下周工作计划");
+        $("#contentTitle").text("本周工作成效");
+        var fromDate = this.getWeekDayDate(year, serialNumber, 1),
+            endDate = this.getWeekDayDate(year, serialNumber, 6).addDays(1),
+            fromDateText = Date.create(fromDate).format("{MM}-{dd}"),
+            endDateText = endDate.format("{MM}-{dd}"),
+            title = userName + "的第" + serialNumber + "周的工作报告";
+        $("#title").text(title);
+        $("#weekDay").html("[<i>" + fromDateText + "~" + endDateText + "</i>]");
+        if(!this.reportType) {
+          $("#prev").text("上一周");
+          $("#next").text("下一周");
+          $("#current").text("本周");
+          $("#switch").removeClass("hide");
+        }
+        if(app.config.currentUser.activeDate < endDate.getTime()) {
+          $("#dayReport").text("本周工作日报");
+        } else {
+          $("#dayReport").addClass("hide");
+        }
+        $el.find("#weeklyblog")
+          .attr("data-id", this.userId)
+          .attr("data-value", Date.create(this.getWeekDayDate(year, parseInt(serialNumber) + 1, 7)).format("{yyyy}-{MM}-{dd}"));
+      }
+      if("month" == reportType){
+        title = userName + "的" + year + "年" + serialNumber + "月份工作报告";
+        $("#title").text(title);
+        $("#planTitle").text("下月工作计划");
+        $("#contentTitle").text("本月工作成效");
+        $("#weekDay").addClass("hide");
+        if(!this.reportType) {
+          $("#prev").text("上一月");
+          $("#next").text("下一月");
+          $("#current").text("本月");
+          $("#switch").removeClass("hide");
+        }
+      }
+      if("season" == reportType){
+        title = userName + "的" + year + "年第" + serialNumber + "季度工作报告";
+        $("#title").text(title);
+        $("#contentTitle").text("本季度工作成效");
+        $("#planTitle").text("下季度工作计划");
+        $("#weekDay").addClass("hide");
+        $("#switch").addClass("hide");
+      }
+      if("year" == reportType) {
+        title = userName + "的" + year + "年年度工作报告";
+        $("#title").text(title);
+        $("#contentTitle").text("本年工作成效");
+        $("#planTitle").text("下一年工作计划");
+        $("#weekDay").addClass("hide");
+        $("#switch").addClass("hide");
+      }
+      if("halfYear" == reportType) {
+        title = userName + "的" + year + "年年中工作报告";
+        $("#title").text(title);
+        $("#contentTitle").text("上半年工作成效");
+        $("#planTitle").text("下半年工作计划");
+        $("#weekDay").addClass("hide");
+        $("#switch").addClass("hide");
+      }
+      if(this.hideBlog) {
+        $el.find("#dayReport").addClass("hide");
+        $el.find("#switch").addClass("hide");
+      }
+    },
+    renderReport: function(report) {
+      if(report.content) {
+        if(this.editable) {
+          $("#effect-content").val(report.content).data("content", report.content);
+        } else {
+          $("#effect-content").html(f.convert2Html(report.content));
+        }
+      } else {
+        $("#effect-content").val("").data("content", "");
+      }
+      if(report.summary) {
+        if(this.editable) {
+          $("#experience-summary").val(report.summary).data("summary", report.summary);
+        } else {
+          $("#experience-summary").html(f.convert2Html(report.summary));
+        }
+      } else {
+        $("#experience-summary").val("").data("summary", "");
+      }
+      if(report.plan) {
+        if(this.editable) {
+          $("#work-plan").val(report.plan).data("plan", report.plan);
+        } else {
+          $("#work-plan").html(f.convert2Html(report.plan));
+        }
+      } else {
+        $("#work-plan").val("").data("plan", "");
+      }
+      if(this.editable) {
+        $(".reports-body").data("reportId", report.id);
+      }
+      if(report.lastUpdateTime) {
+        $("#createTime").text(" 最后提交于" + Date.create(report.lastUpdateTime).format("{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}"));
+      }
+      $("#extend-panel").html("");
+      this.initComponent(report);
+      if(!this.editable && !report.attachments || !this.editable && 0 == report.attachments.length) {
+        $("#report-attachment").css("display", "none");
+      }
+      if(this.flag && this.userId == app.config.currentUser.id) {
+        $("#effect-content").html("不可填写");
+        $("#experience-summary").html("不可填写");
+        $("#work-plan").html("不可填写");
+      }
+    },
+    genParam: function(reportId, userId, year, type, serialNumber) {
+      if (!reportId) {
+          var nowTime = new Date(app.config.organization.nowTime);
+          year = year ? year : nowTime.getFullYear();
+          type = type ? type : "week";
+        if("year" != type && "halfYear" != type) {
+          serialNumber = serialNumber ? serialNumber : nowTime.getISOWeek();
+        }
+      }
+      var workReport = {};
+      workReport["workReport.id"] = reportId;
+      workReport["workReport.year"] = year;
+      workReport["workReport.serialNumber"] = serialNumber;
+      workReport["workReport.type"] = type;
+      workReport["workReport.creator.userId"] = userId;
+      return workReport;
+    },
+    getWeekDayDate: function(year, week, weekDay) {
+      var date = new Date(year, "0", "1");
+      var time = date.getTime();
+      date.setTime(time + 6048E5 * (week - 1));
+      return this.getNextDate(date, weekDay)
+    },
+    getNextDate: function(date, weekDay) {
+      weekDay %= 7;
+      var day = date.getDay(), time = date.getTime();
+      date.setTime(time + 864E5 * (weekDay - day));
+      return date;
+    },
+    getWeeksOfYear: function(date, year) {
+      var daysOfYear = 0 == year % 4 && 0 != year % 100 || 0 == year % 400 ? 366 : 365; // 闰年366
+      return Math.ceil((daysOfYear - date.getDay()) / 7);
+    },
+    isDisable: function() {
+      var nowTime = Date.create(app.config.organization.nowTime),
+          year = nowTime.getFullYear(),
+          month = nowTime.getMonth() + 1,
+          week = nowTime.getISOWeek();
+      nowTime.getISOWeek();
+      if(1 == nowTime.getISOWeek() && 12 == nowTime.getMonth() + 1) {
+        year = parseInt(year) + 1;
+        month = 1;
+      }
+      if(this.year && (2015 < parseInt(this.year) || 2013 > parseInt(this.year))){
+        return true;
+      }
+      if (this.year == year) {
+        switch (this.type) {
+          case "year":
+            if (12 > month) {
+              return true;
+            }
+            break;
+          case "season":
+            if ((1 == this.serialNumber && 3 > month) || (3 == this.serialNumber && 9 > month)) {
+              return true;
+            }
+            break;
+          case "halfYear":
+            if (6 > month) {
+              return true;
+            }
+            break;
+          case "month":
+            if (this.serialNumber > month) {
+              return true;
+            }
+            break;
+          case "week":
+            if (this.serialNumber > week) {
+               return true;
+            }
+        }
+      }
+      switch (this.type) {
+        case "season":
+          if (1 != this.serialNumber && 3 != this.serialNumber) {
+            return true;
+          }
+          break;
+        case "month":
+          if (12 < this.serialNumber) {
+            return true;
+          }
+          break;
+        case "week":
+          if (this.serialNumber > this.getWeeksOfYear(this.getWeekDayDate(this.year, 0, 1), this.year)) {
+            return true
+          }
+      }
+      return false;
+    },
+    remove: function() {
+      $(this.el).off(".workreportcontent");
+      if(this.header) {
+        this.header.remove();
+        this.header = null;
+      }
+      if(this.extendView) {
+        this.extendView.remove();
+        this.extendView = null;
+      }
+      if(this.shareView) {
+        this.shareView.remove();
+        this.shareView = null;
+      }
+    }
   });
 
 }(window, app, Backbone, jQuery, _, moment));

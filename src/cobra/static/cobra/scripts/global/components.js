@@ -374,7 +374,7 @@
       d = this.model;
       if (a && !$.isEmptyObject(a)) {
         if ("sharer" == e) {
-          if ("all" == b && 0 < $(this.shareEl).find("#shareentrys a[userid\x3d0]").length) {
+          if ("all" == b && 0 < $(this.shareEl).find("#shareentrys a[userid=0]").length) {
             f.notify("\u5df2\u5171\u4eab\u7ed9\u6240\u6709\u4eba,\u4e0d\u7528\u91cd\u590d\u6dfb\u52a0");
             return
           }
@@ -464,179 +464,301 @@
 
   app.components.Timeline = Backbone.View.extend({
 
-      template: _.template(app.templates.time_line),
+    template: _.template(app.templates.time_line),
 
-      initialize: function(d) {
-          this.userId = d.userId;
-          this.year = d.year;
-          this.type = d.type;
-          this.serialNumber = d.serialNumber;
-          this.el = d.container;
-          this.parentEl = d.parentEl;
-          $(this.el).html(this.template())
-      },
-      delegateEvents: function() {
-          var d = this,
-              c = $(this.el);
-          c.on("click.timeline", ".j_timetree_spread",
-              function() {
-                  var b = $(this).parent(),
-                      a = b.next(".timetree-weeklist"),
-                      c = b.parent().siblings(".timetree-month").parent().find(".timetree-weeklist");
-                  a.is(":visible") ? (a.slideUp("fast"), b.addClass("active")) : ($(".timetree-head").removeClass("active"), b.addClass("active"), c.slideUp("fast"), a.slideDown("fast"));
-                  $(".j_week").removeClass("active");
-                  b = $(this).parent().find("strong").text();
-                  a = $(".reports-selectyear span").text();
-                  /*ROUTER.navigate("/workreport/" + d.userId + "/" + a + "/month/" + b, {
-                      trigger: !0
-                  });*/
-                  $(".reports-panel").data("year", a).data("type", "month").data("serialNumber", b)
-              });
-          c.on("click.timeline", ".dropdown-menu a", function(b) {
-                  $(this).parents(".dropdown-menu").slideUp(100);
-                  $(this).parents(".dropdown-menu-toggle").removeData("showTimer");
-                  b = $(this).text();
-                  $(this).parents(".dropdown").find("span").text(b);
-                  d.genYearSelect(b);
-                  d.genTimeLineByYear(b)
-              });
-          c.on("click.timeline", ".halfyear",
-              function(b) {
-                  b = $(this);
-                  d.changeCSS(b);
-                  b = $(".reports-selectyear span").text();
-                  /*ROUTER.navigate("/workreport/" + d.userId + "/" + b + "/halfYear", {
-                      trigger: !0
-                  });*/
-                  $(".reports-panel").data("year", b).data("type", "halfYear")
-              });
-          c.on("click.timeline", ".endyear",
-              function(b) {
-                  b = $(this);
-                  d.changeCSS(b);
-                  b = $(".reports-selectyear span").text();
-                  /*ROUTER.navigate("/workreport/" + d.userId + "/" + b + "/year", {
-                      trigger: !0
-                  });*/
-                  $(".reports-panel").data("year", b).data("type", "year")
-              });
-          c.on("click.timeline", ".season", function(b) {
-            b = $(this);
-            d.changeCSS(b);
-            b = b.attr("serialNumber");
-            var a = $(".reports-selectyear span").text();
-            /*ROUTER.navigate("/workreport/" + d.userId + "/" + a + "/season/" + b, {
-                trigger: !0
-            });*/
-            $(".reports-panel").data("year", a).data("type", "season").data("serialNumber", b)
-          });
-          c.on("click.timeline", ".j_week", function(e) {
-            e.preventDefault();
-            var $this = $(this), year, week;
-            $(".j_week").each(function(index, el) {
-              if($(el).hasClass("active")) {
-                $(el).removeClass("active")
-              }
-            });
-            if(!$this.hasClass("active")){
-              $this.addClass("active");
-            }
-            $this.parent().prev().removeClass("active");
-            $(".reports-body").data("reportId", null);
-            year = $(".reports-selectyear span").text();
-            week = $this.find("span").text();
-            ROUTER.navigate("/workreport/" + d.userId + "/" + year + "/week/" + week, {
-              trigger: true
-            });
-            $(".reports-panel").data("year", year).data("type", "week").data("serialNumber", week)
-          })
-      },
-      render: function() {
-          $(this.el);
-          this.renderTimeLine();
-//          f.layout("#timeline");
-          $("#myReport").addClass("router").attr("href", "/workreport/" + this.userId)
-      },
-      changeCSS: function(d) {
-          d.hasClass("season") && (1 == d.attr("serialNumber") ? ($("div[serialnumber=1]").addClass("active"), $("div[serialnumber=3]").removeClass("active")) : ($("div[serialnumber=3]").addClass("active"), $("div[serialnumber=1]").removeClass("active")), $(".timetree-weeklist").css("display", "none"), $(".halfyear").removeClass("active"), $(".endyear").removeClass("active"), $(".month").removeClass("active"), $(".j_week").removeClass("active"));
-          d.hasClass("halfyear") && ($(".halfyear").addClass("active"), $(".timetree-weeklist").css("display", "none"), $("div[serialnumber=1]").removeClass("active"), $("div[serialnumber=3]").removeClass("active"), $(".endyear").removeClass("active"), $(".month").removeClass("active"), $(".j_week").removeClass("active"));
-          d.hasClass("endyear") && ($(".endyear").addClass("active"), $(".timetree-weeklist").css("display", "none"), $("div[serialnumber=1]").removeClass("active"), $("div[serialnumber=3]").removeClass("active"), $(".halfyear").removeClass("active"), $(".month").removeClass("active"), $(".j_week").removeClass("active"))
-      },
-      renderTimeLine: function() {
-          this.type ? (this.genYearSelect(this.year), "week" == this.type ? this.genTimeLineByYear(this.year, this.serialNumber) : "month" == this.type ? this.genTimeLineByYear(this.year, null, this.serialNumber) : this.genTimeLineByYear(this.year, -1, -1)) : (this.genYearSelect(), this.genTimeLineByYear())
-      },
-      genYearSelect: function(d) {
-          var c = $(this.el),
-              b = parseInt(Date.create(app.config.currentUser.activeDate).getFullYear()),
-              a = parseInt(Date.create(app.config.organization.nowTime).getFullYear()),
-              e = new Date(app.config.organization.nowTime);
-          d ? (d = parseInt(d),
-            c.find(".dropdown-toggle").find("span").text(d),
-            c = c.find(".dropdown-menu"),
-            c.html(""),
-            d - 2 >= b && c.append("<li><a>" + (d - 2) + "</a></li>"),
-            d - 1 >= b && c.append("<li><a>" + (d - 1) + "</a></li>"),
-            c.append("<li><a>" + d + "</a></li>"),
-            d + 1 <= a && c.append("<li><a>" + (d + 1) + "</a></li>"),
-            d + 2 <= a && c.append("<li><a>" + (d + 2) + "</a></li>")) : (1 == e.getISOWeek() && 12 == e.getMonth() + 1 && (a += 1),
-            c.find(".dropdown-toggle").find("span").text(a),
-            c = c.find(".dropdown-menu"),
-            c.html(""),
-            a - 2 >= b && c.append("<li><a>" + (a - 2) + "</a></li>"),
-            a - 1 >= b && c.append("<li><a>" + (a - 1) + "</a></li>"),
-            c.append("<li><a>" + a + "</a></li>"))
-      },
-      genTimeLineByYear: function(d, c, b) {
-          var a = new Date(app.config.organization.nowTime);
-          d = d ? d : 1 == a.getISOWeek() && 12 == a.getMonth() + 1 ? a.getFullYear() + 1 : a.getFullYear();
-          var e = this.getWeekDayDate(d, 1, 1),
-              e = this.getWeeksOfYear(e, d);
-          c = c ? c : a.getISOWeek();
-          var h;
-          (new Date(app.config.organization.nowTime)).getMonth();
-          var a = 2,
-              f = 1,
-              k = !0,
-              g = !0,
-              p = !0,
-              n, s = $(".reports-timetree"),
-              u = !1;
-          s.html("");
-          for (var w = 1; w <= e; w++) h = this.getWeekDayDate(d, w, 1),
-              3 < f && k ? (k = $("#season").clone(), k.find("span").text("第一季度"), k.find(".season").attr("serialNumber", 1), s.append(k.html()), k = !1) : 6 < f && g ? (g = $("#halfyear").clone(), s.append(g.html()), g = !1) : 9 < f && p && (p = $("#season").clone(), p.find("span").text("第三季度"), p.find(".season").attr("serialNumber", 3), s.append(p.html()), p = !1),
-              1 != w && (f = h.getMonth() + 1),
-              u = d == h.getFullYear() || d != h.getFullYear() && 1 == w ? !0 : !1,
-              a != f ? (n && s.append(n.html()), a = f, n = $("#month").clone(), n.find("strong").text(f), h = $("#week").clone(), u && f == b && (n.find(".timetree-head").addClass("active"), n.find(".timetree-weeklist").css("display", "block"))) : h = $("#week").clone(),
-              u && w == c && !b ? (h.find("span").text(w), h.find("li").addClass("active"), n.find(".timetree-weeklist").css("display", "block")) : h.find("span").text(w),
-              n.find(".timetree-weeklist").append(h.html()),
-              w == e && ($(".reports-timetree").append(n.html()), h = $("#endyear").clone(), h.find("span").text(d + "年度"), s.append(h.html()))
-      },
-      getWeeksOfYear: function(d, c) {
-          return Math.ceil(((0 == c % 4 && 0 != c % 100 || 0 == c % 400 ? 366 : 365) - d.getDay()) / 7)
-      },
-      getWeekDayDate: function(d, c, b) {
-          d = new Date(d, "0", "1");
-          var a = d.getTime();
-          d.setTime(a + 6048E5 * (c - 1));
-          return this.getNextDate(d, b)
-      },
-      getNextDate: function(d, c) {
-          c %= 7;
-          var b = d.getDay(),
-              a = d.getTime();
-          d.setTime(a + 864E5 * (c - b));
-          return d
-      },
-      update: function(d, c, b, a, e) {
-          this.userId = d;
-          this.year = c;
-          this.type = b;
-          this.serialNumber = a;
-          this.isMyReport = e
-      },
-      remove: function() {
-          $(this.el).off(".timeline")
+    initialize: function(data) {
+      this.userId = data.userId;
+      this.year = data.year;
+      this.type = data.type;
+      this.serialNumber = data.serialNumber;
+      this.el = data.container;
+      this.parentEl = data.parentEl;
+      $(this.el).html(this.template());
+    },
+    delegateEvents: function() {
+      var self = this, $el = $(this.el);
+      $el.on("click.timeline", ".j_timetree_spread", function() {
+        var $treeHead = $(this).parent(),
+            $treeWeekList = $treeHead.next(".timetree-weeklist"),
+            c = $treeHead.parent().siblings(".timetree-month").parent().find(".timetree-weeklist");
+        if($treeWeekList.is(":visible")) {
+          $treeWeekList.slideUp("fast");
+          $treeHead.addClass("active");
+        } else {
+          $(".timetree-head").removeClass("active");
+          $treeHead.addClass("active");
+          c.slideUp("fast");
+          $treeWeekList.slideDown("fast");
+        }
+        $(".j_week").removeClass("active");
+        var month = $(this).parent().find("strong").text();
+        var year = $(".reports-selectyear span").text();
+        ROUTER.navigate("/workreport/" + self.userId + "/" + year + "/month/" + month, {
+            trigger: true
+        });
+        $(".reports-panel").data("year", year).data("type", "month").data("serialNumber", month);
+      });
+      $el.on("click.timeline", ".dropdown-menu a", function(e) {
+        $(this).parents(".dropdown-menu").slideUp(100);
+        $(this).parents(".dropdown-menu-toggle").removeData("showTimer");
+        var year = $(this).text();
+        $(this).parents(".dropdown").find("span").text(year);
+        self.genYearSelect(year);
+        self.genTimeLineByYear(year);
+      });
+      $el.on("click.timeline", ".halfyear", function(e) {
+        var $this = $(this);
+        self.changeCSS($this);
+        var year = $(".reports-selectyear span").text();
+        ROUTER.navigate("/workreport/" + self.userId + "/" + year + "/halfYear", {
+          trigger: true
+        });
+        $(".reports-panel").data("year", year).data("type", "halfYear");
+      });
+      $el.on("click.timeline", ".endyear", function(e) {
+        var $this = $(this);
+        self.changeCSS($this);
+        var year = $(".reports-selectyear span").text();
+        ROUTER.navigate("/workreport/" + self.userId + "/" + year + "/year", {
+            trigger: true
+        });
+        $(".reports-panel").data("year", year).data("type", "year")
+      });
+      $el.on("click.timeline", ".season", function(e) {
+        var $this = $(this);
+        self.changeCSS($this);
+        var serialNumber = $this.attr("serialNumber");
+        var year = $(".reports-selectyear span").text();
+        ROUTER.navigate("/workreport/" + self.userId + "/" + year + "/season/" + serialNumber, {
+          trigger: true
+        });
+        $(".reports-panel").data("year", year).data("type", "season").data("serialNumber", serialNumber);
+      });
+      $el.on("click.timeline", ".j_week", function(e) {
+        e.preventDefault();
+        var $this = $(this), year, week;
+        $(".j_week").each(function(index, el) {
+          if($(el).hasClass("active")) {
+            $(el).removeClass("active")
+          }
+        });
+        if(!$this.hasClass("active")){
+          $this.addClass("active");
+        }
+        $this.parent().prev().removeClass("active");
+        $(".reports-body").data("reportId", null);
+        year = $(".reports-selectyear span").text();
+        week = $this.find("span").text();
+        ROUTER.navigate("/workreport/" + self.userId + "/" + year + "/week/" + week, {
+          trigger: true
+        });
+        $(".reports-panel")
+          .data("year", year)
+          .data("type", "week")
+          .data("serialNumber", week);
+      })
+    },
+    render: function() {
+      $(this.el);
+      this.renderTimeLine();
+//      app.utils.layout("#timeline");
+      $("#myReport").addClass("router").attr("href", "/workreport/" + this.userId);
+    },
+    changeCSS: function(el) {
+      if(el.hasClass("season")) {
+        if(1 == el.attr("serialNumber")) {
+          $("div[serialnumber=1]").addClass("active");
+          $("div[serialnumber=3]").removeClass("active");
+        } else {
+          $("div[serialnumber=3]").addClass("active");
+          $("div[serialnumber=1]").removeClass("active");
+        }
+        $(".timetree-weeklist").css("display", "none");
+        $(".halfyear").removeClass("active");
+        $(".endyear").removeClass("active");
+        $(".month").removeClass("active");
+        $(".j_week").removeClass("active");
       }
+      if(el.hasClass("halfyear")) {
+        $(".halfyear").addClass("active");
+        $(".timetree-weeklist").css("display", "none");
+        $("div[serialnumber=1]").removeClass("active");
+        $("div[serialnumber=3]").removeClass("active");
+        $(".endyear").removeClass("active");
+        $(".month").removeClass("active");
+        $(".j_week").removeClass("active");
+      }
+      if(el.hasClass("endyear")) {
+        $(".endyear").addClass("active");
+        $(".timetree-weeklist").css("display", "none");
+        $("div[serialnumber=1]").removeClass("active");
+        $("div[serialnumber=3]").removeClass("active");
+        $(".halfyear").removeClass("active");
+        $(".month").removeClass("active");
+        $(".j_week").removeClass("active");
+      }
+    },
+    renderTimeLine: function() {
+      if(this.type) {
+        this.genYearSelect(this.year);
+        if("week" == this.type) {
+          this.genTimeLineByYear(this.year, this.serialNumber);
+        } else if("month" == this.type) {
+           this.genTimeLineByYear(this.year, null, this.serialNumber);
+        } else {
+          this.genTimeLineByYear(this.year, -1, -1);
+        }
+      } else {
+        this.genYearSelect();
+        this.genTimeLineByYear();
+      }
+    },
+    genYearSelect: function(year) {
+      var $el = $(this.el),
+          activeYear = parseInt(Date.create(app.config.currentUser.activeDate).getFullYear()),
+          nowYear = parseInt(Date.create(app.config.organization.nowTime).getFullYear()),
+          nowTime = new Date(app.config.organization.nowTime);
+      if(year) {
+        year = parseInt(year);
+        $el.find(".dropdown-toggle").find("span").text(year);
+        $el = $el.find(".dropdown-menu");
+        $el.html("");
+        if(year - 2 >= activeYear) {
+          $el.append("<li><a>" + (year - 2) + "</a></li>");
+        }
+        if(year - 1 >= activeYear) {
+          $el.append("<li><a>" + (year - 1) + "</a></li>");
+        }
+        $el.append("<li><a>" + year + "</a></li>");
+        if(year + 1 <= nowYear) {
+          $el.append("<li><a>" + (year + 1) + "</a></li>");
+        }
+        if(year + 2 <= nowYear) {
+          $el.append("<li><a>" + (year + 2) + "</a></li>");
+        }
+      } else {
+        if(1 == nowTime.getISOWeek() && 12 == nowTime.getMonth() + 1) {
+          nowYear += 1;
+        }
+        $el.find(".dropdown-toggle").find("span").text(nowYear);
+        $el = $el.find(".dropdown-menu");
+        $el.html("");
+        if(nowYear - 2 >= activeYear) {
+          $el.append("<li><a>" + (nowYear - 2) + "</a></li>");
+        }
+        if(nowYear - 1 >= activeYear) {
+          $el.append("<li><a>" + (nowYear - 1) + "</a></li>");
+        }
+        $el.append("<li><a>" + nowYear + "</a></li>");
+      }
+    },
+    genTimeLineByYear: function(year, week, serialNumber) {
+      var nowTime = new Date(app.config.organization.nowTime);
+      if(!year) {
+        if(1 == nowTime.getISOWeek() && 12 == nowTime.getMonth() + 1) {
+          year = nowTime.getFullYear() + 1;
+        } else {
+          year = nowTime.getFullYear();
+        }
+      }
+      var cal_week = this.getWeeksOfYear(this.getWeekDayDate(year, 1, 1), year);
+      if(!week) {
+        week = nowTime.getISOWeek();
+      }
+      var h;
+      (new Date(app.config.organization.nowTime)).getMonth();
+      var a = 2,
+          f = 1,
+          k = !0,
+          g = !0,
+          p = !0,
+          n, $timeTree = $(".reports-timetree"),
+          u = !1;
+      $timeTree.html("");
+      for (var w = 1; w <= cal_week; w++) {
+        h = this.getWeekDayDate(year, w, 1);
+        if(3 < f && k) {
+          k = $("#season").clone();
+          k.find("span").text("第一季度");
+          k.find(".season").attr("serialNumber", 1);
+          $timeTree.append(k.html());
+          k = !1;
+        } else if(6 < f && g) {
+          g = $("#halfyear").clone();
+          $timeTree.append(g.html());
+          g = !1;
+        } else if(9 < f && p) {
+          p = $("#season").clone();
+          p.find("span").text("第三季度");
+          p.find(".season").attr("serialNumber", 3);
+          $timeTree.append(p.html());
+          p = !1;
+        }
+        if(1 != w) {
+          f = h.getMonth() + 1
+        }
+        if(year == h.getFullYear()) {
+          u = true;
+        } else {
+          u = year != h.getFullYear() && 1 == w;
+        }
+        if(a != f) {
+          if(n) {
+            $timeTree.append(n.html());
+          }
+          a = f;
+          n = $("#month").clone();
+          n.find("strong").text(f);
+          h = $("#week").clone();
+          if(u && f == serialNumber) {
+            n.find(".timetree-head").addClass("active");
+            n.find(".timetree-weeklist").css("display", "block");
+          }
+        } else {
+          h = $("#week").clone();
+        }
+        if(u && w == week && !serialNumber) {
+          h.find("span").text(w);
+          h.find("li").addClass("active");
+          n.find(".timetree-weeklist").css("display", "block");
+        } else {
+          h.find("span").text(w);
+        }
+        n.find(".timetree-weeklist").append(h.html());
+        if(w == cal_week) {
+          $(".reports-timetree").append(n.html());
+          h = $("#endyear").clone();
+          h.find("span").text(year + "年度");
+          $timeTree.append(h.html());
+        }
+      }
+    },
+    getWeeksOfYear: function(date, year) {
+      var daysOfYear = 0 == year % 4 && 0 != year % 100 || 0 == year % 400 ? 366 : 365; // 闰年 366 天
+      return Math.ceil((daysOfYear - date.getDay()) / 7);
+    },
+    getWeekDayDate: function(year, week, weekDay) {
+      var date = new Date(year, "0", "1");
+      var time = date.getTime();
+      date.setTime(time + 6048E5 * (week - 1));
+      return this.getNextDate(date, weekDay);
+    },
+    getNextDate: function(date, weekDay) {
+      weekDay %= 7;
+      var day = date.getDay(), time = date.getTime();
+      date.setTime(time + 864E5 * (weekDay - day));
+      return date;
+    },
+    update: function(userId, year, type, serialNumber, isMyReport) {
+      this.userId = userId;
+      this.year = year;
+      this.type = type;
+      this.serialNumber = serialNumber;
+      this.isMyReport = isMyReport;
+    },
+    remove: function() {
+      $(this.el).off(".timeline")
+    }
   });
 
 }(app, Backbone, jQuery, _));
