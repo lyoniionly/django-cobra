@@ -8,12 +8,12 @@
   app.components = {};
 
   app.components.event = {
-    setLastPage: function(a) {
-      pages = a
+    setLastPage: function(page) {
+      pages = page;
     },
     initEvent: function() {
       $.ajaxSetup({
-        cache: !1
+        cache: false
       });
       var g = this;
       /*$(document).ajaxComplete(function(a, b, c) {
@@ -25,7 +25,7 @@
           currentUser: TEAMS.currentUser
         })).render()) : g.relogin = !0
       });*/
-      $("body").on("click", "table.j_stripedTable td:first-child", function(a) {
+      $("body").on("click", "table.j_stripedTable td:first-child", function(e) {
         $(this).parent("tr").addClass("active").siblings().removeClass("active")
       });
       /*$("body").on("mouseenter.dropdownmenu", ".dropdown-menu-toggle", function(a) {
@@ -76,21 +76,25 @@
         $(this).closest(".dropdown-menu-toggle");
         $(this).closest(".dropdown-menu").slideUp(100)
       });*/
-      $("body").off("mouseenter.typeahead", ".typeahead-wrapper").on("mouseenter.typeahead", ".typeahead-wrapper", function(a) {
-        $(this).data("enter", !0)
-      }).off("mouseleave.typeahead", ".typeahead-wrapper").on("mouseleave.typeahead", ".typeahead-wrapper", function(a) {
-        $(this).data("enter", !1)
+      $("body").off("mouseenter.typeahead", ".typeahead-wrapper").on("mouseenter.typeahead", ".typeahead-wrapper", function(e) {
+        $(this).data("enter", true);
+      }).off("mouseleave.typeahead", ".typeahead-wrapper").on("mouseleave.typeahead", ".typeahead-wrapper", function(e) {
+        $(this).data("enter", false);
       });
-      $("body").off("click.controlbtn", ".control-btn").on("click.controlbtn", ".control-btn", function(a) {
-        a.stopPropagation();
+      $("body").off("click.controlbtn", ".control-btn").on("click.controlbtn", ".control-btn", function(e) {
+        e.stopPropagation();
         $(this).addClass("hide");
         $(this).siblings(".typeahead-wrapper").removeClass("hide");
         $(this).siblings(".typeahead-wrapper").find(".control-input").focus()
       });
-      $("body").off("focusout.controlinput", ".control-input").on("focusout.controlinput", ".control-input", function(a, b) {
-        a.stopPropagation();
-        var c = $(this).parents(".typeahead-wrapper");
-        c.data("enter") && "tt" != b || (c.addClass("hide"), c.siblings(".control-btn").removeClass("hide"), c.trigger("hide"))
+      $("body").off("focusout.controlinput", ".control-input").on("focusout.controlinput", ".control-input", function(e, prefix) {
+        e.stopPropagation();
+        var $wrapper = $(this).parents(".typeahead-wrapper");
+        if(!$wrapper.data("enter") || "tt" == prefix) {
+          $wrapper.addClass("hide");
+          $wrapper.siblings(".control-btn").removeClass("hide");
+          $wrapper.trigger("hide");
+        }
       });
       /*$("body").off("click", ".links-control-group a").on("click", ".links-control-group a", function(a) {
         $(this).addClass("hide");
@@ -216,41 +220,43 @@
           seletedList: e
         })).render()
       });*/
-      $("body").off("mouseenter", ".entity-item").on("mouseenter", ".entity-item",
-      function(a) {
+      $("body").off("mouseenter", ".entity-item").on("mouseenter", ".entity-item", function(a) {
         $(this).attr("undeletable") || $(this).parents(".entity-container").attr("undeletable") || $(this).find("a:first").after('<a class="close" title="删除">&times;</a>')
+        if(!$(this).attr("undeletable") && !$(this).parents(".entity-container").attr("undeletable")) {
+          $(this).find("a:first").after('<a class="close" title="删除">&times;</a>');
+        }
       });
-      $("body").off("mouseleave", ".entity-item").on("mouseleave ", ".entity-item",
-      function(a) {
+      $("body").off("mouseleave", ".entity-item").on("mouseleave ", ".entity-item", function(a) {
         $(this).find(".close").remove()
       });
-      $("body").off("click", ".entity-item .close").on("click ", ".entity-item .close",
-      function(a) {
-        a = $(this).prevAll("a").attr("id");
-        var b = $(this).prevAll("a").attr("data-value"),
-        c = $(this).parents(".entity-container"),
-        e = c.attr("data-url");
-        if (e && b) {
-          var d = $(this).parent(),
-          h = c.data("param") || {};
+      $("body").off("click", ".entity-item .close").on("click ", ".entity-item .close", function(evt) {
+        var a = $(this).prevAll("a").attr("id");
+        var shareId = $(this).prevAll("a").attr("data-value"),
+        $container = $(this).parents(".entity-container"),
+        url = $container.attr("data-url");
+        if (url && shareId) {
+          var $parent = $(this).parent(),
+          h = $container.data("param") || {};
           h._method = "delete";
           a = function(a) {
             a && $.ajax({
               type: "POST",
               dataType: "json",
               data: h,
-              url: e.replace("{id}", b),
+              url: url.replace("{id}", shareId),
               success: function(a) {
-                d.remove();
-                c.trigger("removeEntity", a);
+                $parent.remove();
+                $container.trigger("removeEntity", a);
                 $("#stream").trigger("insertStream", a.streams || a.stream);
                 $("#readinfo").trigger("updateReadInfo");
                 app.alert('success', "数据已删除");
               }
             })
           };
-          c.attr("data-noConfirm") ? a(!0) : f.confirm("确定要删除吗？", a)
-        } else $(this).parent().hasClass("tag") || ($(this).parent(".entity-item").remove(), c.trigger("removeEntity", a))
+          $container.attr("data-noConfirm") ? a(!0) : f.confirm("确定要删除吗？", a)
+        } else {
+          $(this).parent().hasClass("tag") || ($(this).parent(".entity-item").remove(), $container.trigger("removeEntity", a))
+        }
       });
       $("body").off("click", ".j_btn_close").on("click ", ".j_btn_close",
       function(a) { (a = $(this).parents("#entitybox")) && 0 < a.length ? a.find(".modal-header .close").click() : $("body").trigger("slideClose")
