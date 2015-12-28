@@ -528,11 +528,11 @@
       this.type = data.type;
       this.serialNumber = data.serialNumber;
       this.model = new app.models.WorkReportModel;
-      /*this.userSliderView = new app.components.Userslider({
-          userId: TEAMS.currentUser.id,
+      this.userSliderView = new app.components.Userslider({
+          userId: app.config.currentUser.id,
           module: "workreport",
           dataType: "subordinate"
-      });*/
+      });
       this.timelineView = new app.components.Timeline({
         userId: this.userId,
         year: this.year,
@@ -546,8 +546,8 @@
         $("#member-layer").last().addClass("hide");
       }
       this.timelineView.render();
-//    this.userSliderView.render();
-//    this.getUnreadCount()
+      this.userSliderView.render();
+//      this.getUnreadCount()
     },
     getUnreadCount: function() {
       this.model.getUnreadCount(function(res) {
@@ -598,11 +598,11 @@
         $("#print").addClass("fs-m print-report");
       }
       if (this.editable) {
-        $(this.el).html(_.template(app.templates.workreport_reportcontent)());
+        $(this.el).html(app.utils.template('workreport.reportcontent'));
       } else if (this.isStat) {
-        $(this.el).html(_.template(app.templates.workreport_readonlyreportcontentstat)());
+        $(this.el).html(app.utils.template('workreport.readonlyreportcontentstat'));
       } else {
-        $(this.el).html(_.template(app.templates.workreport_readonlyreportcontent)())
+        $(this.el).html(app.utils.template('workreport.readonlyreportcontent'));
       }
     },
     delegateEvents: function() {
@@ -764,18 +764,18 @@
       });
     },
     initComponent: function(workreport) {
-      /*var $el = $(this.el);
+      var $el = $(this.el);
       if(workreport.id) {
-        this.extendView = new d({
+        /*this.extendView = new d({
           targetId: workreport.id,
           module: "workreport",
           parentEl: this.el,
           container: "#extend-panel"
         });
-        this.extendView.render(workreport);
+        this.extendView.render(workreport);*/
         if(app.config.currentUser.id == workreport.creator.id) {
           $el.find("#report-share").removeClass("hide");
-          this.shareView = new e({
+          this.shareView = new app.components.ShareAllview({
             entityId: workreport.id,
             module: "workreport",
             shareContainer: "#report-share",
@@ -784,7 +784,7 @@
           this.shareView.render(workreport.shareEntrys);
         }
       }
-      this.attachment = new b({
+      /*this.attachment = new b({
           targetId: workreport.id,
           module: "workreport",
           container: "#report-attachment",
@@ -892,7 +892,7 @@
               }
             } else {
               $el.find("#wr-print").removeClass("hide");
-              $el.find("#wr-export").attr("href", "/workreport/export.json?id=" + e.id + "&userId=" + e.creator.id).removeClass("hide");
+              $el.find("#wr-export").attr("href", "/workreport/export.json?id=" + workReport.id + "&userId=" + workReport.creator.id).removeClass("hide");
             }
           } else {
             if(self.type) {
@@ -903,7 +903,7 @@
             }
             self.renderReport({});
           }
-          self.trigger("unreadCount");
+//          self.trigger("unreadCount");
           $el.find(".loading_large").hide();
           autosize($el.find("#effect-content,#experience-summary,#work-plan"));
         });
@@ -915,7 +915,7 @@
       var self = this;
       if (reportId) {
         this.model.update(report, function() {
-          f.notify("报告内容保存成功");
+          app.alert('success', '报告内容保存成功');
         });
       }
       else {
@@ -925,7 +925,7 @@
         this.model.create(report, function(res) {
           var workReport = res.workReport;
           $(".reports-body").data("reportId", workReport.id);
-          f.notify("报告创建成功");
+          app.alert("success", '报告创建成功');
           $("#extend-panel").html("");
           self.initComponent(workReport);
           self.id = workReport.id;

@@ -109,6 +109,7 @@ if Profile:
 
             # hack for first name, rename "First Name" to "Name"
             self.fields['first_name'].label = _('Name')
+            self.fields['first_name'].required = True
 
             # Set initial values
             for field_name in user_field_names:

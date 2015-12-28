@@ -1,5 +1,4 @@
 {% load i18n %}
-
 <form class="report-edit-form">
   <div class="form-group">
     <label for="">{% trans 'Report Description' %}</label>
@@ -89,6 +88,6 @@
     </textarea>
   </div>
 
-  <a class="btn btn-primary report-submit" href="javascript:void(0);" data-url="{% url 'organization:workreport:daily-report-edit' organization.slug report_date|date:'Y' report_date|date:'b' report_date|date:'d' %}">{% trans 'Submit' %}</a>
+  <a class="btn btn-primary report-submit" href="javascript:void(0);" data-url="{% language "en" %}{% url 'organization:workreport:daily-report-edit' organization.slug report_date|date:'Y' report_date|date:'b' report_date|date:'d' %}{% endlanguage %}">{% trans 'Submit' %}</a>
   <a class="btn btn-danger cancel-report-edit" href="javascript:void(0);">{% trans 'Cancel' %}</a>
 </form>

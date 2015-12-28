@@ -8,21 +8,22 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 
 from paging.helpers import paginate as paginate_func
 import six
 from templatetag_sugar.register import tag
 from templatetag_sugar.parser import Name, Variable, Constant, Optional
 
-from cobra.apps.accounts.utils import get_gravatar
 from cobra.core.javascript import to_json
 from cobra.core.loading import get_model, get_class, get_profile_class
 from cobra.core.constants import EVENTS_PER_PAGE
-from cobra.core.utils import multi_get_letter
-from cobra.apps.accounts.utils import get_gravatar, get_default_avatar_url, get_user
+from cobra.core.utils import multi_get_letter, get_datetime_now
+from cobra.apps.accounts.utils import get_default_avatar_url, get_user, get_avatar_url as get_avatar_url_util
 from cobra.core.compat import get_user_model
 from cobra.core.http import absolute_uri
+from cobra.core import locale
+from cobra.core.dates import epoch
 
 register = template.Library()
 
@@ -86,15 +87,7 @@ def paginator(context, queryset_or_list, request, asvar=None, per_page=EVENTS_PE
 
 @register.simple_tag
 def get_avatar_url(user, size=settings.COBRA_ACCOUNTS_AVATAR_DEFAULT_SIZE):
-    if user is None:
-        return get_default_avatar_url()
-    Profile = get_profile_class()
-    try:
-        instance = Profile.objects.get(user=user)
-    except Profile.DoesNotExist:
-        # User has no profile, try a blank one
-        instance = Profile(user=user)
-    return instance.get_avatar_url(size)
+    return get_avatar_url_util(user, size)
 
 
 @register.inclusion_tag('partials/_avatar_tag.html')
@@ -169,3 +162,15 @@ def timesince_ago(value, now=None):
 @register.filter
 def absolute_url(url):
     return absolute_uri(url)
+
+
+@register.assignment_tag
+def moment_locale():
+    locale_mapping = getattr(settings, 'MOMENT_LOCALES',
+                             locale.LOCALE_MAPPING)
+    return locale_mapping.get(get_language(), 'en')
+
+
+@register.simple_tag
+def now_epoch():
+    return epoch(get_datetime_now(), msec=True)

@@ -22,7 +22,7 @@
         {% if daily_report.owner == request.user and not isTeam %}
           {% if not can_not_edit %}
           <li>
-            <a class="edit-report" href="javascript:void(0);" data-url="{% url 'organization:workreport:daily-report-edit' organization.slug daily_report.which_date|date:'Y' daily_report.which_date|date:'b' daily_report.which_date|date:'d' %}">
+            <a class="edit-report" href="javascript:void(0);" data-url="{% language 'en' %}{% url 'organization:workreport:daily-report-edit' organization.slug daily_report.which_date|date:'Y' daily_report.which_date|date:'b' daily_report.which_date|date:'d' %}{% endlanguage %}">
               <i class="glyphicon glyphicon-pencil"></i>
             </a>
           </li>

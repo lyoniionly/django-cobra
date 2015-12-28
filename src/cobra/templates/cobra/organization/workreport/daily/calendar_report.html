@@ -180,7 +180,8 @@
                       </p>
                       {% ifequal request.user report_user %}
                         <p class="links">
-                          <a class="btn btn-primary btn-lg edit-report" href="javascript:void(0);" data-url="{% url 'organization:workreport:daily-report-edit' organization.slug filter_date|date:'Y' filter_date|date:'b' filter_date|date:'d' %}">{% trans 'Write Daily Report' %}</a>
+                          <a class="btn btn-primary btn-lg edit-report" href="javascript:void(0);"
+                             data-url="{% language "en" %}{% url 'organization:workreport:daily-report-edit' organization.slug filter_date|date:'Y' filter_date|date:'b' filter_date|date:'d' %}{% endlanguage %}">{% trans 'Write Daily Report' %}</a>
                         </p>
                       {% else %}
                         <p class="links">

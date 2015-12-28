@@ -72,13 +72,13 @@ USE_I18N = True
 
 USE_L10N = True
 
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'zh-hans'
 
 # Languages we provide translations for, out of the box.
 gettext_noop = lambda s: s
 LANGUAGES = (
     ('en', gettext_noop('English')),
-    ('zh_Hans', gettext_noop('Simplified Chinese')),
+    ('zh-hans', gettext_noop('Simplified Chinese')),
 )
 
 # Absolute path to the directory that holds media.
@@ -137,13 +137,13 @@ MIDDLEWARE_CLASSES = (
     'cobra.middleware.maintenance.ServicesUnavailableMiddleware',
     'cobra.middleware.proxy.SetRemoteAddrFromForwardedFor',
     'cobra.middleware.debug.NoIfModifiedSinceMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cobra.middleware.sudo.SudoMiddleware',
     'cobra.middleware.locale.CobraLocaleMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',

@@ -4,7 +4,7 @@
 {% load i18n %}
 {% load helper_tags %}
 
-{% block title %}{% trans "Organization Settings" %} | {{ block.super }}{% endblock %}
+{% block title %}{{ organization.name }} | {{ block.super }}{% endblock %}
 
 {% block content_class %}with-left-sidebar with-bg{% endblock %}
 
@@ -52,9 +52,9 @@
         {% trans "Summary" %}
       </a>
     </li>
-    <li class="{% block org_plan_nav %}{% endblock %}">
+    <li class="{% block org_tasks_nav %}{% endblock %}">
       <a href="#">
-        {% trans "Plan" %}
+        {% trans "Tasks Co" %}
       </a>
     </li>
     {% if ACCESS.org_read %}

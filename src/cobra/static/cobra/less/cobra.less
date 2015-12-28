@@ -17,6 +17,7 @@
 @import url("github.less");
 @import url("fileinput.less");
 @import url("select2.less");
+@import url("toastr.less");
 @import url("pygments.less");
 @import url("dashboard.less");
 @import url("blocks.less");
@@ -24,6 +25,7 @@
 @import url("events.less");
 @import url("avatar.less");
 @import url("nav.less");
+@import url("dropdown.less");
 @import url("breadcrumb.less");
 @import url("simple-slider.less");
 @import url("overview.less");
@@ -37,6 +39,10 @@
 @import url("project-list.less");
 @import url("timetree.less");
 @import url("report.less");
+@import url("member-layer.less");
+@import url("entity.less");
+@import url("suggestion.less");
+@import url("typeahead.less");
 @import (less) url("sweetalert.css");
 @import (less) url("bootstrap-clockpicker.css");
 
@@ -85,6 +91,10 @@ a.link-disabled {
   cursor: default;
 }
 
+.aside-nav {
+  list-style: none;
+}
+
 pre {
   margin-bottom: 0;
   word-break: normal;
@@ -124,6 +134,9 @@ ul, ol {
 
 .no-padding {
   padding: 0 !important;
+}
+.no-margin {
+  margin: 0 !important;
 }
 
 .bg-transparent {
@@ -2722,19 +2735,6 @@ section.body .page-header:first-child {
 .btn-small [class^="icon-"],
 .btn-small [class*=" icon-"] {
   margin-top: 0;
-}
-
-section.body {
-  textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
-    height: auto;
-    line-height: auto;
-    border: 1px solid #c3c8ce;
-    padding: 6px 12px;
-    font-size: 15px;
-    .box-shadow(inset 0 1px 1px rgba(0, 0, 0, .05));
-    .border-radius(4px);
-    .placeholder(darken(#f1f2f3, 10));
-  }
 }
 
 table.table td input,
@@ -6392,4 +6392,17 @@ padding-right: 280px;
 
 .clockpicker {
   width: 150px;
+}
+
+.reports-panel {
+  [class*=col-] {
+    margin-left: -10px;
+  }
+}
+
+.detail-block {
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  margin: 0 18px 13px;
 }

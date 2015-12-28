@@ -4,6 +4,7 @@ from django.conf import settings
 
 from cobra.core.compat import md5_constructor
 from cobra.core.dates import epoch
+from cobra.core.loading import get_profile_class
 
 try:
     from django.contrib.auth import get_user_model
@@ -104,10 +105,29 @@ def get_gravatar(email, size=80, default='identicon'):
     return gravatar_url
 
 
-def get_user_info(user_pk):
-    user = get_user_model().objects.get(pk=user_pk)
+def get_avatar_url(user, size=settings.COBRA_ACCOUNTS_AVATAR_DEFAULT_SIZE):
+    if user is None:
+        return get_default_avatar_url()
+    Profile = get_profile_class()
+    try:
+        instance = Profile.objects.get(user=user)
+    except Profile.DoesNotExist:
+        # User has no profile, try a blank one
+        instance = Profile(user=user)
+    return instance.get_avatar_url(size)
+
+
+def get_user_info(user):
     info = {
+        'avatar': get_avatar_url(user),
         'activeDate': epoch(user.date_joined, msec=True),
+        'username': user.get_full_name() or user.username,
+        'name': user.get_full_name() or user.username,
         'id': user.pk
     }
     return info
+
+
+def get_user_info_by_pk(user_pk):
+    user = get_user_model().objects.get(pk=user_pk)
+    return get_user_info(user)

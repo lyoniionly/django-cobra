@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load staticfiles %}
 {% load compress %}
-{% load helper_tags %}
+{% load helper_tags organization_tags %}
 
 {% block mainstyles %}
   {% block styles %}
@@ -108,10 +108,9 @@
     <script type="text/javascript" src="{% static "cobra/scripts/lib/countdown/jquery.plugin.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/countdown/jquery.countdown.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/moment-with-locales.js" %}"></script>
+    {% moment_locale as lang %}
     <script type="text/javascript">
-      {% if request.LANGUAGE_CODE %}
-         moment.locale('{{ request.LANGUAGE_CODE }}');
-      {% endif %}
+      moment.locale('{{ lang }}');
     </script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/bootstrap-datetimepicker.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/simple-slider.js" %}"></script>
@@ -137,6 +136,7 @@
     <script type="text/javascript" src="{% static "cobra/scripts/lib/jquery.form.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/eldarion-ajax-core.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/lib/eldarion-ajax-handlers.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/lib/toastr.js" %}"></script>
     <!-- Globle -->
     <script type="text/javascript" src="{% static "cobra/scripts/global/core.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/conf.js" %}"></script>
@@ -179,28 +179,28 @@
       fade_duration: {{ COBRA_CONFIG.auto_fade_alerts.fade_duration|default:"1500" }},
       types: {{ COBRA_CONFIG.auto_fade_alerts.types|default:"[]"|safe }}
     };
-    app.config.noSubordinates = true;
+    app.config.noSubordinates = {% if request.user|has_subordinates:organization %}false{% else %}true{% endif %};
     app.config.currentUser = {{ currentUser|to_json|safe }};
     {% if project %}
       app.config.projectId = {{ project.slug|to_json|safe }};
       app.config.teamId = {{ project.team.slug|to_json|safe }};
       app.config.organizationId = {{ project.organization.slug|to_json|safe }};
       app.config.organization = {
-        nowTime: 1450062758121
+        nowTime: {% now_epoch %}
       };
     {% elif team %}
       app.config.projectId = null;
       app.config.teamId = {{ team.slug|to_json|safe }};
       app.config.organizationId = {{ team.organization.slug|to_json|safe }};
       app.config.organization = {
-        nowTime: 1450062758121
+        nowTime: {% now_epoch %}
       };
     {% elif organization %}
       app.config.projectId = null;
       app.config.teamId = null;
       app.config.organizationId = {{ organization.slug|to_json|safe }};
       app.config.organization = {
-        nowTime: 1450062758121
+        nowTime: {% now_epoch %}
       };
     {% else %}
       app.config.projectId = null;

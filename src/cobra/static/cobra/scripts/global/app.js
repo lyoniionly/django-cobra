@@ -101,7 +101,14 @@
     },
     _render: function (d) {
       $(".modal-backdrop,.modal").remove();
-      d && ($(d).parents("aside.aside").find(".active").removeClass("active"), $(d).addClass("active"), $("body").find(".aside-nav").data("nav") && $(".aside-nav>li>ul").find(".active").parents(".sub-nav").show().prev().addClass("on"), $("body").trigger("sideNav"));
+      if(d) {
+        $(d).parents("aside.aside").find(".active").removeClass("active");
+        $(d).addClass("active");
+        if($("body").find(".aside-nav").data("nav")) {
+          $(".aside-nav>li>ul").find(".active").parents(".sub-nav").show().prev().addClass("on");
+        }
+        $("body").trigger("sideNav");
+      }
       this.mainView.render();
     },
     _renderSubview: function () {
@@ -126,7 +133,7 @@
       null == this.pageActive ? $("#navigation .j_activeli,#navigation .j_homeli").removeClass("active") : "portal" == this.pageActive ? ($("#navigation .j_activeli").removeClass("active"), $("#navigation .j_homeli").addClass("active")) : ($("#navigation .j_activeli").addClass("active"), $("#navigation .j_homeli").removeClass("active"));
       this.browserTit();
       this.template && (
-        $("#mainContainer").html(_.template(this.template)(d)),
+        $("#mainContainer").html(app.utils.template(this.template, d)),
         /*TEAMS.blogUser*/'' && c && c(),
         app.config.noSubordinates && $("#mainContainer").find(".j_subordinates,.j_subordinate").remove(),
         null != this.userId && this.userId != app.config.currentUser.id && $("#mainContainer").find(".aside-nav>li").not(":first").remove()
@@ -134,10 +141,10 @@
     },
     browserTit: function () {
       var d, c = $(".j_pageActive").find(".j_modnav-" + this.pageActive + " span:eq(0)").text() || "cobra";
-      oldbt = document.title;
+      var oldbt = document.title;
       d = oldbt.slice(oldbt.indexOf(" - "));
       c && (document.title = "portal" == this.pageActive || null == this.pageActive ? "cobra" + d : c + d);
-      /*if (this.isPrintPage) switch (this.pageKey) {
+      if (this.isPrintPage) switch (this.pageKey) {
         case "flow":
           document.title = "w" + d;
           break;
@@ -146,7 +153,7 @@
           break;
         case "workreport":
           document.title = "w" + d
-      }*/
+      }
     },
     remove: function () {
       this.off();
@@ -1119,7 +1126,9 @@
     },
 
     _timeBindPicker: function() {
-      var month_short_name = moment.monthsShort();
+      var localLocale = moment;
+      localLocale.locale('en');
+      var month_short_name = localLocale.monthsShort();
       var date = this.options.year + "/" + this.options.month + "/" + this.options.day;
 
 //      e = moment(b);
@@ -1245,7 +1254,7 @@
       var not_submit_count = $static_el.data('not-submit-count');
       var submit_count = $static_el.data('submit-count');
       var barChartData = {
-	  		labels : [gettext("Not submit"),gettext("Submit Yet")],
+	  		labels : ['未提交', '已提交'],
 	  		datasets : [
 	  			{
 	  				fillColor : "rgba(220,220,220,0.5)",
@@ -1261,13 +1270,13 @@
         value: not_submit_count,
         color:app.utils.colors("red", 500),
         highlight: app.utils.colors("red", 600),
-        label: gettext("Not submit")
+        label: '未提交'
     },
     {
         value: submit_count,
         color: app.utils.colors("green", 300),
         highlight: app.utils.colors("green", 400),
-        label: gettext("Submit Yet")
+        label: '已提交'
     }
 ];
       var ctx = document.getElementById("statistic-canvas-bar").getContext("2d");
@@ -1481,121 +1490,123 @@
   app.OrganizationPage = BasePage.extend({
     initialize: function (data) {
       BasePage.prototype.initialize.apply(this, arguments);
+      var t = $(".project");
+      t.each(function(t, e) {
 
-
-          var t = $(".project");
-          t.each(function(t, e) {
-            
-            var n, i = $(e).find(".add-more"),
-            s = i.siblings(".menu");
-            i.click(function(t) {
-              t.preventDefault()
-            }),
-            $(e).on("mouseenter", ".add-more, .menu",
-            function() {
-              clearTimeout(n),
-              n = null,
-              s.addClass("active")
-            }),
-            $(e).on("mouseleave", ".add-more, .menu",
-            function() {
-              n = setTimeout(function() {
-                s.removeClass("active")
-              },
-              400)
-            })
-          })
+        var n, i = $(e).find(".add-more"),
+        s = i.siblings(".menu");
+        i.click(function(t) {
+          t.preventDefault()
+        }),
+        $(e).on("mouseenter", ".add-more, .menu",
+        function() {
+          clearTimeout(n),
+          n = null,
+          s.addClass("active")
+        }),
+        $(e).on("mouseleave", ".add-more, .menu",
+        function() {
+          n = setTimeout(function() {
+            s.removeClass("active")
+          },
+          400)
+        })
+      })
     }
   });
 
   app.SummaryPage = BasePage.extend({
-    /*initialize: function (data) {
-      BasePage.prototype.initialize.apply(this, arguments);
-      this.timelineView = new app.TimelineView({
-          userId: this.userId,
-          year: this.year,
-          type: this.type,
-          serialNumber: this.serialNumber,
-          container: "#reports-left"
-      });
-      this.render();
-    },
-
-    render: function() {
-      this.timelineView.render();
-    }*/
-
-    initialize: function(c) {
-        this.userId = c.userId;
-        this.year = c.year;
-        this.type = c.type;
-        this.serialNumber = c.serialNumber;
-        this.editable = c.editable;
-        this.pageKey = "workreportpage";
-        this.template = "workreport.workreportpage";
-        this.pageActive = "workreport";
-        this.mainView && (this.year = this.year ? this.year : $(".reports-panel").data("year"), this.type = this.type ? this.type : $(".reports-panel").data("type"), this.serialNumber = this.serialNumber ? this.serialNumber : $(".reports-panel").data("serialNumber"), this.mainView.update(this.userId, this.year, this.type, this.serialNumber, this.editable))
+    initialize: function(data) {
+      this.userId = data.userId;
+      this.year = data.year;
+      this.type = data.type;
+      this.serialNumber = data.serialNumber;
+      this.editable = data.editable;
+      this.pageKey = "workreportpage";
+      this.template = "workreport.workreportpage";
+      this.pageActive = "workreport";
+      if(this.mainView) {
+        this.year = this.year ? this.year : $(".reports-panel").data("year");
+        this.type = this.type ? this.type : $(".reports-panel").data("type");
+        this.serialNumber = this.serialNumber ? this.serialNumber : $(".reports-panel").data("serialNumber");
+        this.mainView.update(
+          this.userId,
+          this.year,
+          this.type,
+          this.serialNumber,
+          this.editable
+        );
+      }
     },
     delegateEvents: function() {
-        this.on("synTimeLine",
-            function(c) {
-                this.mainView.timelineView.genTimeLineByYear(c.year, c.week, c.month)
-            });
-        this.on("unreadCount",
-            function() {
-                this.mainView.getUnreadCount()
-            })
+      this.on("synTimeLine", function(res) {
+        this.mainView.timelineView.genTimeLineByYear(res.year, res.week, res.month);
+      });
+      this.on("unreadCount", function() {
+        this.mainView.getUnreadCount();
+      });
     },
     render: function() {
-        /*this.initLayout({
-            flag: !1
-        });*/
-        $(".aside").find("li.j_mine").addClass("active");
-        $(".goto-top").remove();
-        this.mainView = new app.WorkReportView({
-            userId: this.userId,
-            year: this.year,
-            type: this.type,
-            serialNumber: this.serialNumber,
-            editable: this.editable
-        });
-        this._render();
-        this.subView = new app.WorkReportContentView({
-            userId: this.userId,
-            year: this.year,
-            type: this.type,
-            serialNumber: this.serialNumber,
-            editable: this.editable,
-            container: "#reports-right"
-        });
-        this._renderSubview()
+      this.initLayout({
+          flag: false
+      });
+      $(".aside").find("li.j_mine").addClass("active");
+      $(".goto-top").remove();
+      this.mainView = new app.WorkReportView({
+        userId: this.userId,
+        year: this.year,
+        type: this.type,
+        serialNumber: this.serialNumber,
+        editable: this.editable
+      });
+      this._render();
+      this.subView = new app.WorkReportContentView({
+        userId: this.userId,
+        year: this.year,
+        type: this.type,
+        serialNumber: this.serialNumber,
+        editable: this.editable,
+        container: "#reports-right"
+      });
+      this._renderSubview();
     },
     renderSubview: function() {
-        this.mainView && (this.year = this.year ? this.year : $(".reports-panel").data("year"), this.type = this.type ? this.type : $(".reports-panel").data("type"), this.serialNumber = this.serialNumber ? this.serialNumber : $(".reports-panel").data("serialNumber"), this.mainView.update(this.userId, this.year, this.type, this.serialNumber, this.editable));
-        this.subView = new app.WorkReportContentView({
-            userId: this.userId,
-            year: this.year,
-            type: this.type,
-            serialNumber: this.serialNumber,
-            editable: this.editable,
-            container: "#reports-right"
-        });
-        this._renderSubview()
+      if(this.mainView) {
+        this.year = this.year ? this.year : $(".reports-panel").data("year");
+        this.type = this.type ? this.type : $(".reports-panel").data("type");
+        this.serialNumber = this.serialNumber ? this.serialNumber : $(".reports-panel").data("serialNumber");
+        this.mainView.update(
+          this.userId,
+          this.year,
+          this.type,
+          this.serialNumber,
+          this.editable
+        );
+      }
+      this.subView = new app.WorkReportContentView({
+        userId: this.userId,
+        year: this.year,
+        type: this.type,
+        serialNumber: this.serialNumber,
+        editable: this.editable,
+        container: "#reports-right"
+      });
+      this._renderSubview();
     }
   });
 
   app.Page = Backbone.View.extend({
-      initialize: function(a) {
-          this.relogin = true;
-        if(document.location.href && -1 == document.location.href.indexOf("print/")) {
-          /*this.top = new app.components.top;
-          this.top.render();*/
-        }
-//          this.portalModel = new app.models.PortalModel;
-      },
+    initialize: function(a) {
+      this.relogin = true;
+      if(document.location.href && -1 == document.location.href.indexOf("print/")) {
+        /*this.top = new app.components.top;
+        this.top.render();*/
+      }
+//    this.portalModel = new app.models.PortalModel;
+    },
       delegateEvents: function() {
           var b = this;
-//          app.components.event.initEvent();
+          app.components.event.initEvent();
           $("body").on("click", ".wechat-toggle",
               function(a) {
                   a.stopPropagation();
@@ -1696,7 +1707,7 @@
                       },
                       url: "/blog-message/shareApply.json",
                       success: function(a) {
-                          f.notify("共享申请已发送")
+                        app.alert('success', '共享申请已发送');
                       }
                   })
               });
@@ -1788,17 +1799,16 @@
                       }
                   }))))
               });
-          $("body").off("slideClose").on("slideClose",
-              function(a) {
+          $("body").off("slideClose").on("slideClose", function(a) {
                   $("#entitySlider").removeClass("in");
                   b.entitySlider && b.entitySlider.remove();
-                  f.router && f.router.isInCrm() && ROUTER.navigate(f.router.getUrl({
+                  /*f.router && f.router.isInCrm() && ROUTER.navigate(f.router.getUrl({
                       info: {
                           view: ""
                       }
                   }), {
                       trigger: !0
-                  })
+                  })*/
               });
           $("body").off("sideNav").on("sideNav",
               function() {

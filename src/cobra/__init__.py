@@ -40,6 +40,8 @@ COBRA_CORE_APPS = [
     'cobra.apps.team',
     'cobra.apps.svnkit',
     'cobra.apps.workreport',
+    'cobra.apps.summary',
+    'cobra.apps.share',
     # 3rd-party apps that cobra depends on
     # 'haystack',
     # 'treebeard',

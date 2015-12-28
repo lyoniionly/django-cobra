@@ -229,6 +229,11 @@
 
     layout: function(a, b, d) {
 //      scrollbar.setLayout(a, b, d)
+    },
+
+    template: function(templateName, data) {
+      var html = app.templates[templateName];
+      return data ? _.template(html, data) : html;
     }
 
   };

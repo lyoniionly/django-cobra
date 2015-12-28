@@ -19,129 +19,149 @@
   });
 
   app.models.WorkReportModel = Backbone.Model.extend({
-      initialize: function(f) {
-          this.page = {
-              pageNo: 1,
-              pageSize: 10
-          };
-        this.baseUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/summary/ajax/';
-      },
-      loadDepartment: function(f) {
-          $.ajax({
-              type: "post",
-              url: "/workreport/queryDepartment.json",
-              dataType: "json",
-              success: function(d) {
-                  f && f(d)
-              }
-          })
-      },
-      queryWorkReport: function(f, d) {
-        var url = this.baseUrl + 'view.json';
-          $.ajax({
-              type: "get",
-              url: url,
-              dataType: "json",
-              data: f,
-              success: function(c) {
-                  d && d(c)
-              }
-          })
-      },
-      loadReport: function(f, d, c, b, a) {
-          $.ajax({
-              type: "post",
-              url: "/workreport/loadReport.json",
-              dataType: "json",
-              data: {
-                  currentYear: f,
-                  choiceType: c,
-                  checkType: d,
-                  departmentId: b
-              },
-              success: function(b) {
-                  a && a(b)
-              }
-          })
-      },
-      queryGoalUserlist: function(f, d, c, b, a, e) {
-          $.ajax({
-              type: "post",
-              url: "/workreport/queryGoalUserList.json",
-              dataType: "json",
-              data: {
-                  currentYear: f,
-                  choiceType: c,
-                  checkType: d,
-                  number: b,
-                  departmentId: a
-              },
-              success: function(a) {
-                  e && e(a)
-              }
-          })
-      },
-      create: function(f, d) {
-          $.ajax({
-              type: "post",
-              url: "/workreport.json",
-              dataType: "json",
-              data: f,
-              success: function(c) {
-                  d && d(c)
-              }
-          })
-      },
-      update: function(f, d) {
-          f._method = "PUT";
-          $.ajax({
-              type: "post",
-              url: "/workreport/" + f["workReport.id"] + ".json?",
-              dataType: "json",
-              data: f,
-              success: function(c) {
-                  d && d(c)
-              }
-          })
-      },
-      queryWorkReportType: function(f, d, c, b) {
-          $.ajax({
-              type: "get",
-              url: "/workreport.json",
-              dataType: "json",
-              data: {
-                  type: f,
-                  pageSize: this.page.pageSize,
-                  pageNo: this.page.pageNo,
-                  commentTime: d,
-                  unreadFlag: c
-              },
-              async: !1,
-              success: function(a) {
-                  b && b(a)
-              }
-          })
-      },
-      getUnreadCount: function(f) {
-          $.ajax({
-              type: "get",
-              url: "/workreport/unreadCount.json",
-              dataType: "json",
-              success: function(d) {
-                  f && f(d)
-              }
-          })
-      },
-      readAll: function(f) {
-          $.ajax({
-              type: "get",
-              url: "/workreport/readAll.json",
-              dataType: "json",
-              success: function(d) {
-                  f && f(d)
-              }
-          })
-      }
+    initialize: function(data) {
+      this.page = {
+          pageNo: 1,
+          pageSize: 10
+      };
+      this.baseUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/summary/ajax/';
+    },
+    loadDepartment: function(callback) {
+      $.ajax({
+        type: "post",
+        url: "/workreport/queryDepartment.json",
+        dataType: "json",
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
+        }
+      });
+    },
+    queryWorkReport: function(data, callback) {
+      var url = this.baseUrl + 'view.json';
+      $.ajax({
+        type: "get",
+        url: url,
+        dataType: "json",
+        data: data,
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
+        }
+      });
+    },
+    loadReport: function(year, checkType, choiceType, departmentId, callback) {
+      $.ajax({
+        type: "post",
+        url: "/workreport/loadReport.json",
+        dataType: "json",
+        data: {
+          currentYear: year,
+          choiceType: choiceType,
+          checkType: checkType,
+          departmentId: departmentId
+        },
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
+        }
+      });
+    },
+    queryGoalUserlist: function(year, checkType, choiceType, num, departmentId, callback) {
+      $.ajax({
+        type: "post",
+        url: "/workreport/queryGoalUserList.json",
+        dataType: "json",
+        data: {
+          currentYear: year,
+          choiceType: choiceType,
+          checkType: checkType,
+          number: num,
+          departmentId: departmentId
+        },
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
+        }
+      });
+    },
+    create: function(data, callback) {
+      var url = this.baseUrl + 'workreport.json';
+      $.ajax({
+        type: "post",
+        url: url,
+        dataType: "json",
+        data: data,
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
+        }
+      });
+    },
+    update: function(data, callback) {
+      var url = this.baseUrl + data["workReport.id"] + ".json";
+      data._method = "PUT";
+      $.ajax({
+        type: "post",
+        url: url,
+        dataType: "json",
+        data: data,
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
+        }
+      });
+    },
+    queryWorkReportType: function(type, commentTime, unreadFlag, callback) {
+      $.ajax({
+        type: "get",
+        url: "/workreport.json",
+        dataType: "json",
+        data: {
+          type: type,
+          pageSize: this.page.pageSize,
+          pageNo: this.page.pageNo,
+          commentTime: commentTime,
+          unreadFlag: unreadFlag
+        },
+        async: false,
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
+        }
+      });
+    },
+    getUnreadCount: function(callback) {
+      $.ajax({
+        type: "get",
+        url: "/workreport/unreadCount.json",
+        dataType: "json",
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
+        }
+      });
+    },
+    readAll: function(callback) {
+      $.ajax({
+        type: "get",
+        url: "/workreport/readAll.json",
+        dataType: "json",
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
+        }
+      });
+    }
   });
 
   app.models.Share = Backbone.Model.extend({
@@ -150,14 +170,14 @@
     entityIds: "",
     sids: "",
     shareType: "sharer",
-    original: !1,
-    initialize: function(f) {
-      this.entityId = f.entityId;
-      this.entityIds = f.entityIds;
-      this.serverPath = f.serverPath ? f.serverPath: "";
-      this._module = f.module
+    original: false,
+    initialize: function(data) {
+      this.entityId = data.entityId;
+      this.entityIds = data.entityIds;
+      this.serverPath = data.serverPath ? data.serverPath: "";
+      this._module = data.module
     },
-    save: function(f) {
+    save: function(callback) {
       $.ajax({
         type: "post",
         url: this.serverPath + "/share/editUser.json",
@@ -169,12 +189,14 @@
           module: this._module,
           shareType: this.shareType
         },
-        success: function(d) {
-          f && f(d)
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
-      })
+      });
     },
-    saveAll: function(f) {
+    saveAll: function(callback) {
       $.ajax({
         type: "post",
         url: this.serverPath + "/share/addUser.json",
@@ -186,67 +208,77 @@
           module: this._module,
           shareType: this.shareType
         },
-        success: function(d) {
-          f && f(d)
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
-      })
+      });
     },
-    saveAllSearch: function(f, d) {
+    saveAllSearch: function(data, callback) {
       $.ajax({
-        contentType: "application/json;charset\x3dUTF-8",
+        contentType: "application/json;charset=UTF-8",
         type: "post",
         url: this.serverPath + "/share/addUser.json",
         dataType: "json",
-        data: f,
-        success: function(c) {
-          d && d(c)
+        data: data,
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
-      })
+      });
     },
-    saveShareAll: function(f, d) {
+    saveShareAll: function(data, callback) {
       $.ajax({
         type: "post",
         url: this.serverPath + "/share/shareAll.json",
         dataType: "json",
-        data: f,
-        success: function(c) {
-          d && d(c)
+        data: data,
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
-      })
+      });
     },
-    getProcess: function(f, d) {
+    getProcess: function(data, d) {
       $.ajax({
         type: "post",
         url: this.serverPath + "/share/getBatchShareProcess.json",
         dataType: "json",
-        data: f,
-        success: function(c) {
-          d && d(c)
+        data: data,
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
-      })
+      });
     },
-    query: function(f) {
+    query: function(callback) {
       $.ajax({
         type: "get",
         url: this.serverPath + "/share/" + this.entityId + ".json",
         dataType: "json",
-        success: function(d) {
-          f && f(d)
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
-      })
+      });
     },
-    querySuperior: function(f, d) {
+    querySuperior: function(userIds, callback) {
       $.ajax({
         type: "get",
         url: "/users/superiors.json",
         data: {
-          userIds: f.join(",")
+          userIds: userIds.join(",")
         },
         dataType: "json",
-        success: function(c) {
-          d(c)
+        success: function(res) {
+          callback(res);
         }
-      })
+      });
     }
   });
 }(app, Backbone));

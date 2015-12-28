@@ -78,7 +78,7 @@ class AbstractDailyReport(Model):
         if self.published_datetime > deadline_time:
             delta_days = (self.published_datetime - deadline_time).days
             if delta_days > 0:
-                return _('Late submission for %d days' % delta_days)
+                return _('Late submission for %d days') % delta_days
             return _('Late submission')
         else:
             return _('Submit On Time')

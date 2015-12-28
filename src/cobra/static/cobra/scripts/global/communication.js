@@ -1,8 +1,8 @@
-/* Queued ajax handling for Gitgo.
+/* Queued ajax handling for Cobra.
  *
  * Note: The number of concurrent AJAX connections hanlded in the queue
  * can be configured by setting an "ajax_queue_limit" key in
- * GITGO_CONFIG to the desired number (or None to disable queue
+ * COBRA_CONFIG to the desired number (or None to disable queue
  * limiting).
  */
 (function (app, jQuery) {
@@ -15,11 +15,11 @@
     _queue: [],
     _active: [],
     get_messages: function (request) {
-      var contentType = request.getResponseHeader("Content-Type");
-      if (contentType == "application/javascript" || contentType == "application/json") {
-        return request.responseText;
-      }
-//      return request.getResponseHeader("Content-Type");
+      //var contentType = request.getResponseHeader("Content-Type");
+      //if (contentType == "application/javascript" || contentType == "application/json") {
+      //  return request.responseText;
+      //}
+      return request.getResponseHeader("X-Cobra-Messages");
     },
     // Function to add a new call to the queue.
     queue: function(opts) {

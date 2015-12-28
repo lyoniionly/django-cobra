@@ -176,11 +176,11 @@
       },*/
       workReport: function(userId, year, type, serialNumber) {
         this.app.renderWorkReport(userId, year, type, serialNumber);
-      }//,
-      /*workReport_type: function(d, c) {
-          isNaN(d) ? this.app.renderWorkReportType(d, c) : this.app.renderWorkReport(d)
       },
-      workReport_unreadComment: function(d) {
+      workReport_type: function(d, c) {
+          isNaN(d) ? this.app.renderWorkReportType(d, c) : this.app.renderWorkReport(d);
+      }//,
+      /*workReport_unreadComment: function(d) {
           this.app.renderWorkReportType("comment", d, !0)
       },
       workReport_unreadReplay: function(d) {

@@ -1,4 +1,5 @@
 {% load i18n helper_tags %}
+{% load l10n %}
 
 <div class="report-date">
   <div class="report-date-wrapper">
@@ -50,7 +51,7 @@
 
     <ul class="nav nav-list nav-github">
       {% for abbr_name, full_name in months.items %}
-        <li class="{% ifequal filter_date|date:'M' abbr_name %}active{% endifequal %}">
+        <li class="{% language "en" %}{% ifequal filter_date|date:'M' abbr_name %}active{% endifequal %}{% endlanguage %}">
           {% if is_team %}
             <a href="{% url 'organization:workreport:daily-team-report-month' organization.slug filter_date.year abbr_name %}">{{ full_name }}</a>
           {% else %}

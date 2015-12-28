@@ -6,7 +6,7 @@ from django.utils.six.moves.urllib import parse
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
-from cobra.apps.accounts.utils import get_user_info
+from cobra.apps.accounts.utils import get_user_info_by_pk
 
 
 def strip_language_code(request):
@@ -60,6 +60,6 @@ def metadata(request):
             'google_analytics_id': getattr(settings,
                                            'GOOGLE_ANALYTICS_ID', None)}
     if request.user and request.user.pk > 0:
-        meta.update({'currentUser': get_user_info(request.user.pk)})
+        meta.update({'currentUser': get_user_info_by_pk(request.user.pk)})
 
     return meta

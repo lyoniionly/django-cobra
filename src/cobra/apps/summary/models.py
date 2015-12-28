@@ -6,9 +6,9 @@ from .abstract_models import *  # noqa
 __all__ = []
 
 
-# if not is_model_registered('workreport', 'DailyReport'):
-#     class DailyReport(AbstractDailyReport):
-#         pass
-#
-#     __all__.append('DailyReport')
+if not is_model_registered('summary', 'WorkReport'):
+    class WorkReport(AbstractWorkReport):
+        pass
+
+    __all__.append('WorkReport')
 

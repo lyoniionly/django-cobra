@@ -2,6 +2,7 @@ from collections import defaultdict
 from django import template
 from django.db.models import Q
 from cobra.core.loading import get_model
+from cobra.core.permissions import is_organization_admin
 
 register = template.Library()
 
@@ -43,3 +44,16 @@ def organization_members_with_filter(organization, with_invited=False, limit=Non
         queryset = queryset[0:limit]
 
     return queryset
+
+
+@register.filter
+def has_subordinates(user, organization):
+    '''
+    If the user is the admin of the organization,
+    and the organization has other members except this user,
+    we consider that the user has subordinate
+    '''
+    if is_organization_admin(user, organization) and len(organization_members(organization)) > 1:
+        return True
+    else:
+        return False
