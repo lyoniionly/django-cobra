@@ -46,6 +46,7 @@ COBRA_CORE_APPS = [
     # 'haystack',
     # 'treebeard',
     # 'sorl.thumbnail',
+    'mptt',
     'django_statsd',
     'easy_thumbnails',
     'sudo',

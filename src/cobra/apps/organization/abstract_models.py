@@ -11,11 +11,13 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from easy_thumbnails.fields import ThumbnailerImageField
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
 from cobra.core.compat import AUTH_USER_MODEL
 from cobra.core.constants import RESERVED_ORGANIZATION_SLUGS
 from cobra.core.http import absolute_uri
-from cobra.core.loading import get_class
+from cobra.core.loading import get_class, get_model
 from cobra.core.utils import generate_sha1
 from cobra.models import Model
 from cobra.models import fields
@@ -118,7 +120,6 @@ class AbstractOrganization(Model):
             'name': self.name,
             'status': self.status,
         }
-
 
 
 @python_2_unicode_compatible
@@ -234,3 +235,91 @@ class AbstractOrganizationMember(Model):
             'teams': [t.id for t in self.teams.all()],
             'has_global_access': self.has_global_access,
         }
+
+
+@python_2_unicode_compatible
+class AbstractOrganizationDepartment(MPTTModel, Model):
+    """
+    """
+    name = models.CharField(max_length=100)
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+    organization = fields.FlexibleForeignKey('organization.Organization', related_name="department_set")
+
+    class Meta:
+        abstract = True
+        app_label = 'organization'
+        db_table = 'cobra_organization_department'
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
+
+    __repr__ = sane_repr('organization_id', 'name')
+
+    def __str__(self):
+        return self.name
+
+    def get_node_obj(self):
+        if not self.parent:
+            node_obj = {
+                'name': self.name,
+                'code': '0000',
+                'disporder': 0,
+                'manager': '',
+                'rank': self.get_level() + 1,
+                'id': self.pk
+            }
+        else:
+            node_obj = {
+                'name': self.name,
+                'parent': {
+                    'name': self.parent.name,
+                    'rank': self.parent.get_level() + 1,
+                    'id': self.parent.pk
+                },
+                'rank': self.get_level() + 1,
+                'id': self.pk
+            }
+        return node_obj
+
+    def to_dict(self):
+        OrganizationMember = get_model('organization', 'OrganizationMember')
+        OrganizationDepartmentMember = get_model('organization', 'OrganizationDepartmentMember')
+        if not self.parent:
+            parent_id = 'root'
+            open = True
+            member_count = len(OrganizationMember.objects.get_members(self.organization))
+        else:
+            parent_id = self.parent.pk
+            open = False
+            member_count = OrganizationDepartmentMember.objects.filter(department=self).count()
+        data = {
+            'id': self.pk,
+            'parentId': parent_id,
+            'name': self.name,
+            'open': open,
+            'iconSkin': 'department',
+            'url': '/organization/'+ str(self.pk) +'/user',
+            'type': 'department',
+            'rank': self.get_level() + 1,
+            'attachment': member_count, # This is ref to member count
+            'nodeObj': self.get_node_obj()
+        }
+        return data
+
+
+@python_2_unicode_compatible
+class AbstractOrganizationDepartmentMember(Model):
+    """
+    """
+    user = fields.FlexibleForeignKey(AUTH_USER_MODEL)
+    department = fields.FlexibleForeignKey('organization.OrganizationDepartment', related_name="department_member_set")
+
+    class Meta:
+        abstract = True
+        app_label = 'organization'
+        db_table = 'cobra_organization_department_member'
+
+    __repr__ = sane_repr('user_id', 'department_id')
+
+    def __str__(self):
+        return '%s - %s' % (self.user.username, self.department.name)

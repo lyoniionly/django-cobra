@@ -1595,6 +1595,104 @@
     }
   });
 
+  app.OrgPage = BasePage.extend({
+    initialize: function(data) {
+      this.id = data.id;
+      this.type = data.type || "user";
+      this.operation = data.operation;
+      this.userOrg = data.userOrg;
+      this.pageKey = this.type;
+      this.creator = data.creator;
+      if("department" == this.type) {
+        this.pageKey = "user";
+      }
+      this.template = "org.page";
+      this.el = "#mainContainer"
+    },
+    delegateEvents: function() {
+      $("#mainContainer").on("click.Messages", ".sub-nav li", function(a) {
+        $(".sub-nav li").removeClass("active");
+        $(this).addClass("active")
+      });
+      this.on("addNode", function(a) {
+        this.mainView.addNode(a)
+      });
+      this.on("updateNode", function(a) {
+        this.mainView.updateNode(a.propertyName, a.value)
+      });
+      this.on("updateGroup", function() {
+        this.mainView.updateGroup()
+      });
+      this.on("deleteSelectedNode", function(a) {
+        this.mainView.deleteSelectedNode(a)
+      });
+      this.on("rerenderTree", function() {
+        this.mainView.render()
+      })
+    },
+    render: function() {
+      var e = this,
+      c = this.el;
+      this.initLayout({
+        userId: app.config.currentUser.id
+      });
+      $(e.el).find(".sub-nav li.j_" + e.type).addClass("active");
+      e.inviteView = new app.components.InviteView({
+        container: c + " #org_container .j_main #invite-main-bd",
+        type: "inline",
+        callback: function(a) {
+          e.mainView.loadInviteInfo && e.mainView.loadInviteInfo(a, "prepend")
+        }
+      });
+      $(e.inviteView.container).find("#invite-cancel").addClass("hide");
+      switch (e.type) {
+        case "user":
+          $(e.el).find("#org-main-bd").hasClass("hide") && $(e.el).find("#org-main-bd").removeClass("hide");
+          $(e.el).find("#invite-main-bd").addClass("hide");
+          this.mainView = new app.org.DepartmentTreeView({
+            id: this.id,
+            type: e.type,
+            el: c + " #org_container .j_main .org-left-col",
+            operation: this.operation
+          });
+          this._render();
+          this.renderSubview();
+          break;
+        case "invitation":
+          $(e.el).find("#invite-main-bd").hasClass("hide") && $(e.el).find("#invite-main-bd").removeClass("hide"),
+          $(e.el).find("#org-main-bd").addClass("hide"),
+          this.mainView = new b({
+            container: c + " #org_container .j_main #invite-members .invite-view-wrapper"
+          }),
+          this._render()
+      }
+    },
+    renderSubview: function() {
+      var a = this.el,
+      b = this.id,
+      m = this.type,
+      k = this.userOrg,
+      f = this.creator;
+      "user" == m ? this.subView = new app.org.UserView({
+        id: b,
+        operation: this.operation,
+        el: a + " #org_container .j_main .org-right-col",
+        editable: !0,
+        userOrg: k,
+        isDepartment: !0,
+        creator: f
+      }) : "department" == m && (this.subView = new app.org.DepartmentView({
+        id: this.id,
+        el: a + " #org_container .j_main .org-right-col",
+        operation: this.operation
+      }));
+      this._renderSubview()
+    },
+    undelegateEvents: function() {
+      $(window).off("resize.OrgPage")
+    }
+  });
+
   app.Page = Backbone.View.extend({
     initialize: function(a) {
       this.relogin = true;
@@ -1604,798 +1702,798 @@
       }
 //    this.portalModel = new app.models.PortalModel;
     },
-      delegateEvents: function() {
-          var b = this;
-          app.components.event.initEvent();
-          $("body").on("click", ".wechat-toggle",
-              function(a) {
-                  a.stopPropagation();
-                  a = $(this).data("employee");
-                  a && a.id == TEAMS.currentUser.id || !b.top.newmessage || (b.top.newmessage.openChatWindow(a, "employee"), O.markMessageRead(b.type))
-              });
-          $("body").on("mouseenter", ".popover-toggle",
-              function(a) {
-                  $(this).find(".popover-bottom").fadeTo(100, 1)
-              }).on("mouseleave", ".popover-toggle",
-              function(a) {
-                  $(this).find(".popover-bottom").fadeTo(0).hide()
-              });
-          $("body").off("click", "a.client-toggle").on("click", "a.client-toggle",
-              function() {
-                  (new a).render()
-              });
-          $("body").on("click", ".advise-toggle",
-              function(a) {
-                  (new y).render()
-              });
-          var c = -1;
-          $(document).off("keydown").on("keydown",
-              function(a) {
-                  c = a.keyCode;
-                  null == $(".modal-backdrop.fade.in").get(0) && 27 == c && b.initSlider({
-                      callBack: function(a) {
-                          a && (window.formJsonStr = null, $("body").trigger("slideClose"))
-                      }
-                  })
-              });
-          $(window).off("beforeunload.dropdownmenu").on("beforeunload.dropdownmenu",
-              function() {
-                  if (116 == c) c = -1;
-                  else if (-1 == navigator.userAgent.toLowerCase().indexOf("firefox") && TEAMS.currentUser.loginCount && 1 > TEAMS.currentUser.loginCount) return "您可以通过快捷键Ctrl+D将cobra加入到收藏夹"
-              });
-          $("body").off("triggerClose").on("triggerClose",
-              function(a) {
-                  var b = location.pathname;
-                  a = location.hash;
-                  b = b.substring(0, b.lastIndexOf("/"));
-                  "" == b && "" != a && (b = "/" + a.substring(1, a.lastIndexOf("/")));
-                  ROUTER.navigate(b, {
-                      trigger: !0
-                  })
-              });
-          $("body").off("click", "a.pwd-toggle").on("click", "a.pwd-toggle",
-              function() {
-                  var a = $(this).attr("userId"),
-                      b = $(this).attr("type");
-                  (new v({
-                      userId: a,
-                      type: b
-                  })).render()
-              });
-          $("body").off("click", "a.invite-toggle").on("click", "a.invite-toggle",
-              function(a) {
-                  (new z).render()
-              });
-          $("body").off("click", "div.invite-toggle").on("click", "div.invite-toggle",
-              function(a) {
-                  (new z).render()
-              });
-          $("body").off("click", "a.chat-history-toggle").on("click", "a.chat-history-toggle",
-              function(a) {
-                  a = $(this).data("chatType");
-                  if ("employee" == a) var b = $(this).data("targetId");
-                  else if ("channel" == a) var c = $(this).data("targetId");
-                  (new A({
-                      userId: b,
-                      channelId: c,
-                      chatType: a
-                  })).render()
-              });
-          $("body").off("click", "p.quick-invite-toggle").on("click", "p.quick-invite-toggle",
-              function(a) {
-                  a = $(this).find("span").text();
-                  a = new D({
-                      userName: a
-                  });
-                  a.render();
-                  setTimeout(a.focusInput, 200)
-              });
-          $("body").off("click", "a.upload-toggle").on("click", "a.upload-toggle",
-              function() {
-                  (new x({})).renderBox()
-              });
-          $("body").off("click", ".share-join").on("click", ".share-join",
-              function() {
-                  var a = $(this).attr("entityId"),
-                      b = $(this).attr("module");
-                  $.ajax({
-                      type: "post",
-                      dataType: "json",
-                      data: {
-                          entityId: a,
-                          module: b
-                      },
-                      url: "/blog-message/shareApply.json",
-                      success: function(a) {
-                        app.alert('success', '共享申请已发送');
-                      }
-                  })
-              });
-          $("body").on("click", ".j_entityslider-toggle",
-              function(a) {
-                  var c = $(this);
-                  $(this).parents(".unread").removeClass("unread");
-                  $(this).parents(".newComment").removeClass("newComment");
-                  b.initSlider({
-                      callBack: function(a) {
-                          if (a) {
-                              a = c.attr("barType");
-                              var b = c.attr("idList"),
-                                  d = c.attr("mainlineId"),
-                                  e = c.attr("group"),
-                                  f = c.attr("checkDate"),
-                                  h = c.attr("userName"),
-                                  g = c.attr("data-module"),
-                                  k = c.attr("data-id"),
-                                  m = c.attr("userId"),
-                                  n = c.attr("renderType"),
-                                  p = c.data("tolink"),
-                                  u = c.attr("formData"),
-                                  w = c.attr("title"),
-                                  q = c.attr("form-creator");
-                              $("body").trigger("slideOpen", {
-                                  barType: a,
-                                  mainlineId: d,
-                                  group: e,
-                                  checkDate: f,
-                                  userName: h,
-                                  module: g,
-                                  id: k,
-                                  idList: b,
-                                  userId: m,
-                                  renderType: n,
-                                  tolink: p,
-                                  formData: u,
-                                  formTitle: w,
-                                  formCreator: q
-                              })
-                          }
-                      }
-                  })
-              });
-          $("body").off("slideOpen").on("slideOpen",
-              function(a, c) {
-                  var d = c.barType,
-                      e = c.mainlineId,
-                      f = c.group,
-                      h = c.checkDate,
-                      g = c.userName,
-                      k = c.module,
-                      m = c.id,
-                      n = c.idList,
-                      p = c.userId,
-                      u = c.renderType,
-                      w = c.slideCallback,
-                      q = c.tolink,
-                      s = c.formData,
-                      v = c.formTitle,
-                      x = c.formCreator;
-                  "task" != k || $(this).hasClass("btn") || $(this).addClass("active");
-                  k && m && (b.entitySlider && b.entitySlider.remove(), d = new Q({
-                      barType: d,
-                      mainlineId: e,
-                      group: f,
-                      checkDate: h,
-                      userName: g,
-                      module: k,
-                      id: m,
-                      idList: n,
-                      userId: p,
-                      renderType: u,
-                      page: b.lastPage,
-                      slideCallback: w,
-                      tolink: q,
-                      formData: s,
-                      formTitle: v,
-                      formCreator: x
-                  }), d.render(), b.entitySlider = d)
-              });
-          $("body").on("click",
-              function(a) {
-                  a = $(a.target);
-                  null == $("#entitybox").get(0) && null == $(".modal-backdrop.fade.in").get(0) && (a.hasClass("j_entityslider-toggle") || null != a.parents(".j_entityslider-toggle").get(0) || a.hasClass(".smwx-box") || null != a.parents(".smwx-box").get(0) || null != a.parents("body").get(0) && (a.hasClass("filterSlip_js") || null == a.parents(".filterSlip_js").get(0) && null == a.parents(".ui-pnotify ").get(0) && null == $(".fancybox-overlay.fancybox-overlay-fixed").get(0) && $("#entitySlider").hasClass("in") && (a.hasClass("fc-event-inner") || null != a.parents(".fc-event-inner").get(0) || null != a.parents("#j_content").get(0) || "j_content" == a.context.id || "newAgenda" == a.context.id || 0 < $(".js_stopExecute").size() || 0 == a.closest("#entitySlider").length && b.initSlider({
-                      callBack: function(a) {
-                          a && (window.formJsonStr = null, $("body").trigger("slideClose"))
-                      }
-                  }))))
-              });
-          $("body").off("slideClose").on("slideClose", function(a) {
-                  $("#entitySlider").removeClass("in");
-                  b.entitySlider && b.entitySlider.remove();
-                  /*f.router && f.router.isInCrm() && ROUTER.navigate(f.router.getUrl({
-                      info: {
-                          view: ""
-                      }
-                  }), {
-                      trigger: !0
-                  })*/
-              });
-          $("body").off("sideNav").on("sideNav",
-              function() {
-                  $('.aside-nav[data-nav\x3d"fold"] li\x3ediv.link-item').each(function() {
-                      null != $(this).next(".sub-nav").get(0) && $(this).css("cursor", "pointer");
-                      $(this).append('\x3ci class\x3d"icon-angle-down fr"\x3e\x3c/i\x3e')
-                  });
-                  $("body").off("click", '.aside-nav[data-nav\x3d"fold"] li\x3ediv.link-item').on("click", '.aside-nav[data-nav\x3d"fold"] li\x3ediv.link-item',
-                      function(a) {
-                          a = $(this).parent("li");
-                          var b = $(this).next(".sub-nav");
-                          null != b.get(0) && (b.is(":visible") ? (b.slideUp("fast"), $(this).removeClass("on")) : (b.slideDown("fast"), a.siblings().find("div.link-item").removeClass("on").end().find(".sub-nav").slideUp("fast"), $(this).addClass("on")))
-                      })
-              });
-          $("body").off("mouseenter", ".remoteDownload").on("mouseenter", ".remoteDownload",
-              function(a) {
-                  a = $(this).data("dlid");
-                  a = crmContext.remoteDownloadUrl + "/remotedownload/" + a + "/" + ETEAMSID + "/true";
-                  $(this).data("dltype") && (a += "?type\x3d" + $(this).data("dltype"));
-                  $(this).attr("href", a)
-              });
-          $("#navigation").off("click", ".j_nav_ul a[class*\x3d'j_modnav-'], .j_nav_ul li.j_homeli a, #user-panel .j_user_menu_portal").on("click", ".j_nav_ul a[class*\x3d'j_modnav-'], .j_nav_ul li.j_homeli a, #user-panel .j_user_menu_portal",
-              function(a) {
-                  var c = $(this);
-                  a = c.attr("href");
-                  c = c.data("url");
-                  a == c && b.setConfig(TEAMS.currentUser.id, a)
-              })
-      },
-      initSlider: function(a) {
-          a = a.callBack;
-          if (window.formJsonStr && $("body .form-view_js").get(0) && window.formPlugin) {
-              var b = formPlugin.submitAssembleForm({
-                  parentEl: $("body .form-view_js")
-              });
-              JSON.stringify(b.formData.dataDetails) != window.formJsonStr ? f.confirm("确定放弃填写审批表单吗？放弃后数据将不会被保存！", a) : a({
-                  result: true
-              })
-          } else a({
-              result: true
-          })
-      },
-      render: function(a, b) {
-          this.crmApp && this.crmApp.lastPage && (this.crmApp.lastPage.remove(), this.crmApp.lastPage = null);
-          if (null == this.lastPage) this.lastPage = a;
-          else if (this.lastPage.pageKey != a.pageKey || b) this.lastPage.remove ? this.lastPage.remove() : this.lastPage.mainView && this.lastPage.mainView.remove(),
-              this.lastPage = a;
-          else {
-              this.update(a);
-              this.lastPage.subView && (this.lastPage.subView.remove(), this.lastPage.renderSubview());
-              return
-          }
-          this.lastPage.render();
-//          app.components.event.setLastPage(this.lastPage);
-          $("body").trigger("rViewSlide");
-          $(window).trigger("resize")
-      },
-      update: function(a) {
-          this.lastPage.initialize(a);
-          a.remove()
-      },
-      /*renderHome: function(a) {
-          a || (a = TEAMS.currentUser.id);
-          a != TEAMS.currentUser.id ? this.renderBlog(a) : (this.top && this.top.renderNavUrl(a), this.getDispalyConfig(a))
-      },
-      renderTask: function(a, b) {
-          a || (a = TEAMS.currentUser.id);
-          var d = new c({
-              userId: a,
-              id: b,
-              type: "mine"
-          });
-          this.top && this.top.renderNavUrl(a,
-              function() {
-                  d.renderType()
-              });
-          this.render(d)
-      },
-      renderTaskByType: function(a, b) {
-          a || (a = TEAMS.currentUser.id);
-          b = b ? b : "mine";
-          var d = new c({
-              pageKey: "task-" + b,
-              userId: a,
-              type: b
-          });
-          this.top && this.top.renderNavUrl(a,
-              function() {
-                  d.renderType()
-              });
-          this.render(d)
-      },
-      renderWorkflow: function(a, c, d) {
-          a || (a = TEAMS.currentUser.id);
-          var e = new b({
-              userId: a,
-              id: c,
-              formId: d
-          });
-          this.top && this.top.renderNavUrl(a,
-              function() {
-                  e.renderType()
-              });
-          this.render(e)
-      },
-      renderNewWorkflow: function(a, c, d) {
-          null == c || "new" == c && null == d ? this.renderWorkflow(a, c, d) : (a || (a = TEAMS.currentUser.id), a = new b({
-              userId: a,
-              id: c,
-              formId: d
-          }), this.render(a))
-      },
-      renderWorkflowByType: function(a, c, d) {
-          a || (a = TEAMS.currentUser.id);
-          var e = new b({
-              userId: a,
-              formId: d,
-              searchType: c
-          });
-          this.top && this.top.renderNavUrl(a,
-              function() {
-                  e.renderType()
-              });
-          this.render(e)
-      },*/
-      renderWorkReport: function(userId, year, type, serialNumber) { // Week report userId, year, type, serialNumber
-        var editable = true, page;
-        if(userId){
-          editable = (userId == app.config.currentUser.id);
-        } else {
-          userId = app.config.currentUser.id;
+    delegateEvents: function() {
+        var b = this;
+        app.components.event.initEvent();
+        $("body").on("click", ".wechat-toggle",
+            function(a) {
+                a.stopPropagation();
+                a = $(this).data("employee");
+                a && a.id == TEAMS.currentUser.id || !b.top.newmessage || (b.top.newmessage.openChatWindow(a, "employee"), O.markMessageRead(b.type))
+            });
+        $("body").on("mouseenter", ".popover-toggle",
+            function(a) {
+                $(this).find(".popover-bottom").fadeTo(100, 1)
+            }).on("mouseleave", ".popover-toggle",
+            function(a) {
+                $(this).find(".popover-bottom").fadeTo(0).hide()
+            });
+        $("body").off("click", "a.client-toggle").on("click", "a.client-toggle",
+            function() {
+                (new a).render()
+            });
+        $("body").on("click", ".advise-toggle",
+            function(a) {
+                (new y).render()
+            });
+        var c = -1;
+        $(document).off("keydown").on("keydown",
+            function(a) {
+                c = a.keyCode;
+                null == $(".modal-backdrop.fade.in").get(0) && 27 == c && b.initSlider({
+                    callBack: function(a) {
+                        a && (window.formJsonStr = null, $("body").trigger("slideClose"))
+                    }
+                })
+            });
+        $(window).off("beforeunload.dropdownmenu").on("beforeunload.dropdownmenu",
+            function() {
+                if (116 == c) c = -1;
+                else if (-1 == navigator.userAgent.toLowerCase().indexOf("firefox") && TEAMS.currentUser.loginCount && 1 > TEAMS.currentUser.loginCount) return "您可以通过快捷键Ctrl+D将cobra加入到收藏夹"
+            });
+        $("body").off("triggerClose").on("triggerClose",
+            function(a) {
+                var b = location.pathname;
+                a = location.hash;
+                b = b.substring(0, b.lastIndexOf("/"));
+                "" == b && "" != a && (b = "/" + a.substring(1, a.lastIndexOf("/")));
+                ROUTER.navigate(b, {
+                    trigger: !0
+                })
+            });
+        $("body").off("click", "a.pwd-toggle").on("click", "a.pwd-toggle",
+            function() {
+                var a = $(this).attr("userId"),
+                    b = $(this).attr("type");
+                (new v({
+                    userId: a,
+                    type: b
+                })).render()
+            });
+        $("body").off("click", "a.invite-toggle").on("click", "a.invite-toggle",
+            function(a) {
+                (new z).render()
+            });
+        $("body").off("click", "div.invite-toggle").on("click", "div.invite-toggle",
+            function(a) {
+                (new z).render()
+            });
+        $("body").off("click", "a.chat-history-toggle").on("click", "a.chat-history-toggle",
+            function(a) {
+                a = $(this).data("chatType");
+                if ("employee" == a) var b = $(this).data("targetId");
+                else if ("channel" == a) var c = $(this).data("targetId");
+                (new A({
+                    userId: b,
+                    channelId: c,
+                    chatType: a
+                })).render()
+            });
+        $("body").off("click", "p.quick-invite-toggle").on("click", "p.quick-invite-toggle",
+            function(a) {
+                a = $(this).find("span").text();
+                a = new D({
+                    userName: a
+                });
+                a.render();
+                setTimeout(a.focusInput, 200)
+            });
+        $("body").off("click", "a.upload-toggle").on("click", "a.upload-toggle",
+            function() {
+                (new x({})).renderBox()
+            });
+        $("body").off("click", ".share-join").on("click", ".share-join",
+            function() {
+                var a = $(this).attr("entityId"),
+                    b = $(this).attr("module");
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        entityId: a,
+                        module: b
+                    },
+                    url: "/blog-message/shareApply.json",
+                    success: function(a) {
+                      app.alert('success', '共享申请已发送');
+                    }
+                })
+            });
+        $("body").on("click", ".j_entityslider-toggle",
+            function(a) {
+                var c = $(this);
+                $(this).parents(".unread").removeClass("unread");
+                $(this).parents(".newComment").removeClass("newComment");
+                b.initSlider({
+                    callBack: function(a) {
+                        if (a) {
+                            a = c.attr("barType");
+                            var b = c.attr("idList"),
+                                d = c.attr("mainlineId"),
+                                e = c.attr("group"),
+                                f = c.attr("checkDate"),
+                                h = c.attr("userName"),
+                                g = c.attr("data-module"),
+                                k = c.attr("data-id"),
+                                m = c.attr("userId"),
+                                n = c.attr("renderType"),
+                                p = c.data("tolink"),
+                                u = c.attr("formData"),
+                                w = c.attr("title"),
+                                q = c.attr("form-creator");
+                            $("body").trigger("slideOpen", {
+                                barType: a,
+                                mainlineId: d,
+                                group: e,
+                                checkDate: f,
+                                userName: h,
+                                module: g,
+                                id: k,
+                                idList: b,
+                                userId: m,
+                                renderType: n,
+                                tolink: p,
+                                formData: u,
+                                formTitle: w,
+                                formCreator: q
+                            })
+                        }
+                    }
+                })
+            });
+        $("body").off("slideOpen").on("slideOpen",
+            function(a, c) {
+                var d = c.barType,
+                    e = c.mainlineId,
+                    f = c.group,
+                    h = c.checkDate,
+                    g = c.userName,
+                    k = c.module,
+                    m = c.id,
+                    n = c.idList,
+                    p = c.userId,
+                    u = c.renderType,
+                    w = c.slideCallback,
+                    q = c.tolink,
+                    s = c.formData,
+                    v = c.formTitle,
+                    x = c.formCreator;
+                "task" != k || $(this).hasClass("btn") || $(this).addClass("active");
+                k && m && (b.entitySlider && b.entitySlider.remove(), d = new Q({
+                    barType: d,
+                    mainlineId: e,
+                    group: f,
+                    checkDate: h,
+                    userName: g,
+                    module: k,
+                    id: m,
+                    idList: n,
+                    userId: p,
+                    renderType: u,
+                    page: b.lastPage,
+                    slideCallback: w,
+                    tolink: q,
+                    formData: s,
+                    formTitle: v,
+                    formCreator: x
+                }), d.render(), b.entitySlider = d)
+            });
+        $("body").on("click",
+            function(a) {
+                a = $(a.target);
+                null == $("#entitybox").get(0) && null == $(".modal-backdrop.fade.in").get(0) && (a.hasClass("j_entityslider-toggle") || null != a.parents(".j_entityslider-toggle").get(0) || a.hasClass(".smwx-box") || null != a.parents(".smwx-box").get(0) || null != a.parents("body").get(0) && (a.hasClass("filterSlip_js") || null == a.parents(".filterSlip_js").get(0) && null == a.parents(".ui-pnotify ").get(0) && null == $(".fancybox-overlay.fancybox-overlay-fixed").get(0) && $("#entitySlider").hasClass("in") && (a.hasClass("fc-event-inner") || null != a.parents(".fc-event-inner").get(0) || null != a.parents("#j_content").get(0) || "j_content" == a.context.id || "newAgenda" == a.context.id || 0 < $(".js_stopExecute").size() || 0 == a.closest("#entitySlider").length && b.initSlider({
+                    callBack: function(a) {
+                        a && (window.formJsonStr = null, $("body").trigger("slideClose"))
+                    }
+                }))))
+            });
+        $("body").off("slideClose").on("slideClose", function(a) {
+                $("#entitySlider").removeClass("in");
+                b.entitySlider && b.entitySlider.remove();
+                /*f.router && f.router.isInCrm() && ROUTER.navigate(f.router.getUrl({
+                    info: {
+                        view: ""
+                    }
+                }), {
+                    trigger: !0
+                })*/
+            });
+        $("body").off("sideNav").on("sideNav",
+            function() {
+                $('.aside-nav[data-nav\x3d"fold"] li\x3ediv.link-item').each(function() {
+                    null != $(this).next(".sub-nav").get(0) && $(this).css("cursor", "pointer");
+                    $(this).append('\x3ci class\x3d"icon-angle-down fr"\x3e\x3c/i\x3e')
+                });
+                $("body").off("click", '.aside-nav[data-nav\x3d"fold"] li\x3ediv.link-item').on("click", '.aside-nav[data-nav\x3d"fold"] li\x3ediv.link-item',
+                    function(a) {
+                        a = $(this).parent("li");
+                        var b = $(this).next(".sub-nav");
+                        null != b.get(0) && (b.is(":visible") ? (b.slideUp("fast"), $(this).removeClass("on")) : (b.slideDown("fast"), a.siblings().find("div.link-item").removeClass("on").end().find(".sub-nav").slideUp("fast"), $(this).addClass("on")))
+                    })
+            });
+        $("body").off("mouseenter", ".remoteDownload").on("mouseenter", ".remoteDownload",
+            function(a) {
+                a = $(this).data("dlid");
+                a = crmContext.remoteDownloadUrl + "/remotedownload/" + a + "/" + ETEAMSID + "/true";
+                $(this).data("dltype") && (a += "?type\x3d" + $(this).data("dltype"));
+                $(this).attr("href", a)
+            });
+        $("#navigation").off("click", ".j_nav_ul a[class*\x3d'j_modnav-'], .j_nav_ul li.j_homeli a, #user-panel .j_user_menu_portal").on("click", ".j_nav_ul a[class*\x3d'j_modnav-'], .j_nav_ul li.j_homeli a, #user-panel .j_user_menu_portal",
+            function(a) {
+                var c = $(this);
+                a = c.attr("href");
+                c = c.data("url");
+                a == c && b.setConfig(TEAMS.currentUser.id, a)
+            })
+    },
+    initSlider: function(a) {
+        a = a.callBack;
+        if (window.formJsonStr && $("body .form-view_js").get(0) && window.formPlugin) {
+            var b = formPlugin.submitAssembleForm({
+                parentEl: $("body .form-view_js")
+            });
+            JSON.stringify(b.formData.dataDetails) != window.formJsonStr ? f.confirm("确定放弃填写审批表单吗？放弃后数据将不会被保存！", a) : a({
+                result: true
+            })
+        } else a({
+            result: true
+        })
+    },
+    render: function(a, b) {
+        this.crmApp && this.crmApp.lastPage && (this.crmApp.lastPage.remove(), this.crmApp.lastPage = null);
+        if (null == this.lastPage) this.lastPage = a;
+        else if (this.lastPage.pageKey != a.pageKey || b) this.lastPage.remove ? this.lastPage.remove() : this.lastPage.mainView && this.lastPage.mainView.remove(),
+            this.lastPage = a;
+        else {
+            this.update(a);
+            this.lastPage.subView && (this.lastPage.subView.remove(), this.lastPage.renderSubview());
+            return
         }
-        page = new app.SummaryPage({
-            userId: userId,
-            editable: editable,
-            year: year,
-            type: type,
-            serialNumber: serialNumber
+        this.lastPage.render();
+        app.components.event.setLastPage(this.lastPage);
+        $("body").trigger("rViewSlide");
+        $(window).trigger("resize")
+    },
+    update: function(a) {
+        this.lastPage.initialize(a);
+        a.remove()
+    },
+    /*renderHome: function(a) {
+        a || (a = TEAMS.currentUser.id);
+        a != TEAMS.currentUser.id ? this.renderBlog(a) : (this.top && this.top.renderNavUrl(a), this.getDispalyConfig(a))
+    },
+    renderTask: function(a, b) {
+        a || (a = TEAMS.currentUser.id);
+        var d = new c({
+            userId: a,
+            id: b,
+            type: "mine"
         });
+        this.top && this.top.renderNavUrl(a,
+            function() {
+                d.renderType()
+            });
+        this.render(d)
+    },
+    renderTaskByType: function(a, b) {
+        a || (a = TEAMS.currentUser.id);
+        b = b ? b : "mine";
+        var d = new c({
+            pageKey: "task-" + b,
+            userId: a,
+            type: b
+        });
+        this.top && this.top.renderNavUrl(a,
+            function() {
+                d.renderType()
+            });
+        this.render(d)
+    },
+    renderWorkflow: function(a, c, d) {
+        a || (a = TEAMS.currentUser.id);
+        var e = new b({
+            userId: a,
+            id: c,
+            formId: d
+        });
+        this.top && this.top.renderNavUrl(a,
+            function() {
+                e.renderType()
+            });
+        this.render(e)
+    },
+    renderNewWorkflow: function(a, c, d) {
+        null == c || "new" == c && null == d ? this.renderWorkflow(a, c, d) : (a || (a = TEAMS.currentUser.id), a = new b({
+            userId: a,
+            id: c,
+            formId: d
+        }), this.render(a))
+    },
+    renderWorkflowByType: function(a, c, d) {
+        a || (a = TEAMS.currentUser.id);
+        var e = new b({
+            userId: a,
+            formId: d,
+            searchType: c
+        });
+        this.top && this.top.renderNavUrl(a,
+            function() {
+                e.renderType()
+            });
+        this.render(e)
+    },*/
+    renderWorkReport: function(userId, year, type, serialNumber) { // Week report userId, year, type, serialNumber
+      var editable = true, page;
+      if(userId){
+        editable = (userId == app.config.currentUser.id);
+      } else {
+        userId = app.config.currentUser.id;
+      }
+      page = new app.SummaryPage({
+          userId: userId,
+          editable: editable,
+          year: year,
+          type: type,
+          serialNumber: serialNumber
+      });
 //      this.top && this.top.renderNavUrl(userId);
-        this.render(page);
-      }//,
-      /*renderWorkReportType: function(a, b, c) {
-          var d;
-          "comment" == a ? d = c ? "unreadworeportcomment" : "workreportcomment" : "replay" == a ? d = c ? "unreadworkreportreplay" : "workreportreplay" : "share" == a ? pagekey = "workreportshare" : d = "statistics" == a ? "workreportstatistics" : "unreadworkreport";
-          a = new B({
-              reportType: a,
-              unreadFlag: c,
-              pageKey: d,
-              editable: "replay" == a || "unread" == a || "share" == a ? !1 : !0,
-              id: b
-          });
-          this.render(a)
-      },
-      renderSearch: function(a, b, c, d) {
-          a = new e({
-              type: a,
-              param: b,
-              module: c,
-              objId: d
-          });
-          this.top.renderNavUrl();
-          this.render(a)
-      },
-      renderWatched: function(a, b) {
-          var c = new K({
-              type: "watched",
-              module: a,
-              objId: b
-          });
-          this.render(c)
-      },
-      renderUnfinish: function(a, b) {
-          var c = new K({
-              type: "unfinish",
-              module: a,
-              objId: b
-          });
-          this.top && this.top.renderNavUrl();
-          this.render(c)
-      },
-      renderFeedSearch: function(a, b, c) {
-          a = new h({
-              type: a,
-              module: b,
-              objId: c
-          });
-          this.top && this.top.renderNavUrl();
-          this.render(a)
-      },
-      renderOrganization: function(a, b, c, d, e) {
-          a = new m({
-              id: a,
-              type: b,
-              operation: c,
-              userOrg: d,
-              creator: e
-          });
-          this.top && this.top.renderNavUrl();
-          this.render(a)
-      },
-      renderMyfollow: function(a, b) {
-          a || (a = TEAMS.currentUser.id);
-          var c = new P({
-              pageKey: "myfollow",
-              userId: a,
-              active: "myfollow",
-              type: b
-          });
-          this.top && this.top.renderNavUrl(a,
-              function() {
-                  c.renderType()
-              });
-          this.render(c)
-      },
-      renderBlog: function(a, b, c, d) {
-          a || (a = TEAMS.currentUser.id);
-          a != TEAMS.currentUser.id && (TEAMS.subordinate || $.ajax({
-              type: "get",
-              url: "/users/subordinate/" + TEAMS.currentUser.id + ".json",
-              dataType: "json",
-              async: !1,
-              success: function(a) {
-                  a = a.page.result;
-                  var b = [];
-                  if (a && 0 < a.length)
-                      for (var c = 0; c < a.length; c++) b.push(a[c].employeeId);
-                  else b.push("");
-                  TEAMS.subordinate = b
-              }
-          }));
-          var e = new k({
-              userId: a,
-              type: b,
-              param: d,
-              id: c
-          });
-          this.top && this.top.renderNavUrl(a,
-              function() {
-                  e.renderType()
-              });
-          this.render(e)
-      },
-      renderInfo: function() {
-          var a = new G({
-              pageKey: "info"
-          });
-          this.top && this.top.renderNavUrl();
-          this.render(a)
-      },
-      renderInfoByType: function(a) {
-          a = new G({
-              pageKey: a
-          });
-          this.render(a)
-      },
-      renderProfile: function(a, b) {
-          var c = new H({
-              userId: a,
-              type: b
-          });
-          this.top && (this.top.renderNavUrl(a,
-              function() {}), a && a != TEAMS.currentUser.id && $.ajax({
-              url: "/base/employee/" + a + ".json",
-              type: "get",
-              dataType: "json",
-              async: !1,
-              success: function(a) {
-                  a.employee && !a.employee.followAndSub ? $(".j_basenav .j_blog_NoAuthority").addClass("hide") : $(".j_basenav .j_blog_NoAuthority").removeClass("hide")
-              }
-          }));
-          this.render(c, !0)
-      },
-      documents: function(a, b, c, d) {
-          a || (a = TEAMS.currentUser.id);
-          var e = new p({
-              userId: a,
-              id: b,
-              type: c,
-              folderId: d
-          });
-          this.top && this.top.renderNavUrl(a,
-              function() {
-                  e.renderType()
-              });
-          this.render(e, !0)
-      },
-      mainline: function(a, b, c) {
-          var d = new J({
-              pageKey: "mainline-" + (b ? b : "mine"),
-              userId: a,
-              id: c,
-              filterType: b
-          });
-          this.top && this.top.renderNavUrl(a,
-              function() {
-                  d.renderType()
-              });
-          this.render(d)
-      },
-      mainlinelink: function(a, b, c, d, e, f) {
-          $("#" + b + " .j_goalname").tooltip("hide");
-          var h = new n({
-              id: b,
-              userId: a,
-              mainlineType: c,
-              module: e,
-              objId: f,
-              filterType: d
-          });
-          this.top && this.top.renderNavUrl(a,
-              function() {
-                  h.renderType()
-              });
-          this.render(h)
-      },
-      tag: function(a, b) {
-          var c = new s({
-              type: a,
-              id: b
-          });
-          this.render(c)
-      },
-      messages: function(a, b) {
-          var c = new h({
-              type: a,
-              module: "messages",
-              param: b,
-              newMessage: this.top.newmessage
-          });
-          this.top && this.top.renderNavUrl();
-          this.render(c)
-      },
-      renderTaskreport: function(a) {
-          a = new q({
-              pageKey: "tasksreport",
-              userId: a
-          });
-          this.render(a)
-      },
-      renderTaskreports: function(a) {
-          a = new E({
-              pageKey: "taskreport",
-              userId: a,
-              module: "task"
-          });
-          this.render(a)
-      },
-      renderTaskStatistics: function(a) {
-          a = new E({
-              userId: a,
-              module: "taskstatistics"
-          });
-          this.render(a)
-      },
-      renderFlowreports: function() {
-          var a = new E({
-              pageKey: "flowreport",
-              module: "flow"
-          });
-          this.render(a)
-      },
-      renderWorkhour: function() {
-          var a = new E({
-              pageKey: "workhourreport",
-              module: "workhour"
-          });
-          this.render(a)
-      },
-      renderTimecard: function(a) {
-          a = new E({
-              pageKey: "timecardreport",
-              userId: a,
-              module: "timecard"
-          });
-          this.render(a)
-      },
-      renderBlogreports: function(a) {
-          a = new E({
-              pageKey: "blogreport",
-              userId: a,
-              module: "blog"
-          });
-          this.render(a)
-      },
-      renderLog: function(a, b) {
-          a || (a = TEAMS.currentUser.id);
-          var c = new E({
-              pageKey: "log#" + b,
-              userId: a,
-              type: b,
-              module: "log"
-          });
-          this.render(c)
-      },
-      wechats: function() {
-          var a = new u({
-              chatType: "unread",
-              pageKey: "wechats"
-          });
-          this.render(a)
-      },
-      chat: function(a) {
-          a = new u({
-              id: a,
-              pageKey: "chats"
-          });
-          this.render(a)
-      },
-      channel: function(a) {
-          a = new u({
-              id: a,
-              chatType: "channel",
-              pageKey: "channels"
-          });
-          this.render(a)
-      },
-      unreadfeedback: function(a, b) {
-          var c = new w({
-              userId: TEAMS.currentUser.id,
-              module: a,
-              id: b
-          });
-          this.render(c)
-      },
-      renderTasksCalendar: function(a) {
-          a || (a = TEAMS.currentUser.id);
-          a = new q({
-              pageKey: "taskscalendar",
-              userId: a
-          });
-          this.render(a)
-      },
-      versioninfo: function(a) {
-          a = new G({
-              pageKey: "versioninfo",
-              type: a
-          });
-          this.top && this.top.renderNavUrl();
-          this.render(a)
-      },
-      renderCalendar: function(a) {
-          a = new C({
-              userId: a
-          });
-          this.render(a)
-      },
-      renderForms: function(a, b, c) {
-          a || (a = TEAMS.currentUser.id);
-          var d = new R({
-              type: b,
-              userId: a,
-              formId: c
-          });
-          this.top && this.top.renderNavUrl(a,
-              function() {
-                  d.renderType()
-              });
-          this.render(d)
-      },
-      print: function(a, b) {
-          var c = new I({
-              pageKey: b,
-              id: a
-          });
-          this.render(c)
-      },
-      invitation: function() {
-          var a = new m({
-              type: "invitation"
-          });
-          this.render(a)
-      },
-      showCrmPage: function(a) {
-          var b = this,
-              c = "",
-              c = "develop" == TEAMS.runMode ? TEAMS.service.crm + "/static/js/crm-dev.js" : TEAMS.service.crm + "/static/js/crm.js?v\x3d" + TEAMS.version;
-          g.async(c,
-              function() {
-                  b.lastPage && (b.lastPage.mainView && b.lastPage.mainView.remove(), b.lastPage.remove(), null == b.lastPage);
-                  if (!b.crmApp) {
-                      var c = g("crm/CrmApp");
-                      b.crmApp = new c
-                  }
-                  b.crmApp.showPage(a, b.top, b)
-              })
-      },
-      setConfig: function(a, b) {
-          if (b && TEAMS.userConfig && a == TEAMS.currentUser.id) {
-              for (var c = this.portalModel,
-                      d = null,
-                      e = !1,
-                      f = 0; f < TEAMS.userConfig.length; f++)
-                  if (d = TEAMS.userConfig[f], "system.menu.display" == d.configKey) {
-                      e = !0;
-                      f = d.configValue;
-                      d.configValue = b;
-                      f != b && c.updateConfigValue(d);
-                      break
-                  }
-              e || (d = {
-                      configKey: "system.menu.display",
-                      configValue: b
-                  },
-                  c.saveConfig(d,
-                      function() {
-                          TEAMS.userConfig.push(d)
-                      }))
-          }
-      },
-      getDispalyConfig: function(a) {
-          if (a == TEAMS.currentUser.id && TEAMS.userConfig) {
-              var b = this._getConfig("system.menu.display", a);
-              if (b) {
-                  switch (b) {
-                      case "/blog":
-                          this.renderBlog(a);
-                          break;
-                      case "/workreport":
-                          this.renderWorkReport(a);
-                          break;
-                      case "/workflows":
-                          this.renderWorkflowByType(a);
-                          break;
-                      case "/mainlines":
-                          this.mainline(a);
-                          break;
-                      case "/tasks":
-                          this.renderTask(a);
-                          break;
-                      case "/calendar":
-                          this.renderCalendar(a);
-                          break;
-                      case "/documents":
-                          this.documents(a);
-                          break;
-                      case "/report/taskstatistics":
-                          this.renderTaskStatistics(a);
-                          break;
-                      case "/info/wechat":
-                          this.renderInfoByType("wechat");
-                          break;
-                      case "/info/wechatservice":
-                          this.renderInfoByType("wechatservice");
-                          break;
-                      case "/forms":
-                          this.renderForms(a);
-                          break;
-                      case "/crms/customer":
-                          this.showCrmPage("customer");
-                          break;
-                      case "/crms/contact":
-                          this.showCrmPage("contact");
-                          break;
-                      default:
-                          a = new L({
-                                  userId: a,
-                                  pageKey: "portal"
-                              }),
-                              this.render(a)
-                  }
-                  ROUTER.navigate(b, {
-                      trigger: !1
-                  })
-              } else a = new L({
-                      userId: a,
-                      pageKey: "portal"
-                  }),
-                  this.render(a)
-          }
-      },
-      _getConfig: function(a, b) {
-          var c = null;
-          return b != TEAMS.currentUser.id ? null : (c = TEAMS.userConfig.find(function(b) {
-              return b.configKey == a
-          })) ? c.configValue : null
-      },
-      syncData_channel: function() {
-          $.ajax({
-              type: "get",
-              url: "/synchronizeddata/syncData.json",
-              dataType: "json",
-              success: function(a) {
-                  f.notify("更新完成")
-              }
-          })
-      }*/
+      this.render(page);
+    },
+    /*renderWorkReportType: function(a, b, c) {
+        var d;
+        "comment" == a ? d = c ? "unreadworeportcomment" : "workreportcomment" : "replay" == a ? d = c ? "unreadworkreportreplay" : "workreportreplay" : "share" == a ? pagekey = "workreportshare" : d = "statistics" == a ? "workreportstatistics" : "unreadworkreport";
+        a = new B({
+            reportType: a,
+            unreadFlag: c,
+            pageKey: d,
+            editable: "replay" == a || "unread" == a || "share" == a ? !1 : !0,
+            id: b
+        });
+        this.render(a)
+    },
+    renderSearch: function(a, b, c, d) {
+        a = new e({
+            type: a,
+            param: b,
+            module: c,
+            objId: d
+        });
+        this.top.renderNavUrl();
+        this.render(a)
+    },
+    renderWatched: function(a, b) {
+        var c = new K({
+            type: "watched",
+            module: a,
+            objId: b
+        });
+        this.render(c)
+    },
+    renderUnfinish: function(a, b) {
+        var c = new K({
+            type: "unfinish",
+            module: a,
+            objId: b
+        });
+        this.top && this.top.renderNavUrl();
+        this.render(c)
+    },
+    renderFeedSearch: function(a, b, c) {
+        a = new h({
+            type: a,
+            module: b,
+            objId: c
+        });
+        this.top && this.top.renderNavUrl();
+        this.render(a)
+    },*/
+    renderOrganization: function(a, b, c, d, e) {
+      a = new app.OrgPage({
+          id: a,
+          type: b,
+          operation: c,
+          userOrg: d,
+          creator: e
+      });
+//      this.top && this.top.renderNavUrl();
+      this.render(a);
+    }/*,
+    renderMyfollow: function(a, b) {
+        a || (a = TEAMS.currentUser.id);
+        var c = new P({
+            pageKey: "myfollow",
+            userId: a,
+            active: "myfollow",
+            type: b
+        });
+        this.top && this.top.renderNavUrl(a,
+            function() {
+                c.renderType()
+            });
+        this.render(c)
+    },
+    renderBlog: function(a, b, c, d) {
+        a || (a = TEAMS.currentUser.id);
+        a != TEAMS.currentUser.id && (TEAMS.subordinate || $.ajax({
+            type: "get",
+            url: "/users/subordinate/" + TEAMS.currentUser.id + ".json",
+            dataType: "json",
+            async: !1,
+            success: function(a) {
+                a = a.page.result;
+                var b = [];
+                if (a && 0 < a.length)
+                    for (var c = 0; c < a.length; c++) b.push(a[c].employeeId);
+                else b.push("");
+                TEAMS.subordinate = b
+            }
+        }));
+        var e = new k({
+            userId: a,
+            type: b,
+            param: d,
+            id: c
+        });
+        this.top && this.top.renderNavUrl(a,
+            function() {
+                e.renderType()
+            });
+        this.render(e)
+    },
+    renderInfo: function() {
+        var a = new G({
+            pageKey: "info"
+        });
+        this.top && this.top.renderNavUrl();
+        this.render(a)
+    },
+    renderInfoByType: function(a) {
+        a = new G({
+            pageKey: a
+        });
+        this.render(a)
+    },
+    renderProfile: function(a, b) {
+        var c = new H({
+            userId: a,
+            type: b
+        });
+        this.top && (this.top.renderNavUrl(a,
+            function() {}), a && a != TEAMS.currentUser.id && $.ajax({
+            url: "/base/employee/" + a + ".json",
+            type: "get",
+            dataType: "json",
+            async: !1,
+            success: function(a) {
+                a.employee && !a.employee.followAndSub ? $(".j_basenav .j_blog_NoAuthority").addClass("hide") : $(".j_basenav .j_blog_NoAuthority").removeClass("hide")
+            }
+        }));
+        this.render(c, !0)
+    },
+    documents: function(a, b, c, d) {
+        a || (a = TEAMS.currentUser.id);
+        var e = new p({
+            userId: a,
+            id: b,
+            type: c,
+            folderId: d
+        });
+        this.top && this.top.renderNavUrl(a,
+            function() {
+                e.renderType()
+            });
+        this.render(e, !0)
+    },
+    mainline: function(a, b, c) {
+        var d = new J({
+            pageKey: "mainline-" + (b ? b : "mine"),
+            userId: a,
+            id: c,
+            filterType: b
+        });
+        this.top && this.top.renderNavUrl(a,
+            function() {
+                d.renderType()
+            });
+        this.render(d)
+    },
+    mainlinelink: function(a, b, c, d, e, f) {
+        $("#" + b + " .j_goalname").tooltip("hide");
+        var h = new n({
+            id: b,
+            userId: a,
+            mainlineType: c,
+            module: e,
+            objId: f,
+            filterType: d
+        });
+        this.top && this.top.renderNavUrl(a,
+            function() {
+                h.renderType()
+            });
+        this.render(h)
+    },
+    tag: function(a, b) {
+        var c = new s({
+            type: a,
+            id: b
+        });
+        this.render(c)
+    },
+    messages: function(a, b) {
+        var c = new h({
+            type: a,
+            module: "messages",
+            param: b,
+            newMessage: this.top.newmessage
+        });
+        this.top && this.top.renderNavUrl();
+        this.render(c)
+    },
+    renderTaskreport: function(a) {
+        a = new q({
+            pageKey: "tasksreport",
+            userId: a
+        });
+        this.render(a)
+    },
+    renderTaskreports: function(a) {
+        a = new E({
+            pageKey: "taskreport",
+            userId: a,
+            module: "task"
+        });
+        this.render(a)
+    },
+    renderTaskStatistics: function(a) {
+        a = new E({
+            userId: a,
+            module: "taskstatistics"
+        });
+        this.render(a)
+    },
+    renderFlowreports: function() {
+        var a = new E({
+            pageKey: "flowreport",
+            module: "flow"
+        });
+        this.render(a)
+    },
+    renderWorkhour: function() {
+        var a = new E({
+            pageKey: "workhourreport",
+            module: "workhour"
+        });
+        this.render(a)
+    },
+    renderTimecard: function(a) {
+        a = new E({
+            pageKey: "timecardreport",
+            userId: a,
+            module: "timecard"
+        });
+        this.render(a)
+    },
+    renderBlogreports: function(a) {
+        a = new E({
+            pageKey: "blogreport",
+            userId: a,
+            module: "blog"
+        });
+        this.render(a)
+    },
+    renderLog: function(a, b) {
+        a || (a = TEAMS.currentUser.id);
+        var c = new E({
+            pageKey: "log#" + b,
+            userId: a,
+            type: b,
+            module: "log"
+        });
+        this.render(c)
+    },
+    wechats: function() {
+        var a = new u({
+            chatType: "unread",
+            pageKey: "wechats"
+        });
+        this.render(a)
+    },
+    chat: function(a) {
+        a = new u({
+            id: a,
+            pageKey: "chats"
+        });
+        this.render(a)
+    },
+    channel: function(a) {
+        a = new u({
+            id: a,
+            chatType: "channel",
+            pageKey: "channels"
+        });
+        this.render(a)
+    },
+    unreadfeedback: function(a, b) {
+        var c = new w({
+            userId: TEAMS.currentUser.id,
+            module: a,
+            id: b
+        });
+        this.render(c)
+    },
+    renderTasksCalendar: function(a) {
+        a || (a = TEAMS.currentUser.id);
+        a = new q({
+            pageKey: "taskscalendar",
+            userId: a
+        });
+        this.render(a)
+    },
+    versioninfo: function(a) {
+        a = new G({
+            pageKey: "versioninfo",
+            type: a
+        });
+        this.top && this.top.renderNavUrl();
+        this.render(a)
+    },
+    renderCalendar: function(a) {
+        a = new C({
+            userId: a
+        });
+        this.render(a)
+    },
+    renderForms: function(a, b, c) {
+        a || (a = TEAMS.currentUser.id);
+        var d = new R({
+            type: b,
+            userId: a,
+            formId: c
+        });
+        this.top && this.top.renderNavUrl(a,
+            function() {
+                d.renderType()
+            });
+        this.render(d)
+    },
+    print: function(a, b) {
+        var c = new I({
+            pageKey: b,
+            id: a
+        });
+        this.render(c)
+    },
+    invitation: function() {
+        var a = new m({
+            type: "invitation"
+        });
+        this.render(a)
+    },
+    showCrmPage: function(a) {
+        var b = this,
+            c = "",
+            c = "develop" == TEAMS.runMode ? TEAMS.service.crm + "/static/js/crm-dev.js" : TEAMS.service.crm + "/static/js/crm.js?v\x3d" + TEAMS.version;
+        g.async(c,
+            function() {
+                b.lastPage && (b.lastPage.mainView && b.lastPage.mainView.remove(), b.lastPage.remove(), null == b.lastPage);
+                if (!b.crmApp) {
+                    var c = g("crm/CrmApp");
+                    b.crmApp = new c
+                }
+                b.crmApp.showPage(a, b.top, b)
+            })
+    },
+    setConfig: function(a, b) {
+        if (b && TEAMS.userConfig && a == TEAMS.currentUser.id) {
+            for (var c = this.portalModel,
+                    d = null,
+                    e = !1,
+                    f = 0; f < TEAMS.userConfig.length; f++)
+                if (d = TEAMS.userConfig[f], "system.menu.display" == d.configKey) {
+                    e = !0;
+                    f = d.configValue;
+                    d.configValue = b;
+                    f != b && c.updateConfigValue(d);
+                    break
+                }
+            e || (d = {
+                    configKey: "system.menu.display",
+                    configValue: b
+                },
+                c.saveConfig(d,
+                    function() {
+                        TEAMS.userConfig.push(d)
+                    }))
+        }
+    },
+    getDispalyConfig: function(a) {
+        if (a == TEAMS.currentUser.id && TEAMS.userConfig) {
+            var b = this._getConfig("system.menu.display", a);
+            if (b) {
+                switch (b) {
+                    case "/blog":
+                        this.renderBlog(a);
+                        break;
+                    case "/workreport":
+                        this.renderWorkReport(a);
+                        break;
+                    case "/workflows":
+                        this.renderWorkflowByType(a);
+                        break;
+                    case "/mainlines":
+                        this.mainline(a);
+                        break;
+                    case "/tasks":
+                        this.renderTask(a);
+                        break;
+                    case "/calendar":
+                        this.renderCalendar(a);
+                        break;
+                    case "/documents":
+                        this.documents(a);
+                        break;
+                    case "/report/taskstatistics":
+                        this.renderTaskStatistics(a);
+                        break;
+                    case "/info/wechat":
+                        this.renderInfoByType("wechat");
+                        break;
+                    case "/info/wechatservice":
+                        this.renderInfoByType("wechatservice");
+                        break;
+                    case "/forms":
+                        this.renderForms(a);
+                        break;
+                    case "/crms/customer":
+                        this.showCrmPage("customer");
+                        break;
+                    case "/crms/contact":
+                        this.showCrmPage("contact");
+                        break;
+                    default:
+                        a = new L({
+                                userId: a,
+                                pageKey: "portal"
+                            }),
+                            this.render(a)
+                }
+                ROUTER.navigate(b, {
+                    trigger: !1
+                })
+            } else a = new L({
+                    userId: a,
+                    pageKey: "portal"
+                }),
+                this.render(a)
+        }
+    },
+    _getConfig: function(a, b) {
+        var c = null;
+        return b != TEAMS.currentUser.id ? null : (c = TEAMS.userConfig.find(function(b) {
+            return b.configKey == a
+        })) ? c.configValue : null
+    },
+    syncData_channel: function() {
+        $.ajax({
+            type: "get",
+            url: "/synchronizeddata/syncData.json",
+            dataType: "json",
+            success: function(a) {
+                f.notify("更新完成")
+            }
+        })
+    }*/
   });
 
   Backbone.sync = function (method, model, success, error) {

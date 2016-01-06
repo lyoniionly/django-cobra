@@ -16,7 +16,6 @@ location = lambda x: os.path.join(
     os.path.dirname(os.path.realpath(__file__)), x)
 
 DEBUG = True
-TEMPLATE_DEBUG = True
 SQL_DEBUG = True
 
 # The entry of maintaince mode
@@ -109,30 +108,6 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '$)a7n&o80u!6y5t-+jrd3)3!%vh&shg$wqpjpxc!ar&p#!)n1a'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    # needed by django-treebeard for admin (and potentially other libs)
-    'django.template.loaders.eggs.Loader',
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.request",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.contrib.messages.context_processors.messages",
-    # Cobra specific
-    'cobra.core.context_processors.metadata',
-
-    # allauth specific context processors
-    "allauth.account.context_processors.account",
-    "allauth.socialaccount.context_processors.socialaccount",
-)
-
 MIDDLEWARE_CLASSES = (
     'cobra.middleware.maintenance.ServicesUnavailableMiddleware',
     'cobra.middleware.proxy.SetRemoteAddrFromForwardedFor',
@@ -145,7 +120,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.transaction.TransactionMiddleware',
+    # 'django.middleware.transaction.TransactionMiddleware', # The transaction middleware was deprecated in Django 1.6, and removed in Django 1.8
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'cobra.middleware.ajax.AjaxMessagingMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -186,10 +161,27 @@ ROOT_URLCONF = 'urls'
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 from cobra import COBRA_MAIN_TEMPLATE_DIR
-TEMPLATE_DIRS = (
-    location('templates'),
-    COBRA_MAIN_TEMPLATE_DIR,
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [location('templates'), COBRA_MAIN_TEMPLATE_DIR],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.request",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.contrib.messages.context_processors.messages",
+                # Cobra specific
+                'cobra.core.context_processors.metadata',
+            ],
+            'debug': True
+        },
+    },
+]
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -213,10 +205,10 @@ LOGGING = {
         }
     },
     'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler',
-        },
+        # 'null': {
+        #     'level': 'DEBUG',
+        #     'class': 'django.utils.log.NullHandler',
+        # },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -241,11 +233,11 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['null'],
-            'propagate': True,
-            'level': 'INFO',
-        },
+        # 'django': {
+        #     'handlers': ['null'],
+        #     'propagate': True,
+        #     'level': 'INFO',
+        # },
         'django.request': {
             'handlers': ['mail_admins', 'error_file'],
             'level': 'ERROR',
@@ -265,11 +257,11 @@ LOGGING = {
             'propagate': True,
             'level': 'INFO',
         },
-        'django.db.backends': {
-            'handlers': ['null'],
-            'propagate': False,
-            'level': 'DEBUG',
-        },
+        # 'django.db.backends': {
+        #     'handlers': ['null'],
+        #     'propagate': False,
+        #     'level': 'DEBUG',
+        # },
     }
 }
 

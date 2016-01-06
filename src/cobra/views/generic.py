@@ -6,7 +6,7 @@ import logging
 from django import forms
 from django.conf import settings
 from django.core import validators
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect

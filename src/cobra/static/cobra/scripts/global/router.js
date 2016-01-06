@@ -30,7 +30,7 @@
           "workreport/unreadReplay/:id": "workReport_unreadReplay",
           "workreport/:userId": "workReport",
           "workreport/:userId/:year/:type": "workReport",
-          "workreport/:userId/:year/:type/:serialNumber": "workReport"//,
+          "workreport/:userId/:year/:type/:serialNumber": "workReport",
           /*"search/keywords/:keywords": "search_keywords",
           "search/keywords/:keywords/:module": "search_keywords",
           "search/keywords/:keywords/:module/:objId": "search_keywords",
@@ -57,13 +57,13 @@
           "blog/:userId/:type/:id/:param": "blog",
           "users/myfollow": "user_myfollow",
           "users/myfollow/:id": "user_myfollow",
-          "users/myfollow/:id/:type": "user_myfollow",
+          "users/myfollow/:id/:type": "user_myfollow",*/
           organization: "user_organization",
           "organization/:id": "user_organization",
           "organization/:id/:type": "user_organization",
           "organization/:id/:type/:operation": "user_organization",
           "organization/:id/:type/:operation/:userOrg": "user_organization",
-          "organization/:id/:type/:operation/:userOrg/:creator": "user_organization",
+          "organization/:id/:type/:operation/:userOrg/:creator": "user_organization"/*,
           info: "info",
           "info/:type": "info_navigation",
           profile: "profile",
@@ -179,7 +179,7 @@
       },
       workReport_type: function(d, c) {
           isNaN(d) ? this.app.renderWorkReportType(d, c) : this.app.renderWorkReport(d);
-      }//,
+      },
       /*workReport_unreadComment: function(d) {
           this.app.renderWorkReportType("comment", d, !0)
       },
@@ -209,10 +209,10 @@
       },
       user_myfollow: function(d, c) {
           this.app.renderMyfollow(d, c)
-      },
+      },*/
       user_organization: function(d, c, b, a, e) {
           this.app.renderOrganization(d, c, b, a, e)
-      },
+      }/*,
       profile: function(d, c) {
           this.app.renderProfile(d, c)
       },

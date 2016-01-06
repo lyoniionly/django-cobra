@@ -6,6 +6,7 @@ import six
 from django.db import models
 from cobra.core.compat import pickle
 from cobra.core.strings import decompress, compress
+from cobra.models.compat import _GzippedDictField
 
 try:
     from south.modelsinspector import add_introspection_rules
@@ -19,13 +20,11 @@ __all__ = ('GzippedDictField',)
 logger = logging.getLogger('cobra.errors')
 
 
-class GzippedDictField(models.TextField):
+class GzippedDictField(_GzippedDictField):
     """
     Slightly different from a JSONField in the sense that the default
     value is a dictionary.
     """
-    __metaclass__ = models.SubfieldBase
-
     def to_python(self, value):
         if isinstance(value, six.string_types) and value:
             try:

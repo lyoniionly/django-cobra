@@ -30,6 +30,8 @@ class OrganizationApplication(Application):
     # ajax
     organization_members_subordinates_view = get_class('organization.ajax', 'OrganizationMembersSubordinatesView')
     organization_search_suggestion_view = get_class('organization.ajax', 'OrganizationSearchSuggestionView')
+    organization_departments_view = get_class('organization.ajax', 'OrganizationDepartmentsView')
+    organization_department_view = get_class('organization.ajax', 'OrganizationDepartmentView')
 
     def get_urls(self):
         urls = [
@@ -73,6 +75,11 @@ class OrganizationApplication(Application):
                 name='ajax-members-subordinates'),
             url(r'^(?P<organization_slug>[\w_-]+)/search/suggestion.json$', self.organization_search_suggestion_view.as_view(),
                 name='ajax-search-suggestion'),
+
+            url(r'^(?P<organization_slug>[\w_-]+)/ajax/departments.json$', self.organization_departments_view.as_view(),
+                name='ajax-departments'),
+            url(r'^(?P<organization_slug>[\w_-]+)/ajax/department/(?P<department_id>\d+).json$', self.organization_department_view.as_view(),
+                name='ajax-department'),
 
         ]
         return self.post_process_urls(urls)

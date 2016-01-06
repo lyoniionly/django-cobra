@@ -1,12 +1,8 @@
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.views import generic
-from django.core.urlresolvers import reverse, reverse_lazy
-from django.core.exceptions import ObjectDoesNotExist
-from django import http
+from django.core.urlresolvers import reverse_lazy
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth import logout as auth_logout, login as auth_login
-from django.contrib.sites.models import get_current_site
 from django.conf import settings
 
 from cobra.views.mixins import PageTitleMixin

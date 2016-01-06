@@ -142,6 +142,7 @@
     <script type="text/javascript" src="{% static "cobra/scripts/global/conf.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/models.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/templates.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/validations.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/utils.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/modals.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/forms.js" %}"></script>
@@ -151,6 +152,7 @@
     <script type="text/javascript" src="{% static "cobra/scripts/global/components.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/views.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/router.js" %}"></script>
+    <script type="text/javascript" src="{% static "cobra/scripts/global/org.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/app.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/communication.js" %}"></script>
     <script type="text/javascript" src="{% static "cobra/scripts/global/messages.js" %}"></script>
@@ -166,6 +168,8 @@
        moment.locale('{{ request.LANGUAGE_CODE }}');
     {% endif %}{% endcomment %}
 
+
+
     {% if TIME_ZONE %}
       app.config.timezone = '{{ TIME_ZONE }}';
     {% endif %}
@@ -179,8 +183,13 @@
       fade_duration: {{ COBRA_CONFIG.auto_fade_alerts.fade_duration|default:"1500" }},
       types: {{ COBRA_CONFIG.auto_fade_alerts.types|default:"[]"|safe }}
     };
+
+    {% if project or team or organization %}
     app.config.noSubordinates = {% if request.user|has_subordinates:organization %}false{% else %}true{% endif %};
-    app.config.currentUser = {{ currentUser|to_json|safe }};
+    {% organization_current_user organization request.user as current_user_json %}
+    app.config.currentUser = {{ current_user_json }};
+    {% endif %}
+
     {% if project %}
       app.config.projectId = {{ project.slug|to_json|safe }};
       app.config.teamId = {{ project.team.slug|to_json|safe }};

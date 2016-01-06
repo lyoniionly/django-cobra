@@ -1,8 +1,16 @@
 from collections import defaultdict
 from django import template
 from django.db.models import Q
+from django.utils.safestring import SafeString
+from cobra.apps.accounts.utils import get_user_info
 from cobra.core.loading import get_model
-from cobra.core.permissions import is_organization_admin
+from cobra.core.permissions import is_organization_admin, can_manage_org
+
+## Django 1.5+ compat
+try:
+    import json
+except ImportError:  # pragma: no cover
+    from django.utils import simplejson as json
 
 register = template.Library()
 
@@ -57,3 +65,10 @@ def has_subordinates(user, organization):
         return True
     else:
         return False
+
+
+@register.assignment_tag
+def organization_current_user(organization, user):
+    current_user = get_user_info(user)
+    current_user['admin'] = can_manage_org(user, organization)
+    return SafeString(json.dumps(current_user))

@@ -123,6 +123,9 @@ def get_user_info(user):
         'activeDate': epoch(user.date_joined, msec=True),
         'username': user.get_full_name() or user.username,
         'name': user.get_full_name() or user.username,
+        'email': user.email,
+        'status': 'normal',
+        'lastLoginTime': epoch(user.last_login, msec=True),
         'id': user.pk
     }
     return info

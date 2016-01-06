@@ -22,6 +22,7 @@
 @import url("dashboard.less");
 @import url("blocks.less");
 @import url("lists.less");
+@import url("table.less");
 @import url("events.less");
 @import url("avatar.less");
 @import url("nav.less");
@@ -43,6 +44,7 @@
 @import url("entity.less");
 @import url("suggestion.less");
 @import url("typeahead.less");
+@import url("org.less");
 @import (less) url("sweetalert.css");
 @import (less) url("bootstrap-clockpicker.css");
 
@@ -86,9 +88,12 @@ body {
   }
 }
 
-a.link-disabled {
-  color: #ddd !important;
-  cursor: default;
+a {
+  cursor: pointer;
+  &.link-disabled {
+    color: #ddd !important;
+    cursor: default;
+  }
 }
 
 .aside-nav {
@@ -6011,6 +6016,12 @@ table.commit-list td > div {
 }
 
 .summary {
+  section.body {
+    padding: 0 !important;
+  }
+}
+
+.org-members {
   section.body {
     padding: 0 !important;
   }

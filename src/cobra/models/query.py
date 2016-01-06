@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from django.db import IntegrityError, router, transaction
-from django.db.models.expressions import ExpressionNode
+from django.db.models.expressions import Expression
 from django.db.models.signals import post_save
 
 from .utils import resolve_expression_node
@@ -23,7 +23,7 @@ def update(self, using=None, **kwargs):
 
     affected = self.__class__._base_manager.using(using).filter(pk=self.pk).update(**kwargs)
     for k, v in kwargs.iteritems():
-        if isinstance(v, ExpressionNode):
+        if isinstance(v, Expression):
             v = resolve_expression_node(self, v)
         setattr(self, k, v)
     if affected == 1:
@@ -64,7 +64,7 @@ def create_or_update(model, using=None, **kwargs):
     create_kwargs = kwargs.copy()
     inst = objects.model()
     for k, v in defaults.iteritems():
-        if isinstance(v, ExpressionNode):
+        if isinstance(v, Expression):
             create_kwargs[k] = resolve_expression_node(inst, v)
         else:
             create_kwargs[k] = v

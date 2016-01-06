@@ -223,8 +223,10 @@
     toastr.options.closeButton = true;
     toastr.options.progressBar = true;
     toastr.options.positionClass = "toast-top-center";
-    toastr.options.timeOut = 0;
+    toastr.options.timeOut = 5000;
     toastr.options.extendedTimeOut = 0;
+    toastr.options.showMethod = "slideDown";
+    toastr.options.hideMethod = "slideUp";
   });
 
 }(app, jQuery, _));

@@ -51,7 +51,7 @@ class OrganizationManager(BaseManager):
 
 
 class OrganizationMemberManager(BaseManager):
-    def get_members(self, organization, with_invited=False, exclude_user=None):
+    def get_members(self, organization, with_invited=False, exclude_user=None, limit=None):
         """
         """
         if with_invited:
@@ -68,5 +68,8 @@ class OrganizationMemberManager(BaseManager):
             queryset = queryset.exclude(user=exclude_user)
 
         queryset = sorted(queryset, key=lambda x: x.user.get_display_name() or x.email)
+
+        if limit:
+            queryset = queryset[0:limit]
 
         return queryset

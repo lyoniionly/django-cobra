@@ -1,49 +1,69 @@
-<% if(panel=="participants"){ %>
-  <div id="participants-component">
-    <div class="control-label"><i class="graph graph-16-mans"></i>参与人员:</div>
-    <div class="controls">
-      <div id="participants" class="entity-container" data-url="/share/{id}.json"></div>
-      <span class="typeahead-wrapper hide">
-        <input type="text" id="typeahead-participants" class="control-input typeahead search"
-               data-entity="employee" data-multi="true" placeholder="输入姓名"/>
-        <a class="btn typeahead-search"><i class="icon-search"></i></a>
-      </span>
-      <span id="editParticipant" class="control-btn entity-item-add acl-hide j_add_participants" title="添加参与人，可添加多个">
-        <i title="添加" data-placement="top" data-toggle="tooltip" class="icon-plus-thin"></i>
-      </span>
-    </div>
-  </div>
-<%}%>
-<% if(panel=="share"){ %>
-  <div id="share-component">
-    <div class="control-label"><i class="graph graph-16-share"></i>共　　享:</div>
-    <div class="controls">
-      <div class="entity-simpleshare">
-        <div id="shareentrys" class="entity-container" data-url="/share/{id}.json"></div>
-        <div class="typeahead-wrapper hide">
-          <select id="share-select" class="form-control">
-            <option value="user">用户</option>
-            <option value="department">部门</option>
-            <option value="group">群组</option>
-            <option value="all">所有人</option>
-          </select>
-          <div class="sharetype-group hide">
-            <input type="text" class="control-input typeahead search" data-entity="group" placeholder="输入群组">
-            <a class="btn typeahead-search"><i class="icon-search"></i></a>
-          </div>
-          <div class="sharetype-dept hide">
-            <input type="text" class="control-input typeahead search" data-entity="department" placeholder="输入部门">
-            <a class="btn typeahead-search"><i class="icon-search"></i></a>
-          </div>
-          <div class="sharetype-user">
-            <input type="text" class="control-input typeahead search" data-entity="employee" data-multi="true" placeholder="输入姓名">
-            <a class="btn typeahead-search"><i class="icon-search"></i></a>
-          </div>
-        </div>
-        <span id="editShare" class="control-btn entity-item-add j_add_shareentrys">
-          <i title="添加" data-placement="top" data-toggle="tooltip" class="icon-plus-thin"></i>
-        </span>
-      </div>
-    </div>
-  </div>
-<%}%>
+'org.user': '' +
+'<div class="user-sort-view j-user-list">' +
+  '<div class="user-sortbar">' +
+    '<span id="group-user-checkall" class="hide">' +
+      '<input id="checkAll" class="user-id" type="checkbox">' +
+    '</span>' +
+    '<span class="title">成员列表</span>' +
+    '<span class="users-list-pinyin">' +
+      '<a class="highlight" id="ALL">全部</a>' +
+      '<a id="degit">#</a><a id="A">A</a><a id="B">B</a><a id="C">C</a><a id="D">D</a><a id="E">E</a><a id="F">F</a><a id="G">G</a>' +
+      '<a id="H">H</a><a id="I">I</a><a id="J">J</a><a id="K">K</a><a id="L">L</a><a id="M">M</a><a id="N">N</a>' +
+      '<a id="O">O</a><a id="P">P</a><a id="Q">Q</a><a id="R">R</a><a id="S">S</a><a id="T">T</a>' +
+      '<a id="U">U</a><a id="V">V</a><a id="W">W</a><a id="X">X</a><a id="Y">Y</a><a id="Z">Z</a>' +
+    '</span>' +
+    '<label class="checkbox users-list-checkbox">' +
+      '<input type="checkbox" id="chk2" title="含离职人员">' +
+      '<i>含离职<span>人员</span></i>' +
+    '</label>' +
+  '</div>' +
+  '<div id="user-container" class="users-container">' +
+    '<div id="employee-container">' +
+      '<ul class="employee-list users-list">' +
+        '<li class="list-tit clearfix">' +
+          '<div class="col-4 item username">姓名</div>' +
+          '<div class="col-4 item call">联系方式</div>' +
+          '<div class="col-4 item dept">部门</div>' +
+        '</li>' +
+        '<div class="j_userlistScr scrollwrapper" marginbottom="20">' +
+          '<div id="userlistCon">' +
+            '<div id="list-loading" class="loading_small">' +
+              '<span>正在加载数据，请稍后...</span>' +
+            '</div>' +
+            '<div class="center-more hide">加载更多...</div>' +
+          '</div>' +
+        '</div>' +
+      '</ul>' +
+    '</div>' +
+  '</div>' +
+'</div>' +
+'<div id="usersListClone" class="hide">' +
+  '<li id="groupUserClone" class="clearfix">' +
+    '<div class="col-4 item username ellipsis">' +
+      '<a><input type="checkbox" name="userids" class="user-id hide"/></a>' +
+      '<a class="avatar usercard-toggle" userId>' +
+        '<img alt="avatar" title="查看卡片信息" src="/static/images/avatar.png">' +
+      '</a>' +
+      '<a class="name j_entityslider-toggle" userid="" data-id="" data-module="profile" title="查看他的资料"></a>' +
+    '</div>' +
+    '<div class="col-4 item call ellipsis"></div>' +
+    '<div class="col-4 item dept ellipsis"></div>' +
+    '<span class="follow-btns">' +
+      '<span class="approved hide" title="已关注，点击取消关注">' +
+        '<i class="icon-ok"></i> 已关注 |<a class="btn-unfollow-cancle"> 取消</a>' +
+      '</span>' +
+      '<span class="unapproved hide" title="已发送关注申请">已申请关注</span>' +
+      '<span class="none btn-follow-add hide" title="点击添加关注">' +
+        '<i class="icon-plus"></i> 添加关注' +
+      '</span>' +
+    '</span>' +
+  '</li>' +
+  '<div class="user-invitation-tip">' +
+    '<p>' +
+      'TA没有收到邀请邮件？' +
+      '<a class="user-invitation-resend">重新发送</a>' +
+    '</p>' +
+    '<p>或者将下面的邀请地址直接发给TA:</p>' +
+    '<a id="user-invitation-link"></a>' +
+  '</div>' +
+'</div>',

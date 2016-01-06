@@ -1,4 +1,4 @@
-(function (app, Backbone, jQuery, _) {
+(function (window, app, Backbone, jQuery, _) {
   "use strict";
 
    var $ = jQuery;
@@ -26,7 +26,7 @@
         })).render()) : g.relogin = !0
       });*/
       $("body").on("click", "table.j_stripedTable td:first-child", function(e) {
-        $(this).parent("tr").addClass("active").siblings().removeClass("active")
+        $(this).parent("tr").addClass("active").siblings().removeClass("active");
       });
       /*$("body").on("mouseenter.dropdownmenu", ".dropdown-menu-toggle", function(a) {
         var b = $(this);
@@ -180,14 +180,17 @@
           });
           k.render()
         }
+      });*/
+      $("body").on("click", ".usercard-toggle", function(e) {
+        var userId = $(this).attr("userId");
+        if(userId && "10000" != userId) {
+          (new b({
+            targetEl: $(this),
+            userId: userId
+          })).render();
+        }
       });
-      $("body").on("click", ".usercard-toggle",
-      function(a) { (a = $(this).attr("userId")) && "10000" != a && (new b({
-          targetEl: $(this),
-          userId: a
-        })).render()
-      });
-      $("body").on("click", ".remindcard-toggle",
+      /*$("body").on("click", ".remindcard-toggle",
       function(b) { (b = $(this).attr("data-id")) && (new a({
           targetEl: $(this),
           userId: b
@@ -220,55 +223,69 @@
           seletedList: e
         })).render()
       });*/
-      $("body").off("mouseenter", ".entity-item").on("mouseenter", ".entity-item", function(a) {
-        $(this).attr("undeletable") || $(this).parents(".entity-container").attr("undeletable") || $(this).find("a:first").after('<a class="close" title="删除">&times;</a>')
+      $("body").off("mouseenter", ".entity-item").on("mouseenter", ".entity-item", function(e) {
         if(!$(this).attr("undeletable") && !$(this).parents(".entity-container").attr("undeletable")) {
           $(this).find("a:first").after('<a class="close" title="删除">&times;</a>');
         }
       });
-      $("body").off("mouseleave", ".entity-item").on("mouseleave ", ".entity-item", function(a) {
-        $(this).find(".close").remove()
+      $("body").off("mouseleave", ".entity-item").on("mouseleave ", ".entity-item", function(e) {
+        $(this).find(".close").remove();
       });
       $("body").off("click", ".entity-item .close").on("click ", ".entity-item .close", function(evt) {
-        var a = $(this).prevAll("a").attr("id");
+        var entityItemId = $(this).prevAll("a").attr("id");
         var shareId = $(this).prevAll("a").attr("data-value"),
         $container = $(this).parents(".entity-container"),
         url = $container.attr("data-url");
         if (url && shareId) {
           var $parent = $(this).parent(),
-          h = $container.data("param") || {};
-          h._method = "delete";
-          a = function(a) {
-            a && $.ajax({
+          data = $container.data("param") || {};
+          data._method = "delete";
+          var removeEntity = function(sure) {
+            sure && $.ajax({
               type: "POST",
               dataType: "json",
-              data: h,
+              data: data,
               url: url.replace("{id}", shareId),
-              success: function(a) {
+              success: function(res) {
                 $parent.remove();
-                $container.trigger("removeEntity", a);
-                $("#stream").trigger("insertStream", a.streams || a.stream);
+                $container.trigger("removeEntity", res);
+                $("#stream").trigger("insertStream", res.streams || res.stream);
                 $("#readinfo").trigger("updateReadInfo");
                 app.alert('success', "数据已删除");
               }
             })
           };
-          $container.attr("data-noConfirm") ? a(!0) : f.confirm("确定要删除吗？", a)
+          if($container.attr("data-noConfirm")) {
+            removeEntity(true);
+          } else {
+            f.confirm("确定要删除吗？", removeEntity);
+          }
         } else {
-          $(this).parent().hasClass("tag") || ($(this).parent(".entity-item").remove(), $container.trigger("removeEntity", a))
+          if(!$(this).parent().hasClass("tag")) {
+            $(this).parent(".entity-item").remove();
+            $container.trigger("removeEntity", entityItemId);
+          }
         }
       });
-      $("body").off("click", ".j_btn_close").on("click ", ".j_btn_close",
-      function(a) { (a = $(this).parents("#entitybox")) && 0 < a.length ? a.find(".modal-header .close").click() : $("body").trigger("slideClose")
+      $("body").off("click", ".j_btn_close").on("click ", ".j_btn_close", function(e) {
+        var $entitybox = $(this).parents("#entitybox");
+        if($entitybox) {
+          if(0 < $entitybox.length) {
+            $entitybox.find(".modal-header .close").click();
+          } else {
+            $("body").trigger("slideClose");
+          }
+        }
       });
-      $("body").off("triggerClose").on("triggerClose",
-      function(a) {
-        var b = location.pathname;
-        a = location.hash;
-        b = b.substring(0, b.lastIndexOf("/"));
-        "" == b && "" != a && (b = "/" + a.substring(1, a.lastIndexOf("/")));
-        ROUTER.navigate(b, {
-          trigger: !0
+      $("body").off("triggerClose").on("triggerClose", function(e) {
+        var pathName = location.pathname;
+        var hash = location.hash;
+        pathName = pathName.substring(0, pathName.lastIndexOf("/"));
+        if("" == pathName && "" != hash) {
+          pathName = "/" + hash.substring(1, hash.lastIndexOf("/"));
+        }
+        ROUTER.navigate(pathName, {
+          trigger: true
         })
       });
       /*$("body").off("click", ".j_center .e-list .checkbox").on("click", ".j_center .e-list .checkbox",
@@ -299,32 +316,27 @@
       function(a) {
         0 < $(".main").find(".j_center .selected").size() ? ($("body").addClass("batch-open"), $(".j_batchEl").removeClass("hide")) : ($("body").removeClass("batch-open"), $(".j_batchEl").addClass("hide"))
       });*/
-      $("body").off("click", ".typeahead-search,.selector-toggle").on("click", ".typeahead-search,.selector-toggle",
-      function() {
+      $("body").off("click", ".typeahead-search,.selector-toggle").on("click", ".typeahead-search,.selector-toggle", function() {
         var a = $(this);
         switch (a.attr("data-entity")) {
         case "employee":
           (new m({
-            $target:
-            $(this)
+            $target: $(this)
           })).open();
           break;
         case "department":
-          (new q({
-            $el:
-            $(this)
+          (new window.DepartmentSelector({
+            $el: $(this)
           })).open();
           break;
         case "group":
           (new p({
-            $el:
-            $(this)
+            $el: $(this)
           })).open();
           break;
         case "formLabel":
           (new n({
-            $el:
-            $(this)
+            $el: $(this)
           })).open();
           break;
         case "tag":
@@ -780,7 +792,7 @@
         b = '<p class="fieldOption" id="' + d.id + '"><span>' + d.name + "</sapn></p>",
         b = $($.trim(b)),
         b.data("obj", d);
-        else if (d = c[a], console.log(d),d.createTime = Date.create(d.createTime).format("{yyyy}-{MM}-{dd}"), d.name = d.name.replace(/</g, "&lt").replace(/>/g, "&gt").replace("/[\r\n]/g", " "), b = _.template(app.templates["suggestion." + entity], d), b = $($.trim(b)), b.data("obj", d), d.avatar && b.find(".avatar").attr("src", d.avatar), "relevance" == entity) switch (d.module) {
+        else if (d = c[a], d.createTime = Date.create(d.createTime).format("{yyyy}-{MM}-{dd}"), d.name = d.name.replace(/</g, "&lt").replace(/>/g, "&gt").replace("/[\r\n]/g", " "), b = _.template(app.templates["suggestion." + entity], d), b = $($.trim(b)), b.data("obj", d), d.avatar && b.find(".avatar").attr("src", d.avatar), "relevance" == entity) switch (d.module) {
         case "calendar":
           b.find(".icon-calendar").addClass("hide")
         }
@@ -817,7 +829,7 @@
     defaults: {
       el: "input.typeahead",
       valueKey: "id",
-      creatable: !0,
+      creatable: true,
       callback: function(d) {}
     },
     init: function(d) {
@@ -849,6 +861,65 @@
       }
     }
   };
+
+  window.DepartmentSelector = Backbone.View.extend({
+    initialize: function(c) {
+      this.$el = c = c.$el;
+      this.entity = c.attr("data-entity");
+      this.module = c.attr("module");
+      this.multi = c.attr("data-multi");
+      this.winEl = "#selector-" + this.entity;
+      c = app.templates["selector." + this.entity];
+      $("body").append(c)
+    },
+    delegateEvents: function() {
+      var c = this,
+      b = $(c.winEl);
+      $("body").on("keydown.depart-win",
+      function(a) {
+        27 == a.which && b.modal("hide")
+      });
+      b.on("hidden.bs.modal",
+      function() {
+        c.remove()
+      })
+    },
+    open: function() {
+      $(this.winEl).modal("toggle");
+      this._loadDepartment()
+    },
+    close: function() {
+      $(this.winEl).modal("hide")
+    },
+    _loadDepartment: function() {
+      var c = this;
+      c.treeView = new app.org.TreeView({
+        el: "#selector-org-tree",
+        hasUrl: !1,
+        editable: !1,
+        readonly: !0,
+        noUrl: !0
+      });
+      c.treeView.render(null,
+      function() {
+        $("#selector-org-tree").on("click.depart-win", ".treenode",
+        function(b) {
+          b.preventDefault();
+          b = $(this).data("node");
+          c.close();
+          c.$el.trigger("confirmHandler", {
+            objs: b
+          })
+        })
+      })
+    },
+    remove: function() {
+      var c = $(this.winEl);
+      $("#selector-org-tree").off(".depart-win");
+      c.remove();
+      this.treeView && (this.treeView.remove(), this.treeView = null)
+    }
+  });
 
   app.components.ShareAllview = Backbone.View.extend({
     partEl: "",
@@ -1307,7 +1378,7 @@
           break;
         case "subordinate":
           url = this.baseUrl + "/users/workreportSubordinates/" + this.userId + ".json?allSubordinate=" + isAllSubordinate;
-          $("#listTitle").text("我的下属");
+          $("#listTitle").text("我的团队");
       }
       this.fetchData(url, kw);
     },
@@ -1376,6 +1447,114 @@
     },
     remove: function() {
       $(this.el).off(".UserSlider");
+    }
+  });
+
+  app.components.InviteView = Backbone.View.extend({
+    initialize: function(data) {
+      this.username = data.username;
+      this.$targetEl = data.$targetEl;
+      this.callback = data.callback;
+      this.el = data.container || "#user-invite";
+      this.container = data.container || "body";
+      this.type = data.type;
+      this.inviteModel = new app.models.InviteModel();
+      $(this.container).append(app.utils.template("component.invite"));
+    },
+    delegateEvents: function() {
+      var self = this;
+      $("#invite-modal").on("hidden.bs.modal", function() {
+        self.remove();
+      });
+      $(self.el).on("click.invite", "#invite-submit", function(e) {
+        var $this = $(this);
+        var $userName = $(self.el).find('input[id="inputUsername"]');
+        var userName = $userName.val();
+        var ph = $userName.attr("placeholder");
+        if(userName == ph) {
+          userName = "";
+        }
+        var $email = $(self.el).find('input[id="inputEmail"]');
+        var email = $email.val();
+        var emailPh = $email.attr("placeholder");
+        if(email == emailPh) {
+          email = "";
+        }
+        if (email && !app.validations.formValidateImm($(self.el).find(".form-invite"))) {
+          return false;
+        }
+        if("" == email) {
+          app.alert('warning', "请输入必填项");
+        } else {
+          $this.attr("disabled", "true");
+          var invite = {};
+          invite["inviteInfo.invitee"] = userName;
+          invite["inviteInfo.contact"] = email;
+          self.inviteModel.saveInvite(invite, function(res) {
+            $this.removeAttr("disabled");
+            if(res.inviteInfo && "" != res.inviteInfo) {
+              var inviteInfo = res.inviteInfo;
+              if("success" == inviteInfo.msgType) {
+                if(null == inviteInfo.id) {
+                  app.alert('success', inviteInfo.message);
+                  $email.val("");
+                  self.clearValue($userName);
+                } else {
+                  app.alert('success', "已邀请 " + inviteInfo.invitee + " 加入Cobra");
+                  if(self.callback) {
+                    self.callback(inviteInfo);
+                  }
+                  if(self.type) {
+                    $email.val("");
+                    self.clearValue($userName);
+                  }
+                  self.remove();
+                }
+              } else {
+                app.alert('error', inviteInfo.message);
+                $email.val("");
+                self.clearValue($userName);
+              }
+            }
+          })
+        }
+      });
+      $(self.el).on("click.invite", "#invite-cancel", function(e) {
+        self.remove();
+      });
+      $(self.el).on("click.invite", function(e) {
+        e.stopPropagation();
+      });
+      if("inline" != this.type) {
+        $("body").on("click.invite", function(e) {
+          self.remove();
+        });
+        $("body").on("keydown.invite", function(e) {
+          if(27 == e.which) {
+            self.remove();
+          }
+        })
+      }
+    },
+    render: function() {
+      var top = this.$targetEl.offset().top + 28;
+      var left = this.$targetEl.offset().left;
+      if(left + 240 > $(window).width()) {
+        left -= 220;
+      }
+      $(this.el).css("left", left + "px").css("top", top + "px").css("z-index", 2000);
+      $(this.el).find("input[name='username']").val(this.username).focus();
+    },
+    clearValue: function($el) {
+      $el.val("");
+      $el.focus();
+    },
+    remove: function() {
+      if(!this.type) {
+        $("body").off(".invite");
+        $(this.el).off(".invite");
+        $(this.el).remove();
+      }
     }
   });
 
@@ -1676,4 +1855,4 @@
     }
   });
 
-}(app, Backbone, jQuery, _));
+}(window, app, Backbone, jQuery, _));

@@ -5,7 +5,7 @@ from datetime import datetime
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.utils.datastructures import SortedDict
+from collections import OrderedDict
 from django.utils.translation import ugettext_lazy as _
 
 from cobra.core.loading import get_profile_class, get_model
@@ -119,7 +119,7 @@ if Profile:
             self.fields.keyOrder = user_field_names + profile_field_names
 
             # If django.version >= 1.7
-            self.fields = SortedDict([(key, self.fields[key]) for key in self.fields.keyOrder])
+            self.fields = OrderedDict([(key, self.fields[key]) for key in self.fields.keyOrder])
 
         class Meta:
             model = Profile

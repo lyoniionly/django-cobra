@@ -1,8 +1,12 @@
 from django.contrib import admin
+from mptt.admin import MPTTModelAdmin
+
 from cobra.core.loading import get_model
 
 Organization = get_model('organization', 'Organization')
 OrganizationMember = get_model('organization', 'OrganizationMember')
+OrganizationDepartment = get_model('organization', 'OrganizationDepartment')
+OrganizationDepartmentMember = get_model('organization', 'OrganizationDepartmentMember')
 Team = get_model('team', 'Team')
 
 class OrganizationTeamInline(admin.TabularInline):
@@ -27,3 +31,5 @@ class OrganizationAdmin(admin.ModelAdmin):
     inlines = (OrganizationMemberInline, OrganizationTeamInline)
 
 admin.site.register(Organization, OrganizationAdmin)
+admin.site.register(OrganizationDepartment, MPTTModelAdmin)
+admin.site.register(OrganizationDepartmentMember)

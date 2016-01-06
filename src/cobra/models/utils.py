@@ -5,43 +5,48 @@ import operator
 from uuid import uuid4
 
 from django.db.models import F
-from django.db.models.expressions import ExpressionNode
+from django.db.models.expressions import Expression, Value, CombinedExpression
 from django.template.defaultfilters import slugify
 
 from cobra.core.exceptions import CannotResolveExpression
 
 
 EXPRESSION_NODE_CALLBACKS = {
-    ExpressionNode.ADD: operator.add,
-    ExpressionNode.SUB: operator.sub,
-    ExpressionNode.MUL: operator.mul,
-    ExpressionNode.DIV: operator.div,
-    ExpressionNode.MOD: operator.mod,
+    Expression.ADD: operator.add,
+    Expression.SUB: operator.sub,
+    Expression.MUL: operator.mul,
+    Expression.DIV: operator.div,
+    Expression.MOD: operator.mod,
 }
 try:
-    EXPRESSION_NODE_CALLBACKS[ExpressionNode.AND] = operator.and_
+    EXPRESSION_NODE_CALLBACKS[Expression.AND] = operator.and_
 except AttributeError:
-    EXPRESSION_NODE_CALLBACKS[ExpressionNode.BITAND] = operator.and_
+    EXPRESSION_NODE_CALLBACKS[Expression.BITAND] = operator.and_
 try:
-    EXPRESSION_NODE_CALLBACKS[ExpressionNode.OR] = operator.or_
+    EXPRESSION_NODE_CALLBACKS[Expression.OR] = operator.or_
 except AttributeError:
-    EXPRESSION_NODE_CALLBACKS[ExpressionNode.BITOR] = operator.or_
+    EXPRESSION_NODE_CALLBACKS[Expression.BITOR] = operator.or_
 
 
 def resolve_expression_node(instance, node):
+    # Update by lyon.
     def _resolve(instance, node):
         if isinstance(node, F):
             return getattr(instance, node.name)
-        elif isinstance(node, ExpressionNode):
+        # elif isinstance(node, Value):
+        #     return node.value
+        elif isinstance(node, CombinedExpression):
             return resolve_expression_node(instance, node)
         return node
 
     op = EXPRESSION_NODE_CALLBACKS.get(node.connector, None)
     if not op:
         raise CannotResolveExpression
-    runner = _resolve(instance, node.children[0])
-    for n in node.children[1:]:
-        runner = op(runner, _resolve(instance, n))
+    # runner = _resolve(instance, node.children[0])
+    runner = _resolve(instance, node.lhs)
+    # for n in node.children[1:]:
+    #     runner = op(runner, _resolve(instance, n))
+    runner = op(runner, _resolve(instance, node.rhs))
     return runner
 
 

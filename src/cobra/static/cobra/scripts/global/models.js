@@ -281,4 +281,75 @@
       });
     }
   });
+
+  app.models.InviteModel = Backbone.Model.extend({
+    id: "",
+    pageNo: 0,
+    pageSize: 23,
+    invite: {
+      invitee: ""
+    },
+    saveInvite: function(f, d) {
+      $.ajax({
+        url: "/invite.json",
+        type: "post",
+        dataType: "json",
+        data: f,
+        beforeSend: function() {},
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    saveInvites: function(f, d) {
+      $.ajax({
+        contentType: "application/json;charset=UTF-8",
+        url: "/invite/saves.json",
+        type: "post",
+        dataType: "json",
+        data: f,
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    queryInvitations: function(f) {
+      var d = {};
+      d.pageNo = this.pageNo;
+      d.pageSize = this.pageSize;
+      d["inviteInfo.invitee"] = this.invite.invitee;
+      $.ajax({
+        url: "/invite.json",
+        type: "get",
+        dataType: "json",
+        data: d,
+        success: function(c) {
+          f && f(c)
+        }
+      })
+    },
+    sendInvite: function(f, d) {
+      f && $.ajax({
+        type: "post",
+        url: "/invite/sendInvite/" + f + ".json",
+        dataType: "json",
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    delInvite: function(f, d) {
+      f && $.ajax({
+        type: "post",
+        dataType: "json",
+        data: {
+          _method: "delete"
+        },
+        url: "/invite/" + f + ".json",
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    }
+  });
 }(app, Backbone));

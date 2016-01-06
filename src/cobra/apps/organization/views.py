@@ -16,6 +16,7 @@ from cobra.core.permissions import can_create_organizations, can_add_organizatio
 
 Organization = get_model('organization', 'Organization')
 OrganizationMember = get_model('organization', 'OrganizationMember')
+OrganizationDepartment = get_model('organization', 'OrganizationDepartment')
 Team = get_model('team', 'Team')
 Project = get_model('project', 'Project')
 AuditLogEntry = get_model('auditlog', 'AuditLogEntry')
@@ -59,6 +60,11 @@ class OrganizationCreateView(BaseView):
             org = form.save(commit=False)
             org.owner = request.user
             org.save()
+
+            # create department root for this org
+            OrganizationDepartment.objects.create(
+                name=org.name, organization=org
+            )
 
             AuditLogEntry.objects.create(
                 organization=org,
