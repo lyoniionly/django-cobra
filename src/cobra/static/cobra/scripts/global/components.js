@@ -2694,11 +2694,11 @@
         }
         var keyCode = (e || window.event).keyCode;
         var $p;
-        if (13 == keyCode) {
+        if (app.config.keyCode.ENTER == keyCode) {
           c.find("#typeahead-div p.active").trigger("click.at");
-        } else if (27 == keyCode) {
+        } else if (app.config.keyCode.ESCAPE == keyCode) {
           self.hide();
-        } else if (38 == keyCode) {
+        } else if (app.config.keyCode.UP == keyCode) {
           $p = c.find("#typeahead-div p.active");
           if(1 > $p.length) {
             c.find("#typeahead-div p").last().addClass("active");
@@ -2710,7 +2710,7 @@
               c.find("#typeahead-div p").last().addClass("active");
             }
           }
-        } else if (40 == keyCode) {
+        } else if (app.config.keyCode.DOWN == keyCode) {
           $p = c.find("#typeahead-div p.active");
           if(1 > $p.length) {
             c.find("#typeahead-div p").first().addClass("active");
@@ -2736,28 +2736,28 @@
               var name = copiedText.substr(copiedText.lastIndexOf("@"));
               self.search($.trim(name.replace("@", "")));
               c.removeClass("hide");
-              var g = $("#autoUserTipsPosition")[0].getBoundingClientRect(),
-                e = window.navigator.userAgent.toLowerCase(),
-                f = b.data("left") || 0,
-                k = b.data("top") || 0,
-                p = 0;
+              var tipRect = $("#autoUserTipsPosition")[0].getBoundingClientRect(),
+                userAgent = window.navigator.userAgent.toLowerCase(),
+                left = b.data("left") || 0,
+                top = b.data("top") || 0,
+                offsetpx = 0;
               if("true" == b.attr("isoffsetpx")) {
                 var count = txt.split("\n").length;
                 if(1 < count) {
-                  p = b.data("offsetpx") || 0;
-                  if(1 <= e.indexOf("firefox") && 0 != p) {
-                    p += 1;
+                  offsetpx = b.data("offsetpx") || 0;
+                  if(1 <= userAgent.indexOf("firefox") && 0 != offsetpx) {
+                    offsetpx += 1;
                   }
-                  p *= count - 1;
+                  offsetpx *= count - 1;
                 }
               }
-              if(/msie 9\.0/i.test(e)) {
-                document.getElementById("atdiv").style.top = g.top + 1 + k + p + "px";
-                document.getElementById("atdiv").style.left = g.left - 5 + f + "px";
+              if(/msie 9\.0/i.test(userAgent)) {
+                document.getElementById("atdiv").style.top = tipRect.top + 1 + top + offsetpx + "px";
+                document.getElementById("atdiv").style.left = tipRect.left - 5 + left + "px";
               } else {
                 c.css({
-                  top: g.top + 1 + k + p + "px",
-                  left: g.left - 5 + f + "px"
+                  top: tipRect.top + 1 + top + offsetpx + "px",
+                  left: tipRect.left - 5 + left + "px"
                 });
               }
             }
@@ -2767,20 +2767,20 @@
           }
         }
       });
-      c.off("click.at", "#typeahead-div p").on("click.at", "#typeahead-div p", function(a) {
-        var g = $(this).data("obj");
+      c.off("click.at", "#typeahead-div p").on("click.at", "#typeahead-div p", function(e) {
+        var obj = $(this).data("obj");
         if (self.clickHandler) {
-          self.clickHandler(g, b);
+          self.clickHandler(obj, b);
         } else {
-          var e = self.getCursorPosition(b);
-          a = self.$input.data("userData");
-          var f = g.id,
-            k = g.name,
+          var cursorPosition = self.getCursorPosition(b);
+          var userDatas = self.$input.data("userData");
+          var f = obj.id,
+            k = obj.name,
             p = k + " ",
             q = self.$input.val(),
             m = 0,
             h = g = "";
-          if (q && (g = q.substr(0, e))) {
+          if (q && (g = q.substr(0, cursorPosition))) {
             m = g.length;
             h = g.split("@");
             var v = "";
@@ -2795,35 +2795,35 @@
                 }
               }
             }
-            h = v + p + q.substr(e);
+            h = v + p + q.substr(cursorPosition);
           }
-          e = {
+          var userObj = {
             userId: f,
             userName: k,
             atIndex: m
           };
-          if (a) {
-            for (g = k = 0; g < a.length; g++) {
-              if(a[g].userId != f) {
+          if (userDatas) {
+            for (g = k = 0; g < userDatas.length; g++) {
+              if(userDatas[g].userId != f) {
                 k++;
               } else {
-                if(-1 == b.val().indexOf(a[g].userName)) {
+                if(-1 == b.val().indexOf(userDatas[g].userName)) {
                   k++;
                 }
               }
             }
-            if(k == a.length) {
-              a.push(e);
+            if(k == userDatas.length) {
+              userDatas.push(userObj);
               self.$input.val("").focus().val(h);
             } else {
               self.$input.val("").focus().val(h + " ");
             }
           } else {
-            a = [];
-            a.push(e);
+            userDatas = [];
+            userDatas.push(userObj);
             self.$input.val("").focus().val(h);
           }
-          self.$input.data("userData", a);
+          self.$input.data("userData", userDatas);
           self.$input.focus();
           $("body").find(c).addClass("hide");
           self.hide();
