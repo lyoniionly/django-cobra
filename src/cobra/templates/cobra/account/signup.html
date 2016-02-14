@@ -1,10 +1,34 @@
-{% extends "layouts/modal.html" %}
-
-{% load url from future %}
+{% extends "account/base.html" %}
 {% load i18n %}
 {% load crispy_forms_tags %}
+{% load account %}
 
 {% block title %}{% trans "Signup" %} | {{ block.super }}{% endblock %}
+
+{% block page_account_title %}{% trans "Sign up to Cobra" %}{% endblock %}
+{% block page_account_content %}
+    <p class="message-info">{% trans "Cobra is currently in beta. Feel free to contact us at support@cobra.com." %}</p>
+    <form action="{% url 'account_signup' %}" method="post">
+        {% csrf_token %}
+            <div>
+                {% for field in form %}
+            {{ field|as_crispy_field }}
+          {% endfor %}
+            </div>
+    {% if redirect_field_value %}
+          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+          {% endif %}
+        <p class="submit">
+            <p class="required"><span>*</span> {% trans "Required" %}</p>
+            <button type="submit" class="btn green">
+                {% trans "Register" %} <span class="light"> | {% trans "Beta" %}</span>
+            </button>
+        </p>
+    </form>
+{% endblock %}
+{% block page_account_bottom %}
+    <a class="grey" href="{{ login_url }}">{% trans "Already have an account? Log in" %}</a>
+{% endblock %}
 
 {% block main %}
   <section class="body">

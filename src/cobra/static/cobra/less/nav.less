@@ -1,3 +1,419 @@
+#navigation {
+    height: 50px;
+    position: relative;
+    z-index: 1002
+}
+
+#navigation {
+    position: relative
+}
+
+.navigation {
+    background: #465262
+}
+
+.navigation .dropdown>a:not(.selectui-result):hover,
+.navigation .dropdown.open>a:not(.selectui-result) {
+    -webkit-box-shadow: 0 -3px 3px rgba(0,0,0,0.3);
+    -o-box-shadow: 0 -3px 3px rgba(0,0,0,0.3);
+    box-shadow: 0 -3px 3px rgba(0,0,0,0.3)
+}
+
+.navigation .dropdown-menu {
+    border: 0;
+    -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    -o-box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    margin-top: 0
+}
+
+.base-nav {
+    float: left
+}
+
+.base-nav .nav-ul li {
+    float: left;
+    position: relative
+}
+
+.base-nav .nav-ul li>a {
+    display: block;
+    padding: 0 16px;
+    line-height: 50px;
+    height: 50px;
+    font-size: 16px;
+    color: #fff;
+    text-decoration: none;
+    -webkit-transition: background-color .2s linear,color .2s linear;
+    -o-transition: background-color .2s linear,color .2s linear;
+    transition: background-color .2s linear,color .2s linear
+}
+
+.base-nav .nav-ul li>a {
+    width: 105px;
+    text-align: center
+}
+
+.base-nav .nav-ul li.nav-homeli>a {
+    width: auto
+}
+
+.base-nav .nav-ul li>a:hover,
+.base-nav .nav-ul li.active>a {
+    background-color: #313944
+}
+
+.base-nav .sub-cate dd a span:nth-of-type(1) {
+    display: none
+}
+
+.base-nav .nav-ul .more-li>a {
+    width: 117px
+}
+
+.base-nav .nav-ul .more-li>a:hover,.base-nav .nav-ul .more-li.open>a {
+    background: #fff!important;
+    color: #48484e;
+    border: 0;
+    position: relative;
+    z-index: 2
+}
+
+.base-nav .nav-ul .more-li>a>i {
+    display: inline-block;
+    margin-left: 10px
+}
+
+.base-nav .sub-cate {
+    position: absolute;
+    left: 0;
+    background: #fff;
+    border: 0;
+    z-index: 1;
+    padding: 16px 20px 8px;
+    white-space: nowrap
+}
+
+.base-nav .sub-cate .group {
+    display: inline-block;
+    vertical-align: top
+}
+
+.base-nav .sub-cate .group+.group {
+    margin-left: 35px
+}
+
+.base-nav .sub-cate .group dl {
+    width: 166px
+}
+
+.base-nav .sub-cate dl+dl {
+    padding-top: 16px;
+    border-top: 1px solid #f1f1f1
+}
+
+.base-nav .sub-cate dt {
+    font-weight: bold
+}
+
+.base-nav .sub-cate dd {
+    padding: 12px 0
+}
+
+.base-nav .sub-cate dd a {
+    display: block;
+    height: 27px;
+    line-height: 27px;
+    color: #666;
+    padding: 0 9px;
+    margin-bottom: 6px;
+    text-decoration: none;
+    border-radius: 2px;
+    -webkit-transition: background .15s linear;
+    -o-transition: background .15s linear;
+    transition: background .15s linear
+}
+
+.base-nav .sub-cate dd a.hide {
+    display: none
+}
+
+.base-nav .sub-cate dd a:last-child {
+    margin-bottom: 0
+}
+
+.base-nav .sub-cate dd a:hover {
+    color: #323232;
+    background: #f3f3f3
+}
+
+.base-nav .nav-autolis {
+    float: left;
+    max-width: 105px;
+    height: 50px;
+    overflow: hidden
+}
+
+.base-nav .nav-autolis.hideli>li:not(.active) {
+    display: none!important
+}
+
+@media(min-width:1150px) {
+    .base-nav .nav-autolis {
+        max-width: 210px
+    }
+}
+
+@media(min-width:1280px) {
+    .base-nav .nav-autolis {
+        max-width: 315px
+    }
+}
+
+@media(min-width:1440px) {
+    .base-nav .nav-autolis {
+        max-width: 420px
+    }
+}
+
+@media(min-width:1600px) {
+    .base-nav .nav-autolis {
+        max-width: 525px
+    }
+}
+
+@media(min-width:1720px) {
+    .base-nav .nav-autolis {
+        max-width: 630px
+    }
+}
+
+@media(min-width:1800px) {
+    .base-nav .nav-autolis {
+        max-width: 735px
+    }
+}
+
+@media(min-width:1920px) {
+    .base-nav .nav-autolis {
+        max-width: 840px
+    }
+}
+
+.navigation-themeB,.navigation-themeB .user-panel .user-avatar {
+    background: #306ab7
+}
+
+.navigation-themeB .user-panel.open,.navigation-themeB .user-panel.open .user-avatar {
+    background: #2458a7
+}
+
+.navigation-themeB .nav-ul li>a:hover,.navigation-themeB .nav-ul li.active>a,.navigation-themeB .search-box input[type="text"] {
+    background-color: #2458a7!important
+}
+
+.base-nav-opt {
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    margin: 0 -20px -8px -20px;
+    border-top: 1px solid #d5d5d5
+}
+
+.base-nav-opt a {
+    display: block;
+    text-decoration: none;
+    color: #666
+}
+
+.base-nav-opt a:hover {
+    background: #f1f1f1;
+    color: #333
+}
+
+.quick-menu .nav>li {
+    margin-right: 6px
+}
+
+.quick-menu .nav>li>a {
+    padding: 0 12px;
+    color: #fff;
+    line-height: 50px;
+    height: 50px;
+  border-radius: 0;
+}
+
+.quick-menu .nav>li>a>.fa-angle-down {
+    position: relative;
+    top: 2px;
+    font-size: 14px
+}
+
+.quick-menu .nav>li>a,.quick-menu>li.dropdown a {
+    -webkit-transition: all .2s linear;
+    -o-transition: all .2s linear;
+    transition: all .2s linear
+}
+
+.quick-menu .nav>li>a:hover {
+    background-color: #02aed9
+}
+
+.quick-menu span.logo {
+  position: relative;
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  background: url('../img/logo/logo_white.png') center center no-repeat;
+  background-size: 20px 20px;
+  top: 5px;
+}
+
+.quick-menu .eteams-quick .dropdown-menu {
+    width: 170px
+}
+
+.quick-menu .search-box {
+    width: 172px;
+    margin: 10px 12px 0 0;
+    position: relative;
+    display: inline-block
+}
+
+@media(max-width:1150px) {
+    .quick-menu .search-box {
+        width: 158px
+    }
+}
+
+.quick-menu .search-box input[type="text"] {
+    width: 100%;
+    height: 30px;
+    border-radius: 15px;
+    padding: 5px 32px 5px 22px;
+    line-height: 20px;
+    border: 0;
+    color: #fff;
+    background-color: #1aaed2;
+    -webkit-transition: background-color .25s ease-in-out;
+    -o-transition: background-color .25s ease-in-out;
+    transition: background-color .25s ease-in-out
+}
+
+.quick-menu .search-box input[type="text"]:hover {
+    background-color: #0099be
+}
+
+.quick-menu .search-box input[type="text"]:focus {
+    background-color: #08a
+}
+
+.quick-menu .search-box input[type="text"]::-moz-placeholder {
+    color: rgba(255,255,255,0.8)
+}
+
+.quick-menu .search-box input[type="text"]:-ms-input-placeholder {
+    color: rgba(255,255,255,0.8)
+}
+
+.quick-menu .search-box input[type="text"]::-webkit-input-placeholder {
+    color: rgba(255,255,255,0.8)
+}
+
+.quick-menu .search-box .search-btn {
+    color: #fff;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 30px;
+    width: 32px;
+    text-align: center;
+    line-height: 30px;
+    text-decoration: none
+}
+
+.quick-menu>.nav>li.dropdown:hover>a {
+    color: #48484e;
+    border-color: #a3adba;
+    background: #fff
+}
+
+.quick-menu>.nav>li.dropdown:hover>a span.logo {
+  background-image: url('../img/logo/logo_blue_30_30.png');
+}
+
+.quick-menu .message-menu .dropdown-menu li:hover .badge {
+    background: #fff;
+    color: #428bca
+}
+
+.quick-menu .message-menu .dropdown-menu>li>a {
+//    padding: 5px 60px 5px 40px;
+    position: relative
+}
+
+.quick-menu .message-menu .badge {
+    margin-top: 2px;
+    position: absolute;
+    right: 16px;
+    top: 5px
+}
+
+.quick-menu .message-menu .message-count {
+    padding: 1px 3px;
+    border-radius: 7px;
+    background: #f94521;
+    color: #fff;
+    line-height: 1;
+    min-width: 14px;
+    position: absolute;
+    top: 10px;
+    right: 0;
+    font-size: 12px;
+    font-style: normal
+}
+
+.quick-menu .message-menu .message-count.hint {
+    -webkit-animation: bounce 1s 5;
+    -moz-animation: bounce 1s 5;
+    -ms-animation: bounce 1s 5;
+    -o-animation: bounce 1s 5;
+    animation: bounce 1s 5
+}
+
+.quick-menu .message-menu .message-count:empty {
+    display: none
+}
+
+.quick-menu .popover {
+    text-align: center
+}
+
+.quick-menu .wechat-toggle {
+    position: relative
+}
+
+.quick-menu .wechat-toggle:hover>a {
+    background-color: #56AFE8;
+    color: #fff
+}
+
+.quick-menu .wechat-toggle .popover {
+    right: 177px;
+    top: -20px;
+    left: auto
+}
+
+.quick-menu .wechat-toggle:hover .popover {
+    display: block
+}
+
+.quick-menu .wechat-toggle .popover .arrow {
+    top: 0;
+    margin-top: 22px
+}
+
+
 .nav-links {
   box-shadow: inset 0 -2px 0 0 #eeeeee;
   &.nav-justified > li {

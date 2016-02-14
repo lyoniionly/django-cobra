@@ -59,6 +59,10 @@
   {# Main content goes in this 'layout' block #}
   {% block layout %}{% endblock %}
 
+  {% block entity_slider %}
+    <div id="entitySlider" class="j_stretchBox module-detail-slide"></div>
+  {% endblock %}
+
   {% block tracking %}
     {# Default to using Google analytics #}
 {#    {% include "partials/google_analytics.html" %}#}

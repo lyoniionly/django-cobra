@@ -1,0 +1,63 @@
+{% extends "layouts/modal.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load account %}
+
+{% block title %}
+  {% trans 'Login' %} | {{ block.super }}
+{% endblock %}
+
+{% block main %}
+  <section class="body">
+    {% if next %}
+      <p class="alert alert-info">{% trans "Please login to continue." %}</p>
+    {% endif %}
+
+    <div class="row">
+      <div class="col-sm-6">
+        <form class="form-stacked" action="{% url 'account_login' %}" method="post">
+          {{ form|as_crispy_errors }}
+          <fieldset>
+            <legend>{% trans "Login with your Cobra account" %}</legend>
+          </fieldset>
+          {% csrf_token %}
+
+          {% for field in form %}
+            {{ field|as_crispy_field }}
+          {% endfor %}
+          {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+          {% endif %}
+
+          <fieldset class="form-actions">
+            {% if can_register %}
+              <div class="pull-right" style="margin-top: 5px;">
+                <a href="{{ signup_url }}">{% trans "Create a new account" %}</a>
+              </div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">{% trans "Login" %}</button>
+            <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+          </fieldset>
+        </form>
+      </div>
+      {% comment %}{% if socialaccount.providers %}
+        <div class="col-sm-6">
+          <fieldset>
+            <legend>
+              {% trans "Login using another service" %}
+            </legend>
+          </fieldset>
+          {% url 'cobra-account-settings-identities' as identities_link %}
+          <p>{% blocktrans with identities_link as link %}If you already have an account, you can associate a social
+            identity in the
+            <a href="{{ link }}">identities</a> page in your account settings (after you login).{% endblocktrans %}</p>
+          <br>
+          <ul class="auth-options">
+            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+          </ul>
+          {% include "socialaccount/snippets/login_extra.html" %}
+        </div>
+      {% endif %}{% endcomment %}
+    </div>
+  </section>
+{% endblock %}

@@ -4,7 +4,7 @@ from django.conf import settings
 
 from cobra.core.compat import md5_constructor
 from cobra.core.dates import epoch
-from cobra.core.loading import get_profile_class
+from cobra.core.loading import get_profile_class, get_model
 
 try:
     from django.contrib.auth import get_user_model
@@ -117,8 +117,24 @@ def get_avatar_url(user, size=settings.COBRA_ACCOUNTS_AVATAR_DEFAULT_SIZE):
     return instance.get_avatar_url(size)
 
 
-def get_user_info(user):
+def get_user_info(user, organization=None):
+    department_dict = {}
+    if organization:
+        OrganizationDepartmentMember = get_model('organization', 'OrganizationDepartmentMember')
+        OrganizationDepartment = get_model('organization', 'OrganizationDepartment')
+        try:
+            dm = OrganizationDepartmentMember.objects.get(
+                user=user, department__organization=organization
+            )
+        except Exception as e:
+            department = OrganizationDepartment.objects.get(
+                organization=organization, parent__isnull=True
+            )
+        else:
+            department = dm.department
+        department_dict = department.get_node_obj()
     info = {
+        'account': user.username,
         'avatar': get_avatar_url(user),
         'activeDate': epoch(user.date_joined, msec=True),
         'username': user.get_full_name() or user.username,
@@ -126,11 +142,12 @@ def get_user_info(user):
         'email': user.email,
         'status': 'normal',
         'lastLoginTime': epoch(user.last_login, msec=True),
-        'id': user.pk
+        'id': user.pk,
+        'department': department_dict
     }
     return info
 
 
-def get_user_info_by_pk(user_pk):
+def get_user_info_by_pk(user_pk, organization=None):
     user = get_user_model().objects.get(pk=user_pk)
-    return get_user_info(user)
+    return get_user_info(user, organization)

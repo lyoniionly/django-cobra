@@ -13,14 +13,14 @@
 //          "home/:userId": "home",
 //          portal: "home",
 //          "portal/:userId": "home",
-//          ";jsessionid\x3d:session": "home_session",
-//          tasks: "task_tasks",
-//          "tasks/": "task_tasks",
-//          "tasks/:userId/:type": "tasks_nav",
-//          "tasks/calendar": "task_calendar",
-//          "tasks/calendar/:userId": "task_calendar",
-//          "tasks/:userId": "task_tasks",
-//          "tasks/:userId/:id": "task_tasks",
+//          ";jsessionid=:session": "home_session",
+          tasks: "task_tasks",
+          "tasks/": "task_tasks",
+          "tasks/:userId/:type": "tasks_nav",
+          "tasks/calendar": "task_calendar",
+          "tasks/calendar/:userId": "task_calendar",
+          "tasks/:userId": "task_tasks",
+          "tasks/:userId/:id": "task_tasks",
           workreport: "workReport",
           "workreport/:type": "workReport_type",
           "workreport/:type/:id": "workReport_type",
@@ -149,9 +149,9 @@
       },
       home_session: function() {
           this.home()
-      },
-      task_tasks: function(d, c) {
-          this.app.renderTask(d, c)
+      },*/
+      task_tasks: function(userId, taskId) {
+          this.app.renderTask(userId, taskId)
       },
       tasks_nav: function(d, c) {
           this.app.renderTaskByType(d, c)
@@ -168,7 +168,7 @@
       task_statistics: function(d) {
           this.app.renderTaskStatistics(d)
       },
-      blog_reports: function(d) {
+      /*blog_reports: function(d) {
           this.app.renderBlogreports(d)
       },
       flow_reports: function() {

@@ -6,19 +6,23 @@
 {% block body_class %}workreport{% endblock %}
 {% block org_daily_report_nav %}active{% endblock %}
 
+{% block sidebar %}
+  <ul class="nav nav-list">
+    <li{% if active_tab == 'mine' %} class="active"{% endif %}>
+      <a href="{% url 'organization:workreport:daily-member' organization.slug request.user.username %}">{% trans "My Daily Report" %}</a>
+    </li>
+    <li{% if active_tab == 'team' %} class="active"{% endif %}>
+      <a href="{% url 'organization:workreport:daily-team-report' organization.slug %}">{% trans "Team Daily Report" %}</a>
+    </li>
+    <li{% if active_tab == 'member' %} class="active"{% endif %}>
+      <a href="{% url 'organization:workreport:daily-members-index' organization.slug %}">{% trans "Members Daily Report" %}</a>
+    </li>
+  </ul>
+{% endblock %}
+
 {% block inner %}
   {% block navigation %}
     <ul class="nav nav-links">
-      <li{% if active_tab == 'mine' %} class="active"{% endif %}>
-        <a href="{% url 'organization:workreport:daily-member' organization.slug request.user.username %}">{% trans "My Daily Report" %}</a>
-      </li>
-      <li{% if active_tab == 'team' %} class="active"{% endif %}>
-        <a href="{% url 'organization:workreport:daily-team-report' organization.slug %}">{% trans "Team Daily Report" %}</a>
-      </li>
-      <li{% if active_tab == 'member' %} class="active"{% endif %}>
-        <a href="{% url 'organization:workreport:daily-members-index' organization.slug %}">{% trans "Members Daily Report" %}</a>
-      </li>
-
       {% if can_switch_view_model %}
         {% if is_calendar %}
           <li class="pull-right">

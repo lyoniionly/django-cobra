@@ -1,69 +1,226 @@
-'org.user': '' +
-'<div class="user-sort-view j-user-list">' +
-  '<div class="user-sortbar">' +
-    '<span id="group-user-checkall" class="hide">' +
-      '<input id="checkAll" class="user-id" type="checkbox">' +
-    '</span>' +
-    '<span class="title">成员列表</span>' +
-    '<span class="users-list-pinyin">' +
-      '<a class="highlight" id="ALL">全部</a>' +
-      '<a id="degit">#</a><a id="A">A</a><a id="B">B</a><a id="C">C</a><a id="D">D</a><a id="E">E</a><a id="F">F</a><a id="G">G</a>' +
-      '<a id="H">H</a><a id="I">I</a><a id="J">J</a><a id="K">K</a><a id="L">L</a><a id="M">M</a><a id="N">N</a>' +
-      '<a id="O">O</a><a id="P">P</a><a id="Q">Q</a><a id="R">R</a><a id="S">S</a><a id="T">T</a>' +
-      '<a id="U">U</a><a id="V">V</a><a id="W">W</a><a id="X">X</a><a id="Y">Y</a><a id="Z">Z</a>' +
-    '</span>' +
-    '<label class="checkbox users-list-checkbox">' +
-      '<input type="checkbox" id="chk2" title="含离职人员">' +
-      '<i>含离职<span>人员</span></i>' +
-    '</label>' +
-  '</div>' +
-  '<div id="user-container" class="users-container">' +
-    '<div id="employee-container">' +
-      '<ul class="employee-list users-list">' +
-        '<li class="list-tit clearfix">' +
-          '<div class="col-4 item username">姓名</div>' +
-          '<div class="col-4 item call">联系方式</div>' +
-          '<div class="col-4 item dept">部门</div>' +
-        '</li>' +
-        '<div class="j_userlistScr scrollwrapper" marginbottom="20">' +
-          '<div id="userlistCon">' +
-            '<div id="list-loading" class="loading_small">' +
-              '<span>正在加载数据，请稍后...</span>' +
-            '</div>' +
-            '<div class="center-more hide">加载更多...</div>' +
+"task.mytask": '' +
+'<div class="j_mainscroll mCus-mh100 scrollwrapper">' +
+  '<div class="main-hd">' +
+    '<ul class="toolkit-list">' +
+      '<li class="toolkit-item toolkit-item-sn"><i class="icon-checkbox-unchecked j_check-all"></i></li>' +
+      '<li id="view-taskType" class="toolkit-item hide">' +
+        '<div class="j_mineType btn-group dropdown dropdown-menu-toggle">' +
+          '<a id="task-taskType" class="btn btn-sm dropdown-toggle">分类 <i class="icon-caret-down"></i></a>' +
+          '<ul class="dropdown-menu border-dropdown">' +
+            '<li data-entity="mine" class="active"><a>全部</a></li>' +
+            '<li data-entity="mineManager" title="负责的任务"><a>负责的任务</a></li>' +
+            '<li data-entity="mineParticipants" title="参与的任务"><a>参与的任务</a></li>' +
+          '</ul>' +
+        '</div>' +
+      '</li>' +
+      '<li id="view-state-toggle" class="toolkit-item">' +
+        '<div class="btn-group dropdown dropdown-menu-toggle">' +
+          '<a class="btn btn-sm dropdown-toggle">视图<i class="icon-caret-down"></i></a>' +
+          '<ul id="view-state" class="dropdown-menu border-dropdown">' +
+            '<li data-value="list"><a>列表视图</a></li>' +
+            '<li data-value="dueDate"><a>到期日视图</a></li>' +
+            '<li data-value="beginDate"><a>起始日视图</a></li>' +
+          '</ul>' +
+        '</div>' +
+      '</li>' +
+      '<li class="toolkit-item">' +
+        '<a class="tasks-calendar btn btn-sm j_timeview hide router" href="/tasks/<%=userId%>/calendar">时间视图</a>' +
+      '</li>' +
+      '<li class="toolkit-item">' +
+        '<div class="btn-group dropdown dropdown-menu-toggle">' +
+          '<a id="task-order" class="btn btn-sm dropdown-toggle">排序<i class="icon-caret-down"></i></a>' +
+          '<ul class="dropdown-menu border-dropdown">' +
+            '<li><a data-entity="default" class="orderType" data-direction="DESC">默认</a></li>' +
+            '<li><a class="orderType" data-entity="last_comment_time" data-direction="DESC">按反馈时间</a></li>' +
+            '<li><a class="orderType" data-entity="last_update_time" data-direction="DESC">按任务更新时间</a></li>' +
+            '<li><a class="orderType" data-entity="create_time" data-direction="DESC">按任务创建时间(最新)</a></li>' +
+            '<li><a class="orderType" data-entity="create_time" data-direction="ASC">按任务创建时间(最早)</a></li>' +
+            '<li><a class="orderType" data-entity="due_date" data-direction="DESC">按任务到期时间(最新)</a></li>' +
+            '<li><a class="orderType" data-entity="due_date" data-direction="ASC">按任务到期时间(最早)</a></li>' +
+            '<li><a class="orderType" data-entity="manager" data-direction="ASC">按负责人</a></li>' +
+            '<li><a class="orderType" data-entity="priority" data-direction="DESC">按紧急程度</a></li>' +
+          '</ul>' +
+        '</div>' +
+      '</li>' +
+      '<li class="toolkit-item">' +
+        '<div class="btn-group dropdown" id="task-filter" data-toggle="#task-filter-dropdown">' +
+          '<a class="btn btn-sm dropdown-toggle">筛选 <i class="icon-caret-down"></i></a>' +
+          '<div class="dropdown-filter border-dropdown dropdown-div">' +
+            '<div id="task-filter-dropdown"></div>' +
           '</div>' +
         '</div>' +
-      '</ul>' +
+      '</li>' +
+      '<li class="toolkit-item search">' +
+        '<input class="form-control" type="text" placeholder="搜索" id="tasksearch-keywords">' +
+        '<i class="icon-search" title="搜索"></i>' +
+      '</li>' +
+      '<li class="toolkit-item pull-right m-r-0">' +
+        '<a class="btn btn-success btn-sm j_entityslider-toggle" data-module="task" data-id="today" id="newTask">' +
+          '<i class="icon-plus-thin glyphicon"></i>安排任务' +
+        '</a>' +
+      '</li>' +
+    '</ul>' +
+  '</div>' +
+  '<div class="main-hd main-hd-fixed j_batchEl hide">' +
+    '<ul class="toolkit-list">' +
+      '<li class="toolkit-item toolkit-item-sn"><i class="icon-checkbox-unchecked j_check-all"></i></li>' +
+      '<li class="toolkit-item"><a class="task-watchs btn btn-sm">批量关注</a></li>' +
+      '<li class="toolkit-item"><a class="task-reminds btn btn-sm">批量催办</a></li>' +
+      '<li class="toolkit-item"><a class="task-share btn btn-sm" data-entity="employee" data-multi="true">批量共享</a></li>' +
+      '<li class="toolkit-item"><a class="task-finished btn btn-sm">批量完成</a></li>' +
+      '<li class="toolkit-item pull-right m-r-0">' +
+        '<a class="btn btn-success btn-sm j_entityslider-toggle" data-module="task" data-id="today" id="newTask">' +
+          '<i class="icon-plus-thin glyphicon"></i>安排任务' +
+        '</a>' +
+      '</li>' +
+    '</ul>' +
+  '</div>' +
+  '<div class="main-bd sidebar-in j_sidebarPren">' +
+    '<div class="table-tray scrollwrapper">' +
+      '<div class="tray-cell main-content j_center" id="mytask-container">' +
+        '<div class="task-creater">' +
+          '<input id="qcreatetask" class="placeholder-italic" placeholder="提交新任务，直接@任务责任人，Ctrl+Enter快速新建">' +
+          '<a class="addbtn j_qcreatetask"><i class="icon-plus-thin"></i></a>' +
+        '</div>' +
+        '<div class="j_due group-view e-list-group delay">' +
+          '<div class="e-list-head">' +
+            '<a class="e-list-title group-switch" title="折叠" data-status="on">' +
+              '<strong>已经延期<i class="j_count"></i></strong><i class="icon-angle-right "></i>' +
+            '</a>' +
+          '</div>' +
+          '<ul class="e-list task-list" group="dueDate/delay"></ul>' +
+        '</div>' +
+        '<div class="j_due group-view e-list-group today">' +
+          '<div class="e-list-head">' +
+            '<a class="group-add pull-right" title="安排任务" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i></a>' +
+            '<a class="e-list-title group-switch" title="折叠" data-status="on">' +
+              '<strong>今天到期<i class="j_count"></i></strong><i class="icon-angle-right "></i>' +
+            '</a>' +
+          '</div>' +
+          '<ul class="e-list task-list" group="dueDate/today">' +
+            '<li class="notask">还没有今天到期的任务，点击这里或右边的“<b class="group-add">+</b>”新建一条任务</li>' +
+          '</ul>' +
+        '</div>' +
+        '<div class="j_due group-view e-list-group tomorrow">' +
+          '<div class="e-list-head">' +
+            '<a class="group-add pull-right" title="安排任务" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i></a>' +
+            '<a class="e-list-title group-switch" title="折叠" data-status="on">' +
+              '<strong>明天到期<i class="j_count"></i></strong><i class="icon-angle-right "></i>' +
+            '</a>' +
+          '</div>' +
+          '<ul class="e-list task-list" group="dueDate/tomorrow">' +
+            '<li class="notask">还没有明天到期的任务，点击这里或右边的“<b class="group-add">+</b>”新建一条任务</li>' +
+          '</ul>' +
+        '</div>' +
+        '<div class="j_due group-view e-list-group future">' +
+          '<div class="e-list-head">' +
+            '<a class="group-add pull-right" title="安排任务" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i></a>' +
+            '<a class="e-list-title group-switch" title="折叠" data-status="on">' +
+              '<strong>即将到期<i class="j_count"></i></strong><i class="icon-angle-right "></i>' +
+            '</a>' +
+          '</div>' +
+          '<ul class="e-list task-list" group="dueDate/future"></ul>' +
+        '</div>' +
+        '<div class="j_due group-view e-list-group memo">' +
+          '<div class="e-list-head">' +
+            '<a class="group-add pull-right" title="安排任务" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i></a>' +
+            '<a class="e-list-title group-switch" title="折叠" data-status="on">' +
+              '<strong>无到期日<i class="j_count"></i></strong><i class="icon-angle-right "></i>' +
+            '</a>' +
+          '</div>' +
+          '<ul class="e-list task-list" group="dueDate/memo"></ul>' +
+        '</div>' +
+        '<div class="j_begin group-view e-list-group past">' +
+          '<div class="e-list-head">' +
+            '<a class="group-add pull-right" title="安排任务" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i></a>' +
+            '<a class="e-list-title group-switch" title="折叠" data-status="on">' +
+              '<strong>已经开始<i class="j_count"></i></strong><i class="icon-angle-right "></i>' +
+            '</a>' +
+          '</div>' +
+          '<ul class="e-list task-list" group="beginDate/past"></ul>' +
+        '</div>' +
+        '<div class="j_begin group-view e-list-group today">' +
+          '<div class="e-list-head">' +
+            '<a class="group-add pull-right" title="安排任务" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i></a>' +
+            '<a class="e-list-title group-switch" title="折叠" data-status="on">' +
+              '<strong>今天开始<i class="j_count"></i></strong><i class="icon-angle-right "></i>' +
+            '</a>' +
+          '</div>' +
+          '<ul class="e-list task-list" group="beginDate/today">' +
+            '<li class="notask">还没有今天开始的任务，点击这里或右边的“<b class="group-add">+</b>”新建一条任务</li>' +
+          '</ul>' +
+        '</div>' +
+        '<div class="j_begin group-view e-list-group tomorrow">' +
+          '<div class="e-list-head">' +
+            '<a class="group-add pull-right" title="安排任务" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i></a>' +
+            '<a class="e-list-title group-switch" title="折叠" data-status="on">' +
+              '<strong>明天开始<i class="j_count"></i></strong><i class="icon-angle-right "></i>' +
+            '</a>' +
+          '</div>' +
+          '<ul class="e-list task-list" group="beginDate/tomorrow">' +
+            '<li class="notask">还没有明天开始的任务，点击这里或右边的“<b class="group-add">+</b>”新建一条任务</li>' +
+          '</ul>' +
+        '</div>' +
+        '<div class="j_begin group-view e-list-group future">' +
+          '<div class="e-list-head">' +
+            '<a class="group-add pull-right" title="安排任务" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i></a>' +
+            '<a class="e-list-title group-switch" title="折叠" data-status="on">' +
+              '<strong>即将开始<i class="j_count"></i></strong><i class="icon-angle-right "></i>' +
+            '</a>' +
+          '</div>' +
+          '<ul class="e-list task-list" group="beginDate/future"></ul>' +
+        '</div>' +
+        '<div class="j_begin group-view e-list-group memo">' +
+          '<div class="e-list-head">' +
+            '<a class="group-add pull-right" title="安排任务" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i></a>' +
+            '<a class="e-list-title group-switch" title="折叠" data-status="on">' +
+              '<strong>无起始日<i class="j_count"></i></strong><i class="icon-angle-right "></i>' +
+            '</a>' +
+          '</div>' +
+          '<ul class="e-list task-list" group="beginDate/memo"></ul>' +
+        '</div>' +
+        '<div class="all-type-view e-list-group all-type hide">
+          '<ul id="all-type-list" class="e-list center-list task-list hide" group="all-type"></ul>' +
+          '<div class="hide no-result j_fast-create">没有任务</div>' +
+          '<div class="hide no-result j_no-result-tip">没有任务</div>' +
+          '<div class="hide common-more j_moretask">加载更多<i class="icon-angle-down"></i></div>' +
+          '<div class="hide common-nodata j_nodata">已加载所有任务</div>' +
+        '</div>' +
+        '<div id="mytask-loading" class="loading_small"><span>正在加载数据，请稍后...</span></div>' +
+      '</div>' +
+      '<div class="tray-cell main-sidebar j_rightView" id="mytask-right"></div>' +
     '</div>' +
   '</div>' +
-'</div>' +
-'<div id="usersListClone" class="hide">' +
-  '<li id="groupUserClone" class="clearfix">' +
-    '<div class="col-4 item username ellipsis">' +
-      '<a><input type="checkbox" name="userids" class="user-id hide"/></a>' +
-      '<a class="avatar usercard-toggle" userId>' +
-        '<img alt="avatar" title="查看卡片信息" src="/static/images/avatar.png">' +
-      '</a>' +
-      '<a class="name j_entityslider-toggle" userid="" data-id="" data-module="profile" title="查看他的资料"></a>' +
-    '</div>' +
-    '<div class="col-4 item call ellipsis"></div>' +
-    '<div class="col-4 item dept ellipsis"></div>' +
-    '<span class="follow-btns">' +
-      '<span class="approved hide" title="已关注，点击取消关注">' +
-        '<i class="icon-ok"></i> 已关注 |<a class="btn-unfollow-cancle"> 取消</a>' +
-      '</span>' +
-      '<span class="unapproved hide" title="已发送关注申请">已申请关注</span>' +
-      '<span class="none btn-follow-add hide" title="点击添加关注">' +
-        '<i class="icon-plus"></i> 添加关注' +
-      '</span>' +
-    '</span>' +
-  '</li>' +
-  '<div class="user-invitation-tip">' +
-    '<p>' +
-      'TA没有收到邀请邮件？' +
-      '<a class="user-invitation-resend">重新发送</a>' +
-    '</p>' +
-    '<p>或者将下面的邀请地址直接发给TA:</p>' +
-    '<a id="user-invitation-link"></a>' +
+  '<div class="hide">' +
+    '<li id="taskClone" class="task">' +
+      '<span class="sn"></span>' +
+      '<span class="checkbox"><i class="icon-checkbox-unchecked"></i></span>' +
+      '<span class="e-list-loading"></span>' +
+      '<div class="title j_entityslider-toggle">' +
+        '<div class="text"></div>' +
+        '<span class="importance hide"></span>' +
+      '</div>' +
+      '<div class="right">' +
+        '<span class="comment-count"></span>' +
+        '<span class="user ellipsis"></span>' +
+        '<span class="date"></span>' +
+      '</div>' +
+      '<div class="shortcut hide">' +
+        '<span class="watch"><i class="icon-favourite"></i>&nbsp;关注</span>' +
+        '<span class="finish"><i class="icon-todo"></i>&nbsp;标记未完成</span>' +
+        '<span class="share selector-toggle" data-entity="employee" data-multi="true" targetId=""><i class="icon-share"></i>&nbsp;共享</span>' +
+      '</div>' +
+    '</li>' +
   '</div>' +
 '</div>',
+
+
+"task.subtask": '<div class="right-nav subtask-nav hd" id="subtask-head"><span class="title" id="taskChoose"><i class="graph graph-16 graph-16-subtask m-r-10"></i>子任务<i class="icon-angle-right ph-10 fs-16"></i><a class="toolkit-item j_if-finished hide"><i class="icon-checkbox-unchecked icoinline"></i>包含已完成</a></span><span id="numberDiv" class="numberDiv"><span>0</span>/0</span><span id="descriptionDiv" class="hide ml-5 descriptionDiv">未完成数/总数</span><span class="pull-right addSubtask-container"><a class="btn btn-sm j_addSubtask addSubtask" style="margin-right: -7px;"><i class="icon-plus-thin"></i>新建子任务</a><div class="btn-group dropdown dropdown-menu-toggle"><a class="dropdown-toggle btn btn-sm"><i class="icon-angle-down"></i></a><ul class="dropdown-menu dropdown-menu-right border-dropdown" style="display: none;"><li class="aaa  entity-toggle" data-entity="relevance" data-type="subtask" module="task"><a id="js_customer-import-btn">关联子任务</a></li></ul></div></span></div><div class="subtask-panel" id="subtask-content"><ul class="e-list task-list"></ul><div class="hide center-more">加载更多...</div><div class="hide common-nodata">已加载所有任务</div><div id="subtask-loading" class="loading_small hide"><span>正在加载数据，请稍后...</span></div></div><div class="hide"><li id="subtaskClone" class="task subtask" href="#"><span class="sn-link"></span><div><div class="j_edit title entitybox-toggle"><div class="text"></div><span class="importance hide"></span></div></div><div class="right entity-info"><span class=" title date"><input type="text" class="datepicker textinput subtask-duedate dudate j_dueDateInput" readonly unselectable="on"></input><span class="j_dueDateTxt"></span></span><span class="user ellipsis"></span><span class="typeahead-wrapper hide"><input type="text" class="control-input typeahead search j_subtaskManager" data-entity="employee" placeholder="输入姓名" /><a class="btn typeahead-search"><i class="icon-search"></i></a></span></div><div class="shortcut hide"><span class="j_manager" title="选择负责人"><i class="icon-user"></i></span><span class="j_duedate" title="选择到期日"><i class="icon-alarm"></i></span><span class="j_finished" title="标记完成/未完成"><i class="icon-todo"></i></span></div></li></div>',
+"task.taskinfo": '<div class="module-detail-view"><div class="detail-header"><div class="detail-brand"><i class="graph graph-task"></i>任务</div><div class="detail-actions"><ul class="j_button_ul"><li class="acl-hide"><a title="状态" data-toggle="tooltip" data-placement="top" id="task-status" class="iconlabel" data-status="todo"><i class="icon-checkbox-unchecked"></i>标记完成</a></li><li><a title="锁定后参与人不可编辑" id="task-lock" class="iconlabel" data-toggle="tooltip" data-placement="top"><i class="icon-lock"></i>锁定</a></li><li class="dropdown dropdown-menu-toggle j_more_dropdown"><a class="dropdown-toggle"><i class="icon-cog"></i>更多</a><ul class="dropdown-menu dropdown-menu-right border-dropdown"><li><a id="task-watch"><i class="icon-star"></i>关注</a></li><li><a id="btn-remind" class="remind-toggle" module="task" targetId=""><i class="icon-bell"></i>催办</a></li><li><a id="copy-task"><i class="icon-stack-2"></i>任务复制</a></li><li><a id="btn-calendar" class="agenda-toggle" module="task" targetId="" entity-title="" data-toggle="tooltip" data-placement="top"><i class="icon-calendar-empty"></i>转日程</a></li><li><a id="task-print" data-toggle="tooltip" data-placement="top"><i class="icon-print"></i>打印</a></li><li class="acl-hide acl-w-hide acl-p-hide"><a id="btn-delete"  data-toggle="tooltip" data-placement="top"><i class="icon-trash"></i>删除</a></li></ul></li><li class="j_li_save_untrue hide"><a data-toggle="tooltip" data-placement="top" data-original-title="" title=""><i class="icon-save"></i>保存</a></li><li><a title="关闭" id="btn-close" class="detail-slide-close j_btn_close">%x26times;</a></li></ul></div></div><div class="detail-content scrollwrapper" marginbottom="20" id="task-wrapper" class="form-horizontal entity-info task-info"><div id="task-container" class="task-container"><div class="detail-summary"><div class="summary-avatar j_summary-avatar usercard-toggle" data-toggle="tooltip" data-placement="top"><img src="/static/images/avatar.png"></div><div class="summary-title"><textarea id="task-title" class="j_title acl-disabled smart-title" name="task.title" v-maxlength="100" placeholder="一句话描述任务..."></textarea></div></div><div class="detail-block j_recommend_block"><div class="detail-infos manager-div"><dl class="info-item clearfix acl-w-container"><dt><i class="graph graph-16-man task-manager-label"></i>负责人:</dt><dd><div class="controls"><div undeletable="true" id="task-manager" class="entity-container"></div><span class="typeahead-wrapper hide"><input id="typeahead-manager" type="text" class="control-input form-control typeahead search" data-entity="employee" placeholder="输入姓名"/><a class="btn typeahead-search"><i class="icon-search"></i></a></span><span id="editManager" class="control-btn entity-item-add acl-hide" title="修改负责人"><i title="修改负责人" data-placement="top" data-toggle="tooltip" class="icon-pencil"></i></span></div></dd></dl><dl class="info-item clearfix"><dt><i class="graph graph-16-flag"></i>到期日:</dt><dd class="date-ending controls"><input class="acl-disabled" id="dueDate" name="dueDate" type="text" placeholder="选择到期日" dateGroup="true"></input></dd></dl><dl class="info-item clearfix acl-hide"><dt><i class="graph graph-16-clock"></i>紧急程度:</dt><dd><div class="dropdown dropdown-menu-toggle"><span id="task-urgency" class="dropdown-toggle"><div class="importance-item j_importance_level"><dfn></dfn><span class="j_urgency_name">正常</span></div></span><ul class="dropdown-menu dropdown-urgency border-dropdown"><li><a class="j_urgency" value="normal"><div class="importance-item"><dfn></dfn>正常</div></a></li><li><a class="j_urgency" value="high"><div class="importance-item warning"><dfn></dfn>紧急</div></a></li><li><a class="j_urgency" value="urgency"><div class="importance-item danger"><dfn></dfn>非常紧急</div></a></li></ul></div></dd></dl></div></div><div class="detail-block detail-desc-wrap j_content_block"><span class="graph graph-16-word"></span><div class="desc-input"><textarea id="task-content" class="acl-disabled" name="task.content" placeholder="这里可以添加任务详情..." maxlength="2000"></textarea></div></div><div class="form-preview hide" ><div class="form-view  j_form_view form-view_js j_formpreview" ></div><div class="detail-block detail-desc-wrap info-submit-div hide"><a id="form-submit" class="pull-right btn btn-sm btn-info a-submit">保存</a><span class="pull-right m-r-10">自定义字段区域需要手动保存</span></div></div><div class="detail-block-more hide j_task_form"><a class="btn btn-block btn-sm opc-7"><span class="js_detail-block-more">更多</span><i class="icon-angle-down"></i></a></div><div class="detail-block entity-info j_detailCommands" style="outline:none;"><div class="control-group j_task_detail acl-w-container hide" id="task-participants" icon="#i-participants"></div><div class="control-group j_task_detail hide" id="task-ctag" icon="#i-ctag"></div><div class="control-group j_task_detail hide" id="task-tag" icon="#i-tag"></div><div class="control-group j_task_detail hide" id="task-share" icon="#i-share"></div><div class="control-group j_task_detail hide" id="task-beginDate"><div class="control-label"><i class="graph graph-16-path"></i>起始日期:</div><div class="controls"><input id="beginDate" name="beginDate" type="text" class="datepicker form-control textinput acl-disabled" dateGroup="true"></input></div></div><div class="control-group entity-relevance j_task_detail hide" id="task-mainline" icon="#i-mainline"></div><div class="control-group entity-relevance j_task_detail hide" id="task-relevance-task" icon="#i-relevance-task"></div><div class="control-group entity-relevance j_task_detail hide" id="task-relevance-doc" icon="#i-relevance-doc"></div><div class="control-group entity-relevance j_task_detail hide" id="task-relevance-crm" icon="#i-relevance-crm"></div><div class="control-group entity-relevance j_task_detail hide" id="task-relevance-flow" icon="#i-relevance-flow"></div><div class="control-group entity-relevance j_task_detail hide" id="task-relevance-agenda" icon="#i-relevance-agenda"></div><div id="parent-task" class="control-group  hide"><div class="control-label"><i class="graph graph-16-parent"></i>上级任务:</div><div class="controls"><div class="parent-task-name entity-container"></div></div></div><div class="control-group hide" id="task-attachment" icon="#i-attach"></div><div class="control-group hide" id="task-remind" icon="#i-remind"></div></div><div class="detail-block j_detailhandle detail-handle-wrap clearfix links-control-group"><div class="detail-handles j_task_handle_item"><div class="handle-item"><a id="i-participants" for="#task-participants"><i class="graph graph-16 graph-16-mans"></i>添加参与人</a></div><div class="handle-item"><a id="i-subtask" for="#task-subtask"><i class="graph graph-16 graph-16-subtask"></i>子任务</a></div><div class="handle-item"><a id="i-ctag" for="#task-ctag" for="#task-ctag"><i class="graph graph-16 graph-16-commonlabel"></i>公共标签</a></div><div class="handle-item"><a id="i-tag" for="#task-tag"><i class="graph graph-16 graph-16-label"></i>我的标签</a></div><div class="handle-item"><a id="i-share" for="#task-share"><i class="graph graph-16 graph-16-share"></i>共享</a></div><div class="handle-item"><a id="i-mainline" for="#task-mainline"><i class="graph graph-16 graph-16-pie"></i>关联项目</a></div><div class="handle-item"><a id="i-relevance-task" for="#task-relevance-task"><i class="graph graph-16 graph-16-task"></i>关联任务</a></div><div class="handle-item"><a id="i-relevance-doc" for="#task-relevance-doc"><i class="graph graph-16 graph-16-document"></i>关联文档</a></div><div class="handle-item"><a id="i-relevance-crm" for="#task-relevance-crm"><i class="graph graph-16 graph-16-customer"></i>关联客户</a></div><div class="handle-item"><a id="i-relevance-flow" for="#task-relevance-flow"><i class="graph graph-16 graph-16-workflow"></i>关联审批</a></div><div class="handle-item"><a id="i-relevance-agenda" for="#task-relevance-agenda"><i class="graph graph-16 graph-16-calendar"></i>关联日程</a></div><div class="handle-item"><a id="i-beginDate" for="#task-beginDate"><i class="graph graph-16 graph-16-path"></i>起始日期</a></div><div class="handle-item"><a id="i-attach" for="#task-attachment"><i class="graph graph-16 graph-16-attach"></i>附件</a></div><div class="handle-item"><a id="i-remind" for="#task-remind"><i class="graph graph-16 graph-16-remind"></i>提醒</a></div></div></div><div class="detail-block subtask-wrap hide" id="task-subtask"></div></div></div><div class="comment-easy-wrapper hide"><div class="easy-input"><span class="graph"></span><textarea class="form-control" placeholder="输入评论"></textarea></div><div class="easy-handle"><a class="a-upload pull-left"><i class="icon-paperclip m-r-3"></i>附件</a><a class="pull-right btn btn-sm btn-info a-submit">发布</a></div></div></div>',
+"task.taskright": '<div class="j_sidebarCtrl graph siderbar-ctrl-btn"></div><div class="main-sidebar-bd"><div id="task-right"><div class="sbox"><div class="sbox-hd"><h5 class="sbox-title">今天任务统计</h5></div><div class="sbox-bd"><div class="h-280" id="mytask"></div></div></div><div class="sbox"><div class="sbox-hd"><h5 class="sbox-title">下属任务统计</h5></div><div id="sub" class="sbox-bd"><div class="task-underling-stat"><div id="empList" class="underling-filter clearfix"></div><div class="j_notask no-more hide">该下属没有任务</div><div id="subtask" class="h-280"></div></div><div class="sbox-no-data j_nosub hide">您没有下属</div></div></div><div class="hide" id="empItem"><span class=" filter-item"><a userId="" title="" class="j_employee-click"></a></span></div><span class=" filter-item j_submore more hide"><a>更多</a></span></div></div>',
+"task.calendar": '<div id="taskcalendar-head" class="p-10 ps-r clearfix"><a class="new btn btn-sm btn-success pull-right"><i class="icon-pencil glyphicon"></i>安排任务</a><a class="this-month btn btn-sm pull-right">本月</a><a class="this-week btn btn-sm hide pull-right">本周</a><div class="pull-right"><div class="timeviews"><a class="duedate-view btn btn-sm btn-info hide">到期日视图</a><a class="finished-view btn btn-sm hide">完成日视图</a></div><div class="views btn-group ml-10"><a class="week btn btn-sm">周</a><a class="month btn btn-sm btn-info">月</a><a class="refresh btn-sm btn">刷新</a></div></div><div class="arrows btn-group pull-right"><a class="arrow-left btn btn-sm ph-10">%x26lt;</a><a class="arrow-right btn btn-sm ph-10">%x26gt;</a></div><span class="bold j_taskusername">时间视图</span><span class="date-between ml-20 fs-16 lh-30"></span></div><div id="taskcalendar-wrapper" class="scrollwrapper"><div id="taskcalendar"></div></div><div id="taskcalendar-week"  class="datepicker scrollwrapper hide"><table><thead></thead><tbody></tbody></table></div><div id="taskModal" class="statcalendar-modal entitybox modal fade" tabindex="-1" role="dialog" aria-labelledby="taskModalLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><a id="closebox" href="javascript:;" class="close" data-dismiss="modal" aria-hidden="true">×</a><h5 class="modal-title">安排任务</h5></div><div class="modal-body"></div><div class="modal-footer"></div></div></div></div><div id="alltasks" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="alltasksModalLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><h3 id="alltasksModalLabel"></h3></div><div class="modal-body"></div><div class="modal-footer"><button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button></div></div></div></div>',
+"task.report": '<div id="taskreport"  class="statsheet-view taskreport"><div class="title"><span class="static-time"></span>任务统计报表</div><div class="card p-10 mh-10"><div class="static-choose"><div><select class="form-control static-year"><option value="2010">2010年</option><option value="2011">2011年</option><option value="2012">2012年</option><option value="2013" selected="selected">2013年</option><option value="2014">2014年</option><option value="2015">2015年</option><option value="2016">2016年</option><option value="2017">2017年</option><option value="2018">2018年</option><option value="2019">2019年</option><option value="2020">2020年</option></select></div><div class="static-month">1月</div><div class="static-month">2月</div><div class="static-month">3月</div><div class="static-month">4月</div><div class="static-month">5月</div><div class="static-month">6月</div><div class="static-month">7月</div><div class="static-month">8月</div><div class="static-month">9月</div><div class="static-month">10月</div><div class="static-month">11月</div><div class="static-month">12月</div><div class="filter"><div class="myself"><label class="checkbox-inline"><input type="checkbox" checked><span>我的</span></label></div><div class="myfollow"><label class="checkbox-inline"><input type="checkbox" /><span>我关注的</span></label></div><div class="mySubordinate"><label class="checkbox-inline"><input type="checkbox"/><span>我下属的</span></label></div><div class="department"><select class="form-control static-department"><option value="" selected="selected">请选择-部门</option></select></div></div></div><div id="report-data"  class="report-data j_report-data scrollwrapper" marginbottom="50"><table class="table table-bordered"><thead><tr></tr></thead><tbody></tbody></table></div><div class="stat-foot mt-10">说明：<span><img alt="已完成的任务" src="/static/images/teams/submited.png">已完成的任务</span><span><img alt="无完成任务" src="/static/images/teams/unsubmit.png">无完成任务</span></div></div></div>',
+"task.statistics": '<div id="taskreportview"><div class="main-hd"><div class="title-opt pull-right"><a class="hide btn btn-sm btn-success mt-8">保存为快捷菜单</a><a class="hide btn btn-sm btn-primary mt-8">统计设置</a></div><div class="title bold">任务统计</div></div><div class="bg-white js_taskreportScr scrollwrapper"><div class="p-20"><div class="stat-cdts form-horizontal"><div class="control-group"><label class="control-label">时间：</label><div class="controls"><div class="j_time btn-group btn-group-sm btn-group m-r-10 pull-left" ><a class="btn" data="thisWeek">本周</a><a class="btn" data="last2weeks">近两周</a><a class="btn" data="thisMonth">本月</a><a class="btn" data="lastMonth">上月</a></div><div class="timebox"><input id="begin-date" type="text" class="form-control datepicker" minView="month" maxView="year" format="yyyy-mm-dd"></input>-<input id="end-date" type="text" class="form-control datepicker" minView="month" maxView="year" format="yyyy-mm-dd"></input></div></div></div><div class="control-group clearfix"><label class="control-label">参与人和负责人：</label><div class="controls"><div id="statisticians" class="pull-left entity-container"></div><div class="dropdown dropdown-menu-toggle cdts-addmem-wgt pull-left"><a class="btn btn-sm add-btn"><i class="icon-plus"></i></a><div class="dropdown-menu dropdown-div border-dropdown dropdown-filter" style="display: none;"><div class="filter-group filter-title"><span class="filter-label">我的下属</span></div><div id="statisticians-list" class="filter-group"></div><div class="filter-group filter-title"><span class="filter-label">其他人员</span></div><div class="filter-group"><input type="text" id="employees-list" class="control-input typeahead search" data-entity="employee" data-multi="true" placeholder="输入姓名"/><a class="btn typeahead-search"><i class="icon-search"></i></a></div></div></div><script type="text/template" id="statistician-tmp"><span class="entity-item"><a data-id="<%= id %>" data-module="employee"><%= username %></a></span></script><script type="text/template" id="statistician-list-tmp"><span class="filter-item"><a data-id="<%= id %>" data-module="employee"><%= username %></a></span></script></div></div><div class="stat-cdts-btn"><a id="load" class="btn btn-sm btn-primary">统计</a></div></div><div class="card p-10"><div id="day-chart" class="h-400"></div></div><div class="alert stat-tip alert-info mv-20"><h5>任务统计图表说明</h5><div class="content"><p>进行中：包括了累积到当天尚未完成的任务数量</p><p>已完成：当天完成的任务数量</p><p>新创建：当天创建的任务数量，表格中的“新创建”是指第一列指明的人员创建的任务数量</p><p>注意： "完成状况" 和 "紧急程度" 中的任务都是指该人员负责或参与的任务，而 "新创建" 的数量没有此限制</p></div></div><div class="row mv-20"><div class="col-6"><div class="card p-10"><div id="finish-chart" class="h-200"></div></div></div><div class="col-6"><div class="card p-10"><div id="urgency-chart" class="h-200"></div></div></div></div><div><table id="detail-table" class="stat-table table table-bordered nomg mb-50"><thead><tr><th rowspan="2">人员</th><th colspan="5">完成情况</th><th colspan="3">紧急程度</th><th rowspan="2">新创建</th></tr><tr><th>任务数</th><th>完成度</th><th>进行中</th><th>已完成</th><th>有延期</th><th>正常</th><th>紧急</th><th>非常紧急</th></tr></thead><tbody></tbody></table><script type="text/template" id="row-template"><tr><td><%= personName %></td><td><%= manageOrIn %></td><td><%= Math.round((percent ? percent : 0) * 100) %> %</td><td><%= doing %></td><td><%= finished %></td><td><%= delayed %></td><td><%= normal %></td><td><%= high %></td><td><%= urgency %></td><td><%= created %></td></tr></script></div></div></div></div>',
+"task.chart": '<div class="caption">今天任务统计<i class="ml-3"></i></div><div class="tc-wrap"><div class="sub-caption ">我的今天任务统计<span id="j_me" class="hide">[您当前没有任务]</span></div><div id="taskchart" class="h-250 p-10" ></div><div id="sub" class="hide"><div class="sub-caption"><span id="name">所有下属</span>的今天任务统计  <span class="cs-p j_sub pull-right">我的下属<i class="caret caret-right ml-3"></i></span></div><div id="empList" class="p-10 staff-filter hide"></div><div id="taskchart1" class="h-250 p-10"></div></div></div><div class="hide" id="empItem"><span class=" filter-item"><a userId="" title="" class="employee-click">测试一</a></span></div>',
+"task.taskcopy": '<div id="task-copy-model" class="j_item_copy modal fade task-copy-model" tabindex="-1" role="dialog" aria-hidden="true" ><div class="modal-dialog module-detail-view"><div class="modal-content"><div class="detail-header"><div class="detail-actions"><ul><li class="j_save_copy"><a data-toggle="tooltip" data-placement="top" data-original-title="" title=""><i class="icon-save"></i>保存</a></li><li><a title="关闭" data-dismiss="modal" aria-hidden="true" class="detail-slide-close">×</a></li></ul></div><div class="detail-brand"><i class="graph graph-task"></i>任务复制</div></div><div class="modal-body"><div id="copy-loading" class="loading_small hide"><span>正在复制数据，请稍后...</span></div><div class="taskcopy-view-bg j_taskcopy_body hide"></div><div class="taskcopy-view"><div class="detail-body p-20"><div class="rename"><input class="j_title form-control" type="text" placeholder="请输入任务名称" /></div><div class="taskcopy-tab"><span class="notes">请设置是否复制原任务的以下内容</span><ul class="taskcopy-ul"><li><div class="item principal"><input class="j_task_manager" type="checkbox"/><span>负责人</span></div><div class="item participant"><input class="j_task_participants" type="checkbox"/><span>参与人</span></div><div class="item share"><input class="j_task_shares" type="checkbox"/><span>共享人</span></div></li><li><div class="item principal"><input class="j_relevance_mainline" type="checkbox" checked="checked"/><span>关联项目</span></div><div class="item participant"><input class="j_relevance_task" type="checkbox" checked="checked"/><span>关联任务</span></div><div class="item share"><input class="j_relevance_document" type="checkbox" checked="checked"/><span>关联文档</span></div></li><li><div class="item principal"><input class="j_relevance_customer" type="checkbox" checked="checked"/><span>关联客户</span></div><div class="item participant"><input class="j_relevance_workflow" type="checkbox" checked="checked"/><span>关联审批</span></div><div class="item share"><input class="j_relevance_calendar" type="checkbox" checked="checked"/><span>关联日程</span></div></li></ul><span class="notes"> 默认复制原任务的名称，描述，紧急程度，标签及关联关系</span></div></div></div></div><div class="modal-footer"></div></div></div></div>',
+"task.taskform": '<div id="taskform"><div class="main-hd"><ul class="toolkit-list pull-left js_formtab"><li class="toolkit-item toolkit-item-tab active"  data-target="form_set"><a><i class="icon-layers glyphicon"></i>自定义字段设置</a></li><li class="toolkit-item toolkit-item-tab"  data-target="form_manager"><a><i class="icon-tasks glyphicon"></i>自定义字段统计</a></li></ul></div><div id="form_set" class="js_forms"><div class="layout-hastips j_center"><div class="table-tray"><div class="tray-cell"><div class="swicth-set-list card"><div class="list-item"><div class="pull-right"><a class="btn btn-sm w-60 btn-success pull-right j_set_form">设置</a></div><span>自定义字段</span></div></div></div><div class="tray-cell message-sidebar tray-tips"><div class="panel panel-alpha"><div class="panel-heading"><div class="panel-title">小提示</div></div><div class="panel-body"><p class="e-row">点击“设置”按钮，您可以设置任务详情中的自定义字段</p></div></div></div></div></div></div><div class="js_forms eform-stat-content hide" id="form_manager"><div class="toolkit toolkit-lg toolkit-bar clearfix"><ul class="toolkit-list pull-left js_formtab"><li class="toolkit-item toolkit-item-tab active" data-target="form_data"><a id=%'data-stat%'><i class="icon-th"></i>数据列表</a></li><li class="toolkit-item toolkit-item-tab" data-target="form_stat"><a id="field-stat"><i class="icon-chart-pie"></i>数据统计</a></li><li class="toolkit-item toolkit-item-tab" data-target="form_report"><a id="report-stat"><i class="icon-columns"></i>自定义报告</a></li></ul></div><div class=%'js_forms details hide%' id=%'form_data%'>数据列表</div><div class=%'js_forms details hide%' id=%'form_stat%'>数据统计</div><div class=%'js_forms details hide%' id=%'form_report%'>自定义报告</div></div></div>

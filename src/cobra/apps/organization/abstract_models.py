@@ -18,11 +18,12 @@ from cobra.core.compat import AUTH_USER_MODEL
 from cobra.core.constants import RESERVED_ORGANIZATION_SLUGS
 from cobra.core.http import absolute_uri
 from cobra.core.loading import get_class, get_model
-from cobra.core.utils import generate_sha1
+from cobra.core.utils import generate_sha1, get_datetime_now
 from cobra.models import Model
 from cobra.models import fields
 from cobra.models import sane_repr
 from cobra.models.utils import slugify_instance
+from cobra.core.dates import epoch
 
 from .utils import OrganizationStatus, OrganizationMemberType
 
@@ -120,6 +121,15 @@ class AbstractOrganization(Model):
             'name': self.name,
             'status': self.status,
         }
+
+    def to_dict(self):
+        data = {
+            'name': self.name,
+            'dateCreated': epoch(self.date_added, msec=True),
+            'slug': self.slug,
+            'nowTime': epoch(get_datetime_now(), msec=True)
+        }
+        return data
 
 
 @python_2_unicode_compatible
@@ -238,20 +248,22 @@ class AbstractOrganizationMember(Model):
 
 
 @python_2_unicode_compatible
-class AbstractOrganizationDepartment(MPTTModel, Model):
+class AbstractOrganizationDepartment(MPTTModel):
     """
     """
     name = models.CharField(max_length=100)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     organization = fields.FlexibleForeignKey('organization.Organization', related_name="department_set")
+    display_order = models.IntegerField(null=True, blank=True)
 
     class Meta:
         abstract = True
         app_label = 'organization'
         db_table = 'cobra_organization_department'
+        ordering = ['display_order']
 
     class MPTTMeta:
-        order_insertion_by = ['name']
+        order_insertion_by = ['display_order']
 
     __repr__ = sane_repr('organization_id', 'name')
 
@@ -279,6 +291,8 @@ class AbstractOrganizationDepartment(MPTTModel, Model):
                 'rank': self.get_level() + 1,
                 'id': self.pk
             }
+            if self.display_order:
+                node_obj['disporder'] = self.display_order
         return node_obj
 
     def to_dict(self):

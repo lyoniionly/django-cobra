@@ -1,11 +1,505 @@
 (function (window, app, Backbone, jQuery, _) {
   "use strict";
 
-   var $ = jQuery;
+  var $ = jQuery;
 
   var pages = {};
 
   app.components = {};
+
+  app.components.Top = Backbone.View.extend({
+    initialize: function(b) {
+//      this.model = new c;
+//      this.newmessage = new a;
+      if($("#header").length>0) {
+        this.custmenumodel = new app.models.CustMenuModel();
+        app.config.custshowmenus = this.custmenumodel.getMenuElTpl(_.sortBy(_.filter(empMenusContext, function(a) {
+          return 1 == a.menuStatus
+        }), "orderIndex"));
+        app.config.custhidemenus = this.custmenumodel.getMenuElTpl(_.sortBy(_.filter(empMenusContext, function(a) {
+          return 0 == a.menuStatus
+        }), "orderIndex"));
+        $("#header").html(app.utils.template("component.top", app.config));
+      }
+
+//      app.utils.layout("#header #navigation .j_userlistScroll");
+//      this.modifyCrmsPath();
+//      this.crmService = new q;
+      $(window).trigger("resize");
+    },
+    delegateEvents: function() {
+      var a = this,
+      b = this.model;
+      $("#user-panel").off("mouseenter", ".js_userTab li").on("mouseenter", ".js_userTab li", function(b) {
+        var c = $(this);
+        b = setTimeout(function() {
+          var b = c.attr("data-items");
+          $("#user_followbtn").hide();
+          $("#user-panel .js_userTab li").removeClass("active");
+          c.addClass("active");
+          $("#user-panel .user-list").addClass("hide");
+          if("user_follow" == b) {
+            $("#user_followbtn").show();
+            $("#user-panel #user_follow").removeClass("hide");
+            if(!$("#user-panel #user_follow").hasClass("no-follow") && 0 >= $("#user-panel #user_follow").children().length) {
+              a.renderMyfollow(!0);
+            }
+          }
+          "user_mysub" == b && ($("#user-panel #user_mysub").removeClass("hide"), 0 >= $("#user-panel #user_mysub").children().length && a.renderSubordinate(!0));
+          "user_org" == b && ($("#user-panel #user_org").removeClass("hide"), 0 >= $("#user-panel #user_org").children().length && a.renderOrgMembers(!0))
+        },
+        300);
+        c.data("timmer", b)
+      }).on("mouseleave", ".nav-tabs li", function(a) {
+        (a = $(this).data("timmer")) && clearTimeout(a)
+      });
+      $("body").off("mouseenter.dropdownmenu", ".dropdown-menu-toggle").on("mouseenter.dropdownmenu", ".dropdown-menu-toggle", function(b) {
+        ! $("#user-panel #user_follow").hasClass("no-follow") && 0 >= $("#user-panel #user_follow").children().length && a.renderMyfollow(!0, !0);
+        $("#j_dropUser .js_userTab").removeClass("hide");
+        $("#j_dropUser .j_userlistScroll").removeClass("hide");
+        $("#j_dropUser .j_user-search-container").addClass("hide")
+      });
+      $("#user-panel").on("click", "li.more", function(c) {
+        switch ($(this).attr("for")) {
+        case "user_follow":
+          $(this).hide();
+          b.myfollowPage.pageNo++;
+          a.renderMyfollow();
+          break;
+        case "user_mysub":
+          $(this).hide();
+          b.subordinatePage.pageNo++;
+          a.renderSubordinate();
+          break;
+        case "user_org":
+          $(this).hide();
+          b.userPage.pageNo++;
+          a.renderOrgMembers();
+          break;
+        case "search-result":
+          c = {},
+          c.keywords = $(this).attr("kwords"),
+          $(this).hide(),
+          b.searchUserPage.pageNo++,
+          a.renderSearch(c, !1)
+        }
+      });
+      $("body").on("click", ".j_addFollow", function(a) {
+        var b = $(this);
+        b.data("addFollowCallback",
+        function() {
+          $("#follow-container").find("#follower-add").click();
+          b.data("addFollowCallback", null)
+        });
+        $("#follow-container").find("#follower-add").click();
+        ROUTER.navigate("/users/myfollow", {
+          trigger: !0
+        })
+      });
+      $("body").on("click", ".j_clickhide", function(a) {
+        $("#navigation #j_dropUser").hide()
+      });
+      $("#logout").on("click", function(a) {
+        f.confirm("\u786e\u5b9a\u8981\u9000\u51fa\u5417?", function(a) {
+          a && (0 < navigator.userAgent.indexOf("MSIE") && (0 < navigator.userAgent.indexOf("MSIE 6.0") || 0 < navigator.userAgent.indexOf("MSIE 7.0") || 0 < navigator.userAgent.indexOf("MSIE 8.0") || 0 < navigator.userAgent.indexOf("MSIE 9.0")) || $.websocket.close(), window.location = "/logout")
+        })
+      });
+      $("body").on("mouseenter", ".j_messageCount", function() {
+        $(this).find(".message-count").removeClass("hint");
+//        d.clear();
+      });
+      $("body").on("keyup", "#searchTop", function(a) {
+        var b = $.trim($(this).val()),
+        b = b.replace(/\%/g, "");
+        13 == a.which && b && 0 < b.length && (b = b.replace(/\\/g, "\\\\"), ROUTER.navigate("/search/keywords/" + b, {
+          trigger: !0
+        }));
+        $("body").find("#middlePageSearch").val(b)
+      });
+      $("body").on("click", "#searchTopIcon", function(a) {
+        a = $.trim($("#searchTop").val()); (a = a.replace(/\%/g, "")) && 0 < a.length && (a = a.replace(/\\/g, "\\\\"), ROUTER.navigate("/search/keywords/" + $.trim(a), {
+          trigger: !0
+        }));
+        $("#searchTop").val(a)
+      });
+      $("#left").off("refresh").on("refresh", function(a, b) {
+        var c = $("#statistic-panel .nav-tabs li.active");
+        switch (b) {
+        case "latest":
+          "latest" == c.attr("data-items") && c.trigger("click");
+          break;
+        case "watched":
+          "watched" == c.attr("data-items") && c.trigger("click")
+        }
+      });
+      $("body").on("click", "#mainline-create-fast", function(b) {
+        a.mainlinenew = new h({
+          parentEl: "body",
+          userId: a.userId,
+          callback: function(b) {
+            a.mainlinenew.hide();
+            ROUTER.app.lastPage && ("mainline" == ROUTER.app.lastPage.pageKey ? ROUTER.app.lastPage.mainView.insertMainline(b) : -1 < ROUTER.app.lastPage.pageKey.indexOf("mainlinelinkpage#") && ROUTER.app.lastPage.mainView.insertMainline(b))
+          }
+        });
+        a.mainlinenew.render()
+      });
+      $("body").on("click", "#document-create-fast", function(b) {
+        a.documentnewview = new m({
+          userId: a.userId,
+          callback: function(a) {
+            ROUTER.app.lastPage && ROUTER.app.lastPage.pageKey == "documentpage#" + TEAMS.currentUser.id + "mine" && ROUTER.app.lastPage.mainView.insertDocument(a)
+          }
+        });
+        a.documentnewview.render()
+      });
+      $("body").on("click", ".j_joinOrCreate,.j_joinOrCreate_dropdown", function(a) { (new p({
+          userId: app.config.currentUser.id,
+          parentEl: ""
+        })).render()
+      });
+      $("body").on("click", "#module_notice a.close", function(a) {
+        $(this).parent().addClass("hide")
+      });
+      $("body").on("click", "#module_notice span a", function(a) {
+        $("#module_notice a.close").trigger("click")
+      });
+      $("body").on("click", "#contactRecord-create-fast", function(b) {
+        b = g("crm/customer/remind/FastContactRecordView");
+        a.fastContactRecordView = new b({
+          callback: function(a) {}
+        });
+        a.fastContactRecordView.render()
+      });
+      $("body").off("keyup", "#user-search").on("keyup", "#user-search", function(b) {
+        var c = {},
+        e = $.trim($(this).val()),
+        e = e.replace(/\%/g, "");
+        13 == b.which && e && 0 < e.length && ($("#j_dropUser .js_userTab").addClass("hide"), $("#j_dropUser .j_userlistScroll").addClass("hide"), $("#j_dropUser .j_user-search-container").removeClass("hide"), $("#j_dropUser #search-result").removeClass("hide"), $(".j_user-search-container #search-result").empty(), c.keywords = e.replace(/\\/g, "\\\\"), a.renderSearch(c, !0));
+        if ("" == e || 0 == e.length) $("#j_dropUser .js_userTab").removeClass("hide"),
+        $("#j_dropUser .j_userlistScroll").removeClass("hide"),
+        $("#j_dropUser .j_user-search-container").addClass("hide");
+        $("#user-search").val(e)
+      });
+      $("body").off("click", "#user-search-icon").on("click", "#user-search-icon", function(b) {
+        b = {};
+        var c = $.trim($("#j_dropUser #user-search").val()),
+        c = c.replace(/\%/g, "");
+        $("#j_dropUser .js_userTab").addClass("hide");
+        $("#j_dropUser .j_userlistScroll").addClass("hide");
+        $("#j_dropUser .j_user-search-container").removeClass("hide");
+        $("#j_dropUser #search-result").removeClass("hide");
+        $(".j_user-search-container #search-result").empty();
+        b.keywords = c.replace(/\\/g, "\\\\");
+        a.renderSearch(b, !0);
+        $("#user-search").val(c)
+      });
+      $("body").off("click.top", ".j_teams-swich ul.dropdown-menu li").on("click.top", ".j_teams-swich ul.dropdown-menu li", function() {
+        if (!$(this).hasClass("active")) {
+          var a = $(this).data("employeeId");
+          location.href = TEAMS.passportUrl + "/changeTenant?employeeId=" + a
+        }
+      })
+    },
+    render: function() {
+      var a = this,
+      b = app.utils.uuid(),
+      c = navigator.userAgent,
+      h = !1;
+      if (0 < c.indexOf("AppleWebKit")) {
+        for (var c = navigator.userAgent.split("/"), k = 0; k < c.length; k++) 0 < c[k].indexOf("Safari") && (c = c[k].split(" ")[0]);
+        8 > parseInt(c) && (h = !0)
+      }
+      /*h || 0 < navigator.userAgent.indexOf("MSIE") && (0 < navigator.userAgent.indexOf("MSIE 6.0") || 0 < navigator.userAgent.indexOf("MSIE 7.0") || 0 < navigator.userAgent.indexOf("MSIE 8.0") || 0 < navigator.userAgent.indexOf("MSIE 9.0")) ? (POLLING.register(e.feedCounter), POLLING.register(e.messageCounter), POLLING.register(e.blogCounter)) : $.websocket("/websocket/portal", a.userId ? a.userId: TEAMS.currentUser.id, TEAMS.currentTenant.tenantKey, "protal", b,
+      function(a) {
+        if (void 0 != a.chatMessage) $("body").trigger("chatMessage", a),
+        $("body").trigger("history", a);
+        else if (void 0 != a.channel)"updateChannelName" == a.operateType ? ($("body").trigger("updateChannelName0", a), $("body").trigger("updateChannelName1", a), $("body").trigger("updateChannelName2", a)) : "createChannel" == a.operateType ? $("body").trigger("createChannel0", a) : "quitChannel" == a.operateType ? $("body").trigger("quitChannel0", a) : "addUsers" == a.operateType ? $("body").trigger("addUsers0", a) : "deleteChannel" == a.operateType && $("body").trigger("deleteChannel", a);
+        else {
+          var b = !1,
+          c = $("#navigation .j_messageCount a.j_unreadblog span").html(),
+          h = $("#navigation .j_messageCount a.j_newitem span").html(),
+          f = $("#navigation .j_messageCount a.j_newcomment span").html(),
+          k = $("#navigation .j_messageCount a.j_newfinish span").html(),
+          m = $("#navigation .j_messageCount a.j_atme span").html();
+          if (null == c || "" == c) c = 0;
+          if (null == h || "" == h) h = 0;
+          if (null == f || "" == f) f = 0;
+          if (null == k || "" == k) k = 0;
+          if (null == m || "" == m) m = 0;
+          var n = $("#navigation .j_messageCount a.j_wechat span").html(),
+          g = $("#navigation .j_messageCount a.j_remind span").html(),
+          p = $("#navigation .j_messageCount a.j_follow span").html(),
+          q = $("#navigation .j_messageCount a.j_applyJoin span").html(),
+          s = $("#navigation .j_messageCount a.j_shareJoin span").html();
+          if (null == n || "" == n) n = 0;
+          if (null == g || "" == g) g = 0;
+          if (null == p || "" == p) p = 0;
+          if (null == q || "" == q) q = 0;
+          if (null == s || "" == s) s = 0;
+          $("#j_dropMessage li a span").html("");
+          $(".statistic-panel .panel-border").show();
+          $(".statistic-panel .statistic-line").show();
+          var u = a.unreadBlogCount,
+          w = a.feedCount.newitem,
+          v = a.feedCount.newcomment,
+          l = a.feedCount.newfinish,
+          r = a.feedCount.atme;
+          $("#navigation .j_messageCount a.j_unreadblog span").html(u);
+          $("#navigation .j_messageCount a.j_newitem span").html(w);
+          $("#navigation .j_messageCount a.j_newcomment span").html(v);
+          $("#navigation .j_messageCount a.j_newfinish span").html(l);
+          $("#navigation .j_messageCount a.j_atme span").html(r);
+          a.feedCount && (a.feedCount.newitem ? $("#j_dropMessage a.j_newitem span").html(a.feedCount.newitem) : $("#j_dropMessage a.j_newitem span").html(""), a.feedCount.newcomment ? $("#j_dropMessage a.j_newcomment span").html(a.feedCount.newcomment) : $("#j_dropMessage a.j_newcomment span").html(""), a.feedCount.newfinish ? $("#j_dropMessage a.j_newfinish span").html(a.feedCount.newfinish) : $("#j_dropMessage a.j_newfinish span").html(""), a.feedCount.atme ? $("#j_dropMessage a.j_atme span").html(a.feedCount.atme) : $("#j_dropMessage a.j_atme span").html(""));
+          if (a.messageCounts) for (u = 0; u < a.messageCounts.length; u++) w = a.messageCounts[u],
+          $("#j_dropMessage li a.j_" + w.messageType + " span").html(0 == w.count ? "": w.count);
+          a.wechatCount && $("#j_dropMessage li a.j_wechat span").html(0 == a.wechatCount ? "": a.wechatCount);
+          a = $("#navigation .j_messageCount a.j_unreadblog span").html();
+          u = $("#navigation .j_messageCount a.j_newitem span").html();
+          w = $("#navigation .j_messageCount a.j_newcomment span").html();
+          v = $("#navigation .j_messageCount a.j_newfinish span").html();
+          l = $("#navigation .j_messageCount a.j_atme span").html();
+          if (null == a || "" == a) a = 0;
+          if (null == u || "" == u) u = 0;
+          if (null == w || "" == w) w = 0;
+          if (null == v || "" == v) v = 0;
+          if (null == l || "" == l) l = 0;
+          var r = $("#navigation .j_messageCount a.j_wechat span").html(),
+          N = $("#navigation .j_messageCount a.j_remind span").html(),
+          O = $("#navigation .j_messageCount a.j_follow span").html(),
+          L = $("#navigation .j_messageCount a.j_applyJoin span").html(),
+          M = $("#navigation .j_messageCount a.j_shareJoin span").html();
+          if (null == r || "" == r) r = 0;
+          if (null == N || "" == N) N = 0;
+          if (null == O || "" == O) O = 0;
+          if (null == L || "" == L) L = 0;
+          if (null == M || "" == M) M = 0;
+          a > c && (b = !0);
+          u > h && (b = !0);
+          w > f && (b = !0);
+          v > k && (b = !0);
+          l > m && (b = !0);
+          r > n ? (b = !0, $(".smwx-msg-number").html("(" + r + ")").data("count", r), $(".smwx-mini-list-trigger").addClass("high-light")) : ($(".smwx-msg-number").html("").data("count", 0), $(".smwx-mini-list-trigger").removeClass("high-light"));
+          N > g && (b = !0);
+          O > p && (b = !0);
+          L > q && (b = !0);
+          M > s && (b = !0);
+          e.totaling();
+          c = $("#navigation #j_message em.message-count").html();
+          d.needRemind() && b && null != c && "" != c ? d.show() : (null == c || "" == c || $("#navigation #j_message em.message-count").hasClass("hide")) && d.clear()
+        }
+      },
+      function() {
+        POLLING.register(e.feedCounter);
+        POLLING.register(e.messageCounter);
+        POLLING.register(e.blogCounter)
+      });*/
+      app.config.currentUser.avatar && $("#user-panel img").attr("src", app.config.currentUser.avatar);
+      this.checkTime();
+      app.config.currentUser.activeDate && app.config.currentUser.lastLoginTime && this.inviteModal();
+//      this.newmessage.render();
+//      a.loadMessage(e.feedCounter);
+//      a.loadMessage(e.messageCounter);
+//      a.loadMessage(e.blogCounter);
+      if(app.config.noSubordinates) {
+        $(".j_top_mysubordinates").addClass("hide");
+        $(".user-tab").addClass("nosub");
+      } else {
+        $(".j_top_mysubordinates").removeClass("hide");
+        $(".user-tab").removeClass("nosub");
+      }
+//      this.crmService.isShowMessage(function(a) {
+//        0 != a.actionMsg.code ? f.notify(a.actionMsg.message) : a.data && $("#j_dropMessage .j_applyReceive").parent().removeClass("hide")
+//      });
+//      setInterval(function() {
+//        a.processTimeout()
+//      },
+//      6E5)
+    },
+    renderMyfollow: function(a, b) {
+      /*var c = this,
+      e = this.model;
+      a && (e.myfollowPage.pageNo = 1);
+      $("#user_followbtn").show();
+      e.loadMyfollow(function(a) {
+        if (a = e.myfollowPage) 1 == e.myfollowPage.pageNo && 0 >= a.result.length && b ? (1 > $("#user_follow").children().length && $("#user_follow").append('<div class="ta-c" style="margin-top:60px"><span>\u76ee\u524d\u6ca1\u6709\u5173\u6ce8\u4eba,\u60a8\u53ef\u4ee5\u70b9\u51fb<a class="j_clickhide j_addFollow">\u52a0\u5173\u6ce8</a>\u6dfb\u52a0\u5173\u6ce8\u4eba\uff01</span></div>'), $("#user-panel .user-list").addClass("hide"), $("#user-panel #user_org").removeClass("hide"), $("#user-panel .js_userTab li").removeClass("active"), $("#user-panel .js_userTab li.j_user_org").addClass("active"), 0 >= $("#user-panel #user_org").children().length && c.renderOrgMembers(!0)) : ($("#user-panel .js_userTab li.j_user_follow").addClass("active"), c._renderUser(a, "user_follow"))
+      })*/
+    },
+    renderSubordinate: function(a) {
+      var b = this,
+      c = this.model;
+      a && (c.subordinatePage.pageNo = 1);
+      $("#user_followbtn").hide();
+      c.loadSubordinate(function(a) {
+        1 == c.subordinatePage.pageNo && 0 == c.subordinatePage.result.length ? $("#user_mysub").append('<div class="ta-c"><span>\u76ee\u524d\u6ca1\u6709\u4e0b\u5c5e\uff01</span></div>') : b._renderUser(c.subordinatePage, "user_mysub")
+      })
+    },
+    renderOrgMembers: function(a) {
+      var b = this,
+      c = this.model;
+      a && (c.userPage.pageNo = 1);
+      $("#user_followbtn").hide();
+      c.loadOrgMembers(function(a) {
+        b._renderUser(c.userPage, "user_org");
+        1 == c.userPage.pageNo && 1 == c.userPage.result.length ? $("#user_org").append('<div class="ta-c" style="margin-top:80px">\u56e2\u961f\u6210\u5458\u53ea\u6709\u60a8\u4e00\u4eba\uff0c<a class="invite-toggle">\u9080\u8bf7\u540c\u4e8b</a>\u52a0\u5165\u534f\u4f5c\u5427\uff01</div>') : $("#user_org a.invite-toggle").parent().parent().remove()
+      })
+    },
+    renderSearch: function(a, b) {
+      var c = this,
+      e = this.model;
+      b && (e.searchUserPage.pageNo = 1);
+      $("#user_followbtn").addClass("hide");
+      e.searchUserByKeywords(a,
+      function(a) {
+        a = a.keywords;
+        0 == e.searchUserPage.result.length ? $(".j_user-search-container .j_noSearchResult").removeClass("hide") : (c._renderUser(e.searchUserPage, "search-result", a), $(".j_user-search-container .j_noSearchResult").addClass("hide"))
+      })
+    },
+    renderNavUrl: function(a, b) {
+      $(".j_basenav .j_blog_NoAuthority").addClass("hide");
+      if(a && a != app.config.currentUser.id) {
+        ($("#navigation").addClass("navigation-themeB"), $(".j_hidetosub").addClass("hide"), $(".user-nameof").removeClass("hide"), $(".j_nav_ul a").each(function(b, c) {
+          var e = $(this).data("url");
+          if (e) {
+            var d = "",
+            d = $(c).hasClass("j_modnav-customers") ? app.config.menuCrmContext + "/customer?blogUser=id_" + a: $(c).hasClass("j_modnav-contacts") ? app.config.menuCrmContext + "/contact?blogUser=id_" + a: e + "/" + a;
+            $(this).attr("href", d)
+          }
+        }), app.config.blogUser && app.config.blogUser.id == a || $.ajax({
+          url: "/base/employee/" + a + ".json",
+          type: "get",
+          dataType: "json",
+          async: !1,
+          success: function(a) {
+            if (a.employee) {
+              var c = a.employee;
+              $("#user-panel .user-name").html(c.username);
+              $("#user-panel img.j_user-currentAvatar").attr("src", c.avatar ? c.avatar: "/static/images/avatar.png");
+              $("#user-panel img.j_user-avatar").attr("src", app.config.currentUser.avatar ? app.config.currentUser.avatar: "/static/images/avatar.png");
+              $(".j_basenav .j_homeli").addClass("hide");
+              $(".j_basenav #top_menuset").parent().addClass("hide");
+              $(".j_baseautolis").addClass("hideli");
+              a.employee && a.employee.subordinate ? ($(".j_basenav #more-menu").show(), $(".j_pageActive .j_modnav-report").addClass("hide"), $(".j_pageActive .j_modnav-wechat").addClass("hide"), $(".j_pageActive .j_modnav-form").addClass("hide"), $(".j_pageActive .j_modnav-wechatservice").addClass("hide")) : ($(".j_pageActive .j_modnav-report").removeClass("hide"), $(".j_pageActive .j_modnav-wechat").removeClass("hide"), $(".j_pageActive .j_modnav-form").removeClass("hide"), $(".j_pageActive .j_modnav-wechatservice").removeClass("hide"), $(".j_basenav #more-menu").hide());
+              $(".j_pageActive .group dl").each(function() {
+                var a = !0;
+                $(this).find("a").each(function() {
+                  $(this).hasClass("hide") || (a = !1)
+                });
+                a ? $(this).hide() : $(this).show()
+              });
+              $(".j_to-myspace").removeClass("hide");
+              app.config.blogUser = c;
+              b && b();
+              $(window).trigger("resize")
+            }
+          }
+        }))
+      } else {
+        $(".j_hidetosub").removeClass("hide");
+        $(".user-nameof").addClass("hide");
+        $("#navigation").removeClass("navigation-themeB");
+        $("#user-panel .user-name").html(app.config.currentUser.username);
+        $("#user-panel img.j_user-currentAvatar").attr("src", app.config.currentUser.avatar ? app.config.currentUser.avatar: "/static/images/avatar.png");
+        $(".j_nav_ul a").each( function(index) {
+          var url = $(this).data("url");
+          if(url) {
+            $(this).attr("href", url);
+          }
+        });
+        $(".j_basenav #top_menuset").parent().removeClass("hide");
+        $(".j_pageActive, .j_pageActive a").removeClass("hide");
+        $(".j_basenav .j_blogli").addClass("hide");
+        $(".j_basenav #more-menu").show();
+        $(".j_baseautolis").removeClass("hideli");
+        $(".j_to-myspace").addClass("hide");
+        $(".j_pageActive .group dl").each(function() {
+          var a = !0;
+          $(this).find("a").each(function() {
+            $(this).hasClass("hide") || (a = !1)
+          });
+          a ? $(this).hide() : $(this).show()
+        });
+        app.config.blogUser = null;
+        b && b();
+        $(".j_basenav .j_homeli").removeClass("hide");
+        $(".j_basenav .j_blogli").addClass("hide");
+        $(window).trigger("resize");
+      }
+    },
+    modifyCrmsPath: function() {
+      var a = $("#header").find("#menu-customers"),
+      b = a.attr("href"),
+      c = a.attr("data-url");
+      a.attr({
+        href: app.config.menuCrmContext + b,
+        "data-url": app.config.menuCrmContext + c
+      })
+    },
+    checkTime: function() {
+      /*var a = this;
+      this.model.checkTime(function(b) {
+        a.checkIn = b.checkIn;
+        a.checkIn ? $(".j_check_inOrOut").attr("id", "check-out").html("\u7b7e\u9000") : $(".j_check_inOrOut").attr("id", "check-in").html("\u7b7e\u5230")
+      })*/
+    },
+    inviteModal: function() {
+      /*if (3 >= app.config.currentTenant.usedLicense) {
+        var a = new b;
+        $(a.el).find(".modal-title").html("\u60a8\u56e2\u961f\u4e2d\u4eba\u5458\u8fd8\u6bd4\u8f83\u5c11\uff0c\u9a6c\u4e0a\u9080\u8bf7\u81ea\u5df1\u7684\u540c\u4e8b\u6765\u52a0\u5165\uff0c\u4e00\u8d77\u4f53\u9a8c\u4e91\u529e\u516c\u534f\u4f5c");
+        a.render()
+      }*/
+    },
+    _renderUser: function(a, b, c) {
+      var e = "#" + b;
+      "" == b && (e = "#user_org");
+      if (a) {
+        for (var d = a.result || [], h = 0; h < d.length; h++) {
+          var f = a.result[h];
+          if (! (0 < $(e).find("#" + f.id).length)) {
+            var k = "/static/images/avatar.png";
+            null != f.avatar && (k = f.avatar);
+            var m = $("#cloneDiv .j_userItems").clone();
+            f.relation && "approved" == f.relation || f.id == app.config.currentUser.id || f.subordinate || "user_mysub" == b ? (m.attr("title", f.username), m.find("a").attr("href", "/blog/" + f.id)) : (m.attr("title", f.username), m.removeClass("j_clickhide"), m.find("a").addClass("usercard-toggle"), m.find("a").attr("userId", f.id), m.find("a").removeClass("router"), m.find("a").attr("user-name", f.username));
+            m.find("a img").attr("src", k);
+            m.find("a em").html(f.username);
+            f.id != app.config.currentUser.id ? (k = $("#cloneDiv .j_userItemsWechat").clone(), k.attr("id", f.id).data("employee", f), 0 < f.unReadChatCount && (k.addClass("show"), k.removeClass("hide")), m.append(k)) : m.find("a").attr("id", f.id);
+            $(e).append(m)
+          }
+        }
+        $(e).find(".more").remove();
+        a.hasNext && ("#search-result" == e ? $(e).append('<li class="user-item more" kwords="' + c + '" for = "' + b + '"><a>\u663e\u793a\u66f4\u591a...</a></li>') : $(e).append('<li class="user-item more" for = "' + b + '"><a>\u663e\u793a\u66f4\u591a...</a></li>'))
+      }
+    },
+    hideMyfollow: function() {
+      $("#follow-panel li.follow").hide()
+    },
+    loadMessage: function(a) {
+      var b = a.param ? a.param: {};
+      b.count = 1;
+      $.ajax({
+        type: "get",
+        global: !1,
+        url: a.url,
+        dataType: "json",
+        data: b,
+        success: function(b) {
+          b.actionMsg && -1 == b.actionMsg.code || a.callback && a.callback(b)
+        }
+      })
+    },
+    processTimeout: function() {
+      $.ajax({
+        type: "get",
+        global: !1,
+        url: "/global",
+        dataType: "json",
+        success: function(a) {}
+      })
+    },
+    remove: function() {
+      this.model = null;
+      this.fastContactRecordView && (this.fastContactRecordView.remove(), this.fastContactRecordView = null)
+    }
+  });
 
   app.components.event = {
     setLastPage: function(page) {
@@ -22,13 +516,13 @@
           a = $.parseJSON(b.responseText)
         } catch(e) {}
         g.relogin && a.actionMsg && -1 == a.actionMsg.code ? (g.relogin = !1, (new u({
-          currentUser: TEAMS.currentUser
+          currentUser: app.config.currentUser
         })).render()) : g.relogin = !0
       });*/
       $("body").on("click", "table.j_stripedTable td:first-child", function(e) {
         $(this).parent("tr").addClass("active").siblings().removeClass("active");
       });
-      /*$("body").on("mouseenter.dropdownmenu", ".dropdown-menu-toggle", function(a) {
+      $("body").on("mouseenter.dropdownmenu", ".dropdown-menu-toggle", function(a) {
         var b = $(this);
         $(this).hasClass("j_tag") && (new s).render();
         b.addClass("open");
@@ -43,7 +537,7 @@
         },
         300);
         b.data("showTimer", a);
-        $(this).hasClass("user-panel") && (null == $("body").find(".user-menu-backdrop").get(0) && $("body").append('<div class\x3d"user-menu-backdrop fade"></div>'), a = setTimeout(function() {
+        $(this).hasClass("user-panel") && (null == $("body").find(".user-menu-backdrop").get(0) && $("body").append('<div class="user-menu-backdrop fade"></div>'), a = setTimeout(function() {
           $("body").find(".user-menu-backdrop").addClass("in")
         },
         150), $(this).data("dropTimer", a))
@@ -72,10 +566,10 @@
           }
         }
         a = $($(this).parents(".dropdown")[0]);
-        a.hasClass("dropdown-gettext") && (b = $(this).text(), a.find(".dropdown-toggle").html(b + ' <i class\x3d"icon-caret-down"></i>'));
+        a.hasClass("dropdown-gettext") && (b = $(this).text(), a.find(".dropdown-toggle").html(b + ' <i class="icon-caret-down"></i>'));
         $(this).closest(".dropdown-menu-toggle");
         $(this).closest(".dropdown-menu").slideUp(100)
-      });*/
+      });
       $("body").off("mouseenter.typeahead", ".typeahead-wrapper").on("mouseenter.typeahead", ".typeahead-wrapper", function(e) {
         $(this).data("enter", true);
       }).off("mouseleave.typeahead", ".typeahead-wrapper").on("mouseleave.typeahead", ".typeahead-wrapper", function(e) {
@@ -151,7 +645,7 @@
           });
           h.render()
         }
-      });
+      });*/
       $("body").on("click", ".entitybox-toggle", function(a) {
         var b = $(this).attr("data-module");
         a = $(this).attr("data-id");
@@ -160,7 +654,7 @@
         h = $(this).attr("userId"),
         f = $(this).attr("data-type");
         if (b && a) {
-          var k = new e({
+          var k = new app.components.EntityBox({
             entityModule: b,
             entityId: a,
             entityValue: d,
@@ -176,11 +670,11 @@
                 "agenda" == b && (1 == $("#portal-container #calendar-list").size() && $("#portal-container #calendar-list").trigger("refresh"), $("#calendar").trigger("refetch"))
               }
             },
-            page: w
+            page: pages
           });
           k.render()
         }
-      });*/
+      });
       $("body").on("click", ".usercard-toggle", function(e) {
         var userId = $(this).attr("userId");
         if(userId && "10000" != userId) {
@@ -320,7 +814,7 @@
         var a = $(this);
         switch (a.attr("data-entity")) {
         case "employee":
-          (new m({
+          (new window.UserSelector({
             $target: $(this)
           })).open();
           break;
@@ -377,9 +871,8 @@
             app.alert('success', '共享申请已发送');
           }
         })
-      });
-      $(window).on("resize",
-      function(a) {
+      });*/
+      $(window).on("resize", function(a) {
         setTimeout(function() {
           $("body div.scrollwrapper").each(function(a) {
             $(this).trigger("resizeSroll", a)
@@ -412,7 +905,7 @@
         }
         a.mCustomScrollbar("update")
       });
-      $("body").off("rViewSlide").on("rViewSlide",
+      /*$("body").off("rViewSlide").on("rViewSlide",
       function(a) {
         1439 < $(window).width() ? ($(".j_sidebarPren").addClass("sidebar-in"), $(".j_sidebarCtrl").data("open", !0).addClass("on")) : ($(".j_sidebarPren").removeClass("sidebar-in"), $(".j_sidebarCtrl").data("open", !1).removeClass("on"));
         setTimeout(function() {
@@ -458,6 +951,620 @@
       })*/
     }
   };
+
+  app.components.CustMenuView = Backbone.View.extend({
+    initialize: function(data) {
+      this.userId = data.userId || app.config.currentUser.id;
+      this.el = data.container || "body";
+      this.container = $(data.container);
+      this.model = new app.models.CustMenuModel({
+        userId: this.userId
+      });
+    },
+    delegateEvents: function() {
+      var self = this,
+        menuModel = this.model,
+        $el = $(this.el);
+      /*$("body").on("click.custMenuView", ".goto-top", function(e) {
+        app.utils.gotoTop(self.el + " #menuset-wrapper")
+      });*/
+      $el.off("click.custMenuView", ".reset-navsetting a").on("click.custMenuView", ".reset-navsetting a", function(e) {
+        e.preventDefault();
+        menuModel.resetNavsetting(function(res) {
+          app.alert('success', "重置成功,刷新页面或重新登录后生效");
+          if (res.empmenus) {
+            var menus = _.sortBy(res.empmenus, "orderIndex");
+            $el.find(".j_sortmenus").empty();
+            for (var i = 0; i < menus.length; i++) {
+              if (i != 0) {
+                var checkd = "";
+                if(menus[i].menuStatus === 1) {
+                  checkd = 'checked="checked"'
+                }
+                checkd = '<li class="on_off cs-m"><span class="middle_helper"></span><span data-id="' + menus[i].id + '" class="menu_name">' + menus[i].menuName + '</span><input  type="checkbox" ' + checkd + ' +/><span title="拖拉排序" class="menu_move"></span></li>';
+                $el.find(".j_sortmenus").append(checkd)
+              }
+            }
+            $el.find(".j_sortmenus .on_off :checkbox").tzCheckbox({
+              labels: ["", ""]
+            })
+          }
+        })
+      });
+      $el.off("click.custMenuView", ".on_off :checkbox").on("click.custMenuView", ".on_off :checkbox", function(e) {
+        var $this = $(this),
+          checked = $this.next(".tzCheckBox").hasClass("checked") ? 1 : 0,
+          menu = {};
+        if ($(".sortmenus").find(".tzCheckBox.checked").length === 0) {
+          $this.next("span.tzCheckBox").addClass("open checked");
+          app.alert('warning', "请至少保留一个应用!");
+        } else {
+          var menuId = $this.parents("li").find(".menu_name").attr("data-id");
+          self.model.loadEmpAllMenus(function(res) {
+            var menus = _.filter(res, function(m) {
+              return m.menuStatus === 1
+            });
+            if(menus.length===1 && menus[0].id===menuId && checked===0) {
+              $this.next("span.tzCheckBox").addClass("open checked");
+              app.alert('warning', "请至少保留一个应用!");
+            } else {
+              menu.menuId = menuId;
+              menu.menuStatus = checked;
+              menuModel.updateMenuStatus(menu, function(a) {
+                app.alert('success', "更新成功,刷新页面或重新登录后生效");
+              });
+            }
+          })
+        }
+      });
+    },
+    render: function() {
+      var el = this.el,
+        $container = this.container,
+        self = this;
+      this.model.loadEmpAllMenus(function(res) {
+        var menus = _.sortBy(res, "orderIndex");
+        $container.html(app.utils.template("base.custmenu", {
+          menus: menus
+        }));
+        $container.find(".on_off :checkbox").tzCheckbox({
+          labels: ["", ""]
+        });
+        $(".sortmenus").sortable({
+          stop: function() {
+            self.updateMenuOrders();
+          }
+        });
+        $(".sortmenus").disableSelection();
+        if("#entitybox-container" == el) {
+          $(el).find(".j_menuset_close").removeClass("hide");
+        }
+        app.utils.layout(el + " #menuset-wrapper", [{
+          gotoTopButton: false,
+          bottomBlank: false
+        }]);
+        if(null != $(el + " #menuset-wrapper").parents("#entitybox").get(0)) {
+          $(el + " #menuset-wrapper").height(465).mCustomScrollbar("update")
+        }
+      });
+    },
+    updateMenuOrders: function() {
+      var $sortList = $(".sortmenus li"),
+        menuIds = [],
+        menuOrders = [],
+        menu = {},
+        menuId,
+        menuOrder;
+      $.each($sortList, function(index, el) {
+        menuId = $(el).find(".menu_name").attr("data-id");
+        menuOrder = index;
+        menuIds.push(menuId);
+        menuOrders.push(menuOrder);
+      });
+      menu.menuIds = menuIds.join(",");
+      menu.menuOrders = menuOrders.join(",");
+      this.model.updateMenuOrders(menu, function(a) {
+        app.alert('success', "更新成功,重新登录后生效")
+      })
+    },
+    remove: function() {
+      $(this.el).off(".custMenuView")
+    }
+  });
+
+  app.components.EntityBox = Backbone.View.extend({
+    el: "#entitybox",
+    initialize: function(data) {
+      this.target = data.target;
+      this.entityId = data.entityId;
+      this.entityModule = data.entityModule;
+      this.entityValue = data.entityValue;
+      this.extProperties = data.extProperties;
+      this.callbacks = data.callbacks;
+      this.page = data.page;
+      if($("#entitybox").length < 1) {
+        $("body").append(app.utils.template("base.entitybox"));
+      } else {
+        $("#entitybox").trigger("destroy");
+      }
+      this.options = data || {};
+    },
+    delegateEvents: function() {
+      var self = this;
+      $("#entitybox").on("hidden.bs.modal.EntityBox", function() {
+        self.remove()
+      });
+      $("#entitybox").on("shown.bs.modal.EntityBox", function(e) {
+        if(self.scroller) {
+          if(!$("#entitybox #entitybox-container").find(self.scroller).hasClass("mCustomScrollbar")) {
+            app.utils.layout(self.scroller, [{
+              gotoTopButton: false,
+              bottomBlank: self.hasBlank
+            }]);
+          }
+          $("#entitybox #entitybox-container").find(self.scroller).height(465).mCustomScrollbar("update");
+        }
+        $(window).trigger("resize");
+        self.callbacks && self.callbacks.afterOpen && self.callbacks.afterOpen();
+      });
+      $("#entitybox").on("remove.EntityBox", "#btn-linkdomain", function(e) {
+        $("#entitybox").modal("hide")
+      });
+      $("#entitybox").on("remove.EntityBox", "#btn-delete, #pass-submit, #back-submit,#add-step-confirm", function(e) {
+        $("#entitybox").modal("hide");
+        if(self.target.attr("need-delete") && self.target.attr("need-delete") != "no" && $(self.target).attr("id") != "task-create-fast") {
+          self.target.trigger("remove");
+        }
+      });
+      $("#entitybox").on("click.EntityBox", ".btn-back", function(e) {
+        $("#entitybox").modal("hide");
+        e.stopPropagation();
+      });
+      $("#entitybox").on("click.EntityBox", ".entitybox-toggle", function(a) {});
+      $("#entitybox").on("shown", function(e) {
+        self.callbacks && self.callbacks.afterOpen && self.callbacks.afterOpen()
+      });
+      $("#entitybox").on("destroy", function(e) {
+        if(self.entityView) {
+          self.entityView.remove();
+          self.entityView = null;
+        }
+        $("#entitybox").off(".EntityBox");
+      });
+      $("#entitybox").off("click.EntityBox").on("click.EntityBox", function(e) {
+        if (e.target == e.currentTarget && (self.entityModule == "customer" || self.entityModule == "contact")) {
+          var $commentTextarea = $("#entitybox #comment-textarea");
+          if($commentTextarea.size() > 0 && $commentTextarea.val().replace($commentTextarea.attr("placeholder"), "").trim().length > 0) {
+            e.currentTarget = void 0; // 为了返回undefined
+            app.utils.confirm("存在未提交的联系记录，确认关闭？", function(isConfirm) {
+              if(isConfirm) {
+                $("#entitybox .modal-header .close").click();
+              } else {
+                setTimeout(function() {
+                  $("#entitybox #comment-textarea").focus();
+                }, 500);
+              }
+            });
+          }
+        }
+      });
+      $("#entitybox").off("keydown.EntityBox").on("keydown.EntityBox", function(e) {
+        if(e.which == 27) {
+          if(window.formJsonStr && $("body .form-view_js").get(0) && window.formPlugin) {
+            var form = formPlugin.submitAssembleForm({
+              parentEl: $("body .form-view_js")
+            });
+            if(JSON.stringify(form.formData.dataDetails) != window.formJsonStr) {
+              app.utils.confirm("确定放弃填写表单吗？放弃后数据将不会被保存！", function(isConfirm) {
+                if(isConfirm) {
+                  $("#entitybox").modal("hide");
+                }
+              });
+            } else {
+              $("#entitybox").modal("hide");
+            }
+          } else {
+            $("#entitybox").modal("hide");
+          }
+        }
+      });
+    },
+    render: function() {
+      var self = this,
+        entityId = this.entityId,
+        title = "",
+        options = {};
+      self.scroller = "";
+      self.hasBlank = true;
+      switch (this.entityModule) {
+      case "task":
+        title = "<h5 class='modal-title'>任务信息</h5>";
+        this.entityView = new d({
+          id: entityId,
+          container: "#entitybox-container",
+          callback: this.callbacks ? this.callbacks.afterCreate: null,
+          page: self.page
+        });
+        self.scroller = "#task-wrapper";
+        break;
+      case "document":
+        title = "<h5 class='modal-title'>文档信息</h5>";
+        this.entityView = new c({
+          id: entityId,
+          container: "#entitybox-container",
+          page: self.page
+        });
+        self.scroller = "#document-container";
+        break;
+      case "workflow":
+        title = "<h5 class='modal-title'>审批信息</h5>";
+        if(isNaN(parseInt(entityId))) {
+          this.entityView = new e({
+            requestId: entityId,
+            userId: app.config.currentUser.id,
+            container: "#entitybox-container",
+            callback: function() {
+              self.close();
+            },
+            page: self.page,
+            closable: false
+          });
+        } else {
+          this.entityView = new b({
+            requestId: entityId,
+            container: "#entitybox-container",
+  //          page: this.page,
+            callback: function() {
+              self.close();
+            },
+            page: self.page,
+            closable: false
+          });
+        }
+        break;
+      case "mainline":
+        title = "<h5 class='modal-title'>项目信息</h5>";
+        this.entityView = new n({
+          id: entityId,
+          container: "#entitybox-container",
+          callback: function() {
+            self.close();
+          },
+          page: self.page
+        });
+        self.scroller = "#mainline-container";
+        break;
+      case "blog":
+        title = "<h5 class='modal-title'>日报信息</h5>";
+        this.entityView = new k({
+          container: "#entitybox-container",
+          isEntityBox: !0,
+          callback: function() {
+            self.close();
+          },
+          page: self.page
+        });
+        self.scroller = "#blog-post-fast";
+        break;
+      case "agenda":
+        options = self.options;
+        if (options.detail) {
+          title = "<h5 class='modal-title'>日程详情</h5>";
+          options.container = "#entitybox-container";
+          options.callback = this.callbacks ? this.callbacks.afterOperate: null;
+          this.entityView = new q(options);
+          self.scroller = "#agendaInfo-wrapper";
+          break;
+        }
+        title = "<h5 class='modal-title'>日程</h5>";
+        if(options.allDay == void 0) {
+          options.allDay = true;
+        }
+        if (!options.start) {
+          var now = new Date,
+            year = now.getFullYear(),
+            month = (now.getMonth() + 1) < 10 ? "0" + (now.getMonth() + 1): (now.getMonth() + 1),
+            day = now.getDate(),
+            realDay = day + 1,
+            dateString = year + "-" + month + "-" + (realDay < 10 ? "0" + realDay: realDay);
+          options.start = Date.create(year + "-" + month + "-" + (10 > day ? "0" + day: day)).getTime();
+          options.end = Date.create(dateString).getTime();
+        }
+        if("new" == options.entityId) {
+          options.entityId = null;
+        }
+        options.container = "#entitybox-container";
+        options.callback = this.callbacks ? this.callbacks.afterOperate: null;
+        options.userId = app.config.currentUser.id;
+        this.entityView = new p(options);
+        self.scroller = "#agenda-wrapper";
+        break;
+      case "weeklyblog":
+        title = "<h5 class='modal-title'>本周工作日报</h5>";
+        options = self.options;
+        options.container = "#entitybox-container";
+        options.callback = this.callbacks ? this.callbacks.afterOperate: null;
+        this.entityView = new m({
+          container: "#entitybox-container",
+          userId: this.entityId,
+          date: this.entityValue,
+          callback: function() {
+            self.close();
+          }
+        });
+        self.scroller = "#blogs-wrapper";
+        break;
+      case "flowSequence":
+        title = "<h5 class='modal-title'>固定审批</h5>";
+        options = self.options;
+        if("new" == options.entityId) {
+          options.entityId = null;
+        }
+        options.container = "#entitybox-container";
+        options.callback = this.callbacks ? this.callbacks.afterOperate: null;
+        this.entityView = new a(options);
+        self.scroller = "#fasten-container";
+        break;
+      case "custmenu":
+        options = self.options;
+        if("new" == options.entityId) {
+          options.entityId = null;
+        }
+        options.userId = app.config.currentUser.id;
+        options.container = "#entitybox-container";
+        this.entityView = new app.components.CustMenuView(options);
+        break;
+      case "quitTransfer":
+        title = "<h5 class='modal-title'>离职交接</h5>";
+        options = self.options;
+        if("new" == options.entityId) {
+          options.entityId = null;
+        }
+        options.container = "#entitybox-container";
+        options.userId = entityId;
+        options.userName = this.entityValue;
+        options.callback = this.callbacks ? this.callbacks.afterOperate: null;
+        this.entityView = new g(options);
+        self.scroller = "#fasten-container";
+      }
+      if("weeklyblog" == this.entityModule) {
+        $(".modal-header").removeClass("hide");
+        $("#entitybox").find(".modal-header h5").remove();
+        $("#entitybox").find(".modal-header").append(title);
+      }
+      if("workflow" == this.entityModule) {
+        $("#entitybox").modal({
+          keyboard: false
+        });
+      } else {
+        $("#entitybox").modal();
+      }
+      this.entityView.render();
+      if("blog" == this.entityModule) {
+        $("#entitybox-container").find(".j_postsize").focus();
+        $("#entitybox-container").find(".j_blog-post").addClass("active");
+      }
+    },
+    close: function() {
+      $("#entitybox").modal("hide");
+    },
+    remove: function() {
+      if(this.entityView) {
+        this.entityView.remove();
+        this.entityView = null;
+      }
+      $("#entitybox").off(".EntityBox");
+      $("#entitybox").off(".bs.modal");
+      $("#entitybox").remove();
+    }
+  });
+
+  app.components.EntitySlider = Backbone.View.extend({
+    initialize: function(data) {
+      this.idList = data.idList;
+      this.id = data.id;
+      this.formId = data.formId;
+      this.module = data.module;
+      this.userId = data.userId;
+      this.renderType = data.renderType;
+      this.slideCallback = data.slideCallback;
+      this.page = data.page;
+      this.formData = data.formData;
+      this.tolink = data.tolink || false;
+      this.mainlineId = data.mainlineId;
+      this.userName = data.userName;
+      this.barType = data.barType;
+      this.dataName = data.dataName;
+      this.seriesName = data.seriesName;
+      this.group = data.group;
+      this.checkDate = data.checkDate;
+      this.formTitle = data.formTitle;
+      this.formCreator = data.formCreator
+    },
+    delegateEvents: function() {},
+    render: function() {
+      var self = this,
+      u = this.idList,
+      id = this.id,
+      v = this.slideCallback,
+      x = this.mainlineId,
+      y = this.userName,
+      l = this.barType,
+      r = this.dataName,
+      D = this.seriesName,
+      C = this.group,
+      B = this.checkDate,
+      F = this.formTitle,
+      I = this.formCreator;
+      switch (this.module) {
+      case "task":
+        this.stretchView = new f({
+          id: id,
+          container: "#entitySlider",
+          page: this.page,
+          closable: !0
+        });
+        break;
+      case "document":
+        this.stretchView = new c({
+          id: id,
+          container: "#entitySlider",
+          closable: !0,
+          page: this.page,
+          tolink: this.tolink
+        });
+        break;
+      case "customer":
+        this.stretchView = new(g("crm/customer/CustomerView"))({
+          customerId: id,
+          el: "#entitySlider",
+          userId: app.config.currentUser.id,
+          closable: !0,
+          page: this.page,
+          slideCallback: v,
+          callbacks: {
+            afterDel: function(a) {
+              self.page && sself.page.trigger("remove", a)
+            },
+            afterCreateByName: function(a) {},
+            afterUpdateField: function(a, b, e) {
+              "name" == b && self.page && self.page.trigger("changeTitle", {
+                id: a,
+                title: e
+              })
+            },
+            afterChangeWatch: function(a, b) {
+              self.page && self.page.trigger("changeWatch", {
+                id: a,
+                watched: b
+              })
+            }
+          }
+        });
+        break;
+      case "workflow":
+        this.stretchView = new b({
+          requestId: id,
+          container: "#entitySlider",
+          page: this.page,
+          closable: !0,
+          renderType: this.renderType
+        });
+        break;
+      case "flowform":
+        this.stretchView = new a({
+          requestId: id,
+          userId: app.config.currentUser.id,
+          container: "#entitySlider",
+          page: this.page,
+          closable: !0
+        });
+        break;
+      case "biaogeform":
+        this.stretchView = new k({
+          userId: app.config.currentUser.id,
+          formId: id,
+          dataId: id,
+          container: "#entitySlider",
+          renderType: this.renderType,
+          page: this.page
+        });
+        break;
+      case "mainline":
+        this.stretchView = new e({
+          id: id,
+          container: "#entitySlider",
+          page: this.page,
+          tolink: this.tolink
+        });
+        break;
+      case "mainlineTaskList":
+        this.stretchView = new d({
+          idList: u,
+          id: id,
+          group: C,
+          checkDate: B,
+          mainlineId: x,
+          dataName: r,
+          seriesName: D,
+          userName: y,
+          barType: l,
+          container: "#entitySlider",
+          page: this.page,
+          closable: !0
+        });
+        break;
+      case "workreport":
+        this.stretchView = new h({
+          id: id,
+          container: "#entitySlider",
+          isStat: !0,
+          hideBlog: !0
+        });
+        break;
+      case "profile":
+        this.stretchView = new app.profile.ProfileView({
+          container: "#entitySlider",
+          userId: id,
+          closable: !0
+        });
+        break;
+      case "agenda":
+        u = self.options;
+        void 0 == u.allDay && (u.allDay = !0);
+        var w;
+        u.start || (x = new Date, w = x.getFullYear(), v = x.getMonth(), v += 1, v = 10 > v ? "0" + v: v, x = x.getDate(), y = x + 1, y = w + "-" + v + "-" + (10 > y ? "0" + y: y), u.start = Date.create(w + "-" + v + "-" + (10 > x ? "0" + x: x)).getTime(), u.end = Date.create(y).getTime());
+        "new" == u.id && (u.id = null);
+        u.callback = this.slideCallback ? this.slideCallback.afterOperate: null;
+        u.changeEvent = this.slideCallback ? this.slideCallback.changeEvent: null;
+        this.stretchView = new q({
+          container: "#entitySlider",
+          userId: app.config.currentUser.id,
+          allDay: u.allDay,
+          start: u.start,
+          end: u.end,
+          entityId: u.id,
+          page: this.page,
+          callback: u.callback,
+          changeEvent: u.changeEvent
+        });
+        break;
+      case "formdatareport":
+        this.stretchView = new p({
+          id: id,
+          userId: app.config.currentUser.id,
+          formData: self.formData,
+          container: "#entitySlider",
+          closable: !0,
+          page: this.page
+        });
+        break;
+      case "mainlineview":
+        this.stretchView = new e({
+          id: self.id,
+          container: "#entitySlider",
+          page: this.page,
+          tolink: !0
+        });
+        break;
+      case "writeform":
+        this.stretchView = new n({
+          userId: app.config.currentUser.id,
+          formId: id,
+          dataId: id,
+          container: "#entitySlider",
+          page: this.page,
+          formTitle: F,
+          formCreator: I
+        })
+      }
+      $("#entitySlider").hasClass("in") || $("#entitySlider").addClass("in");
+      this.stretchView.render()
+    },
+    remove: function() {
+      this.stretchView && (this.stretchView.remove(), this.stretchView = null)
+    }
+  });
 
   app.components.Preview = Backbone.View.extend({
     initialize: function(data) {
@@ -550,7 +1657,7 @@
               container: c.el,
               browse_button: c.el + " #pickFiles",
               drop_element: c.el + " #upload-wrap",
-              max_file_size: "normal" == TEAMS.currentTenant.status ? "50mb" : "20mb",
+              max_file_size: "normal" == app.config.currentTenant.status ? "50mb" : "20mb",
               url: "/base/upload.json?refId=" + c.targetId + "&module=" + c._module + "&ETEAMSID=" + ETEAMSID,
               flash_swf_url: "/static/swf/plupload.swf"
           });
@@ -716,7 +1823,7 @@
       this.entity = e;
       if ("relevance" == e) {
         var d = c.parent().find(".typeahead-search");
-        "customer" == d.attr("module") ? b.remote = TEAMS.service.crm + "/customer/suggestion.json": "calendar" == d.attr("module") ? b.remote = "/agendas/suggestion.json": b.remote = "/" + d.attr("module") + "s/suggestion.json"
+        "customer" == d.attr("module") ? b.remote = app.config.service.crm + "/customer/suggestion.json": "calendar" == d.attr("module") ? b.remote = "/agendas/suggestion.json": b.remote = "/" + d.attr("module") + "s/suggestion.json"
       }
       this.privacy = "1" == c.attr("privacy") ? !0 : !1;
       if (e) if ($("#typeahead-div .loading_small").addClass(e).show(), c = b.remote, d = {},
@@ -863,61 +1970,286 @@
   };
 
   window.DepartmentSelector = Backbone.View.extend({
-    initialize: function(c) {
-      this.$el = c = c.$el;
-      this.entity = c.attr("data-entity");
-      this.module = c.attr("module");
-      this.multi = c.attr("data-multi");
+    initialize: function(data) {
+      this.$el = data = data.$el;
+      this.entity = data.attr("data-entity");
+      this.module = data.attr("module");
+      this.multi = data.attr("data-multi");
       this.winEl = "#selector-" + this.entity;
-      c = app.templates["selector." + this.entity];
-      $("body").append(c)
+      $("body").append(app.templates["selector." + this.entity]);
     },
     delegateEvents: function() {
-      var c = this,
-      b = $(c.winEl);
-      $("body").on("keydown.depart-win",
-      function(a) {
-        27 == a.which && b.modal("hide")
+      var self = this;
+      var $winEl = $(self.winEl);
+      $("body").on("keydown.depart-win", function(e) {
+        if(e.which == 27) {
+          $winEl.modal("hide");
+        }
       });
-      b.on("hidden.bs.modal",
-      function() {
-        c.remove()
+      $winEl.on("hidden.bs.modal", function() {
+        self.remove();
       })
     },
     open: function() {
       $(this.winEl).modal("toggle");
-      this._loadDepartment()
+      this._loadDepartment();
     },
     close: function() {
-      $(this.winEl).modal("hide")
+      $(this.winEl).modal("hide");
     },
     _loadDepartment: function() {
-      var c = this;
-      c.treeView = new app.org.TreeView({
+      var self = this;
+      self.treeView = new app.org.TreeView({
         el: "#selector-org-tree",
         hasUrl: !1,
         editable: !1,
         readonly: !0,
         noUrl: !0
       });
-      c.treeView.render(null,
-      function() {
-        $("#selector-org-tree").on("click.depart-win", ".treenode",
-        function(b) {
-          b.preventDefault();
-          b = $(this).data("node");
-          c.close();
-          c.$el.trigger("confirmHandler", {
-            objs: b
-          })
-        })
-      })
+      self.treeView.render(null, function() {
+        $("#selector-org-tree").on("click.depart-win", ".treenode", function(e) {
+          e.preventDefault();
+          var node = $(this).data("node");
+          self.close();
+          self.$el.trigger("confirmHandler", {
+            objs: node
+          });
+        });
+      });
     },
     remove: function() {
-      var c = $(this.winEl);
+      var $winEl = $(this.winEl);
       $("#selector-org-tree").off(".depart-win");
-      c.remove();
-      this.treeView && (this.treeView.remove(), this.treeView = null)
+      $winEl.remove();
+      if(this.treeView) {
+        this.treeView.remove();
+        this.treeView = null;
+      }
+    }
+  });
+
+  window.UserSelector = Backbone.View.extend({
+    initialize: function(g) {
+      this.$target = g = g.$target;
+      this.isMulti = !1;
+      this.entity = g.attr("data-entity");
+      this.module = g.attr("module");
+      this.multi = g.attr("data-multi");
+      this.el = "#selector-employee";
+      g = app.templates["selector." + this.entity];
+      $("body").append(g);
+      $("#all-org-users").html(app.utils.template("org.departmenttree"));
+      $("#all-group-users").html(app.utils.template("org.user"));
+      $(this.el).find(".j_selectedUsersScr").css("max-height", "70px");
+      app.utils.layout(this.el + " .j_selectedUsersScr");
+      this.isMulti = this.multi ? !0 : !1;
+      this.departmentTreeView = new app.org.DepartmentTreeView({
+        id: "",
+        type: "user",
+        readonly: !0,
+        noUrl: !0,
+        height: 310,
+        el: "#all-org-users"
+      });
+      this.userView = new app.org.UserView({
+        id: "",
+        operation: "user",
+        editable: !1,
+        isMulti: this.isMulti,
+        height: 280,
+        el: "#userSelector-multi #all-group-users",
+        removeSlider: !0,
+        target: this.$target
+      });
+      this.groupModel = new app.org.GroupModel();
+    },
+    delegateEvents: function() {
+      var a = this,
+      b = $(a.el);
+      $("body").on("keydown.user-win",
+      function(a) {
+        27 == a.which && b.modal("hide")
+      });
+      b.on("hidden.bs.modal",
+      function() {
+        a.remove()
+      });
+      b.on("click.user-win", "#org-tree-list a",
+      function() {
+        var b = $(this).parent().attr("id");
+        a.userView.id = b;
+        a.userView.editable = !1;
+        a.userView.isMulti = a.isMulti;
+        a.userView.userOrg = "";
+        a.userView.operation = "";
+        a.userView.el = "#userSelector-multi #all-group-users";
+        a.userView.render(a.getAllChecked());
+        $("#org-user-info").addClass("hide");
+        $("#group-user-info").addClass("hide")
+      });
+      b.on("click.user-win", "#org-group-list a",
+      function() {
+        var b = $(this).attr("id");
+        a.userView.id = b;
+        a.userView.editable = !1;
+        a.userView.isMulti = a.isMulti;
+        a.userView.userOrg = "searchgroup";
+        a.userView.operation = "search";
+        a.userView.el = "#userSelector-multi #all-group-users";
+        a.userView.render(a.getAllChecked());
+        $("#org-user-info").addClass("hide");
+        $("#group-user-info").addClass("hide")
+      });
+      b.on("addUser.user-win", "#all-group-users",
+      function(b, e) {
+        var c = $("<a> " + e.username + " </a>");
+        c.attr("id", e.id);
+        c.data("user", e);
+        0 == $("#userSelector-multi .selected-users #" + e.id).size() && $("#userSelector-multi .selected-users").prepend(c);
+        a.haveCheckedUser()
+      });
+      b.on("deleteUser.user-win", "#all-group-users",
+      function(b, e) {
+        $("#userSelector-multi .selected-users #" + e.id).remove();
+        a.haveCheckedUser()
+      });
+      b.on("addAllUser.user-win", "#all-group-users",
+      function(b, e) {
+        for (var c = 0; c < e.length; c++) {
+          var d = e[c];
+          if (!a.isExistUser(d)) {
+            var f = $("<a> " + d.username + " </a>");
+            f.attr("id", d.id);
+            f.data("user", d);
+            $("#userSelector-multi .selected-users").prepend(f)
+          }
+        }
+        a.haveCheckedUser()
+      });
+      b.on("deleteAllUser.user-win", "#all-group-users",
+      function(b, e) {
+        for (var c = 0; c < e.length; c++) $("#userSelector-multi .selected-users #" + e[c].id).remove();
+        a.haveCheckedUser()
+      });
+      if (!a.isMulti) b.on("click.user-win", "#employee-container li",
+      function(b) {
+        if (b = $(this).data("user")) a.close(),
+        b.sourceId = $(this).attr("id"),
+        a.$target.trigger("confirmHandler", {
+          objs: b
+        })
+      });
+      b.on("click.user-win", ".j_user_ok",
+      function() {
+        var b = [];
+        $("#userSelector-multi .selected-users>a").each(function() {
+          var a = $(this).data("user");
+          b.push(a)
+        });
+        a.$target.trigger("confirmHandler", {
+          objs: b
+        });
+        a.close()
+      });
+      b.on("click.user-win", ".j_user_cancel",
+      function() {
+        a.close()
+      });
+      b.on("click.user-win", "#addUserToGroupButton",
+      function(a) {
+        var b = [];
+        $("#userSelector-multi .selected-users>a").each(function() {
+          var a = $(this).data("user");
+          b.push(a)
+        });
+        0 < b.length ? ($(this).addClass("hide"), $("#add-group-input-text").show(), $("#addConfirmButton").removeClass("hide"), $("#addCancelButton").removeClass("hide"), $("#add-group-input-text").focus()) : f.notify("\u8bf7\u9009\u62e9\u7fa4\u7ec4\u6210\u5458")
+      });
+      b.on("click.user-win", "#addConfirmButton",
+      function(b) {
+        b = $("#add-group-input-text").val();
+        if ("" == $.trim(b)) f.notify("\u8bf7\u8f93\u5165\u7fa4\u7ec4\u540d\u79f0"),
+        $("#add-group-input-text").focus();
+        else if (20 < $.trim(b).length) f.notify("\u7fa4\u7ec4\u540d\u79f0\u4e0d\u5f97\u8d85\u8fc720\u4e2a\u5b57\u7b26"),
+        $("#add-group-input-text").focus();
+        else {
+          var e = {},
+          c = "";
+          $("#userSelector-multi .selected-users>a").each(function() {
+            c += $(this).attr("id") + ","
+          });
+          e["group.name"] = $.trim(b);
+          e.employeeId = TEAMS.currentUser.id;
+          e.ids = c;
+          a.groupModel.saveGroupAddEmployee(e,
+          function(a) {
+            $("#add-group-input-text").val("");
+            $("#add-group-input-text").hide();
+            $("#addUserToGroupButton").removeClass("hide");
+            $("#addConfirmButton").addClass("hide");
+            $("#addCancelButton").addClass("hide");
+            f.notify("\u6dfb\u52a0\u6210\u529f");
+            $("#group-users").trigger("click")
+          })
+        }
+      });
+      b.on("click.user-win", "#addCancelButton",
+      function(a) {
+        $("#add-group-input-text").hide();
+        $("#addUserToGroupButton").removeClass("hide");
+        $("#addConfirmButton").addClass("hide");
+        $("#addCancelButton").addClass("hide")
+      })
+    },
+    open: function() {
+      var a = $(this.el);
+      a.modal("toggle");
+      this._openEmpMulti();
+      "flow" == this.module ? a.find("#modalLabel-employee").html("\u9009\u62e9\u529e\u7406\u4eba") : a.find("#modalLabel-employee").html("\u4eba\u5458\u9009\u62e9")
+    },
+    close: function() {
+      $(this.el).modal("hide")
+    },
+    _openEmpMulti: function() {
+      $(this.el);
+      $("#userSelector-multi").removeClass("hide");
+      $("#add-group-input-text").hide();
+      this.departmentTreeView.render();
+      this.userView.render();
+      this.isMulti ? $(".selector-btns .j_user_ok").removeClass("hide") : ($("#userSelector-multi .user-selector-header").addClass("hide"), $("#userSelector-multi .user-wrapper").addClass("hide"));
+      $("#dept-user-invite").addClass("hide");
+      $(this.el).find("#add-dept-group").addClass("hide");
+      $("#org-user-info").addClass("hide");
+      $("#group-user-info").addClass("hide");
+      $("#control-hide").addClass("hide")
+    },
+    haveCheckedUser: function() {
+      this.isChecked() ? "none" == $("#add-group-input-text").css("display") && $("#addUserToGroupButton").removeClass("hide") : $("#addUserToGroupButton").addClass("hide")
+    },
+    isExistUser: function(a) {
+      var b = !1;
+      $("#userSelector-multi .selected-users>a").each(function() {
+        var c = $(this).data("user");
+        a.id == c.id && (b = !0)
+      });
+      return b
+    },
+    isChecked: function() {
+      var a = [],
+      a = this.getAllChecked();
+      return 0 < a.length ? !0 : !1
+    },
+    getAllChecked: function() {
+      var a = [];
+      $("#userSelector-multi .selected-users>a").each(function() {
+        var b = $(this).data("user");
+        a.push(b)
+      });
+      return a
+    },
+    remove: function() {
+      var a = $(this.el);
+      a.off(".user-win");
+      a.remove()
     }
   });
 
@@ -1260,6 +2592,346 @@
       });
       return e
     }
+  });
+
+  app.components.AtMeView = Backbone.View.extend({
+    initialize: function(options) {
+      this.$input = options.$input;
+      this.clickHandler = options.clickHandler;
+      this.remote = options.remote || "/search/suggestion.json";
+      this.el = "#atdiv";
+      this.hiddenHtml = '<div id="autoTalkBox" style="z-index:-2000;top:$top$px;left:$left$px;width:$width$px;height:$height$px;position:absolute;scroll-top:$SCTOP$px;overflow:hidden;overflow-y:auto;visibility:hidden;word-break:break-all;word-wrap:break-word;*letter-spacing:0.6px;"><span id="autoTalkText"></span></div>';
+      this.positionHTML = '<span id="autoUserTipsPosition">&nbsp;123</span>'
+    },
+    render: function() {
+      var rect = this.$input[0].getBoundingClientRect(),
+        width = this.$input[0].offsetWidth,
+        height = this.$input[0].offsetHeight,
+        html = this.hiddenHtml.slice();
+      $("body").append(html);
+      $("#autoTalkBox").css({
+        top: rect.top,
+        left: rect.left,
+        width: width,
+        height: height,
+        SCTOP: "0"
+      });
+      this.delegateEvents();
+    },
+    delegateEvents: function() {
+      var self = this,
+        c = $(self.el),
+        b = self.$input;
+      $(window).off("resize.at").on("resize.at", function(e) {
+        if(null != $("#autoTalkText")[0]) {
+          var rect;
+          try {
+            rect = self.$input[0].getBoundingClientRect();
+          } catch(e) {
+            return;
+          }
+          var width = self.$input[0].offsetWidth;
+          var height = self.$input[0].offsetHeight;
+          $("#autoTalkBox").css({
+            top: rect.top,
+            left: rect.left,
+            width: width,
+            height: height,
+            SCTOP: "0"
+          });
+          var cursorPosition = self.getCursorPosition(b);
+          if (!cursorPosition) {
+            return self.hide();
+          }
+          var txt = b.val().slice(0, cursorPosition);
+          $("#autoTalkText")[0].innerHTML = txt.slice(0, txt.length).replace(/\n/g, "<br/>").replace(/\s/g, "&nbsp;") + self.positionHTML;
+          rect = $("#autoUserTipsPosition")[0].getBoundingClientRect();
+          var userAgent = window.navigator.userAgent.toLowerCase();
+          if(/msie 9\.0/i.test(userAgent)) {
+            document.getElementById("atdiv").style.top = rect.top + 1 + "px";
+            document.getElementById("atdiv").style.left = rect.left - 5 + "px";
+          } else {
+            c.css({
+              top: rect.top + 1 + "px",
+              left: rect.left - 5 + "px"
+            });
+          }
+        }
+      });
+      b.off("focusin.at").on("focusin.at", function(e, nil) {
+        if(!nil) {
+          $("[id=atdiv]").each(function() {
+            $(this).remove();
+          });
+          $("[id=autoTalkBox]").each(function(a) {
+            $(this).remove();
+          });
+          $("body").append('<div id="atdiv" class="controls hide" style="position: absolute;z-index:9999;">' + app.utils.template("component.typeahead") + "</div>")
+        }
+      });
+      b.off("click.at").on("click.at", function(e) {
+        b.trigger("keyup.at");
+      });
+      b.off("keydown.at").on("keydown.at", function(e) {
+        var keyCode = (e || window.event).keyCode;
+        if ((app.config.keyCode.UP == keyCode || app.config.keyCode.DOWN == keyCode) && c.find("#typeahead-div p").hasClass("employee")) {
+          self.preventEvent(e);
+          return false;
+        }
+        if(app.config.keyCode.ENTER == keyCode && c.find("#typeahead-div p").hasClass("active")) {
+          self.preventEvent(e);
+        }
+      });
+      $("body").not(b).not(c).off("click.at").on("click.at", function(e) {
+        self.hide();
+      });
+      b.off("keyup.at").on("keyup.at", function(e) {
+        var rect = self.$input[0].getBoundingClientRect();
+        if(rect) {
+          $("#autoTalkBox").css({
+            top: rect.top
+          });
+        }
+        var keyCode = (e || window.event).keyCode;
+        var $p;
+        if (13 == keyCode) {
+          c.find("#typeahead-div p.active").trigger("click.at");
+        } else if (27 == keyCode) {
+          self.hide();
+        } else if (38 == keyCode) {
+          $p = c.find("#typeahead-div p.active");
+          if(1 > $p.length) {
+            c.find("#typeahead-div p").last().addClass("active");
+          } else {
+            $p.removeClass("active");
+            if(0 < $p.prev().length) {
+              $p.prev().addClass("active");
+            } else {
+              c.find("#typeahead-div p").last().addClass("active");
+            }
+          }
+        } else if (40 == keyCode) {
+          $p = c.find("#typeahead-div p.active");
+          if(1 > $p.length) {
+            c.find("#typeahead-div p").first().addClass("active");
+          } else {
+            $p.removeClass("active");
+            if(0 < $p.next().length) {
+              $p.next().addClass("active");
+            } else {
+              c.find("#typeahead-div p").first().addClass("active");
+            }
+          }
+        } else {
+          var cursorPosition = self.getCursorPosition(b);
+          if (!cursorPosition) {
+            return self.hide();
+          }
+          var txt = b.val().slice(0, cursorPosition);
+          $("#autoTalkText")[0].innerHTML = txt.slice(0, txt.length).replace(/\n/g, "<br/>").replace(/\s/g, "&nbsp;") + self.positionHTML;
+          var copiedText = txt.slice( - txt.length);
+          copiedText.match(/(\w+)?@(\w+)$|@$/);
+          if (copiedText && -1 != copiedText.indexOf("@") && $.trim(copiedText.substr( - 1))) {
+            if ( - 1 == copiedText.substr(copiedText.lastIndexOf("@"), cursorPosition).indexOf(" ")) {
+              var name = copiedText.substr(copiedText.lastIndexOf("@"));
+              self.search($.trim(name.replace("@", "")));
+              c.removeClass("hide");
+              var g = $("#autoUserTipsPosition")[0].getBoundingClientRect(),
+                e = window.navigator.userAgent.toLowerCase(),
+                f = b.data("left") || 0,
+                k = b.data("top") || 0,
+                p = 0;
+              if("true" == b.attr("isoffsetpx")) {
+                var count = txt.split("\n").length;
+                if(1 < count) {
+                  p = b.data("offsetpx") || 0;
+                  if(1 <= e.indexOf("firefox") && 0 != p) {
+                    p += 1;
+                  }
+                  p *= count - 1;
+                }
+              }
+              if(/msie 9\.0/i.test(e)) {
+                document.getElementById("atdiv").style.top = g.top + 1 + k + p + "px";
+                document.getElementById("atdiv").style.left = g.left - 5 + f + "px";
+              } else {
+                c.css({
+                  top: g.top + 1 + k + p + "px",
+                  left: g.left - 5 + f + "px"
+                });
+              }
+            }
+            c.removeClass("hide");
+          } else {
+            return self.hide();
+          }
+        }
+      });
+      c.off("click.at", "#typeahead-div p").on("click.at", "#typeahead-div p", function(a) {
+        var g = $(this).data("obj");
+        if (self.clickHandler) {
+          self.clickHandler(g, b);
+        } else {
+          var e = self.getCursorPosition(b);
+          a = self.$input.data("userData");
+          var f = g.id,
+            k = g.name,
+            p = k + " ",
+            q = self.$input.val(),
+            m = 0,
+            h = g = "";
+          if (q && (g = q.substr(0, e))) {
+            m = g.length;
+            h = g.split("@");
+            var v = "";
+            for (var g = 0; g < h.length; g++) {
+              if(0 == g) {
+                v = v + h[g];
+              } else {
+                if(g != h.length - 1) {
+                  v = v + "@" + h[g];
+                } else {
+                  v = v + "@";
+                }
+              }
+            }
+            h = v + p + q.substr(e);
+          }
+          e = {
+            userId: f,
+            userName: k,
+            atIndex: m
+          };
+          if (a) {
+            for (g = k = 0; g < a.length; g++) {
+              if(a[g].userId != f) {
+                k++;
+              } else {
+                if(-1 == b.val().indexOf(a[g].userName)) {
+                  k++;
+                }
+              }
+            }
+            if(k == a.length) {
+              a.push(e);
+              self.$input.val("").focus().val(h);
+            } else {
+              self.$input.val("").focus().val(h + " ");
+            }
+          } else {
+            a = [];
+            a.push(e);
+            self.$input.val("").focus().val(h);
+          }
+          self.$input.data("userData", a);
+          self.$input.focus();
+          $("body").find(c).addClass("hide");
+          self.hide();
+        }
+      });
+    },
+    preventEvent: function(e) {
+      if(e && e.preventDefault) {
+        e.preventDefault();
+      } else {
+        window.event.returnValue = false;
+      }
+      e.stopPropagation();
+    },
+    getCursorPosition: function($input) {
+      if (document.selection && document.selection.length) {
+        $input.focus();
+        var selection = document.selection.createRange();
+        var copiedSelection = selection.duplicate();
+        copiedSelection.moveToElementText($input[0]);
+        copiedSelection.setEndPoint("EndToEnd", selection);
+        $input[0].selectionStart = copiedSelection.text.length - selection.text.length;
+        $input[0].selectionEnd = $input[0].selectionStart + selection.text.length
+      }
+      return $input[0].selectionStart;
+    },
+    search: function(kw) {
+      var self = this,
+        $el = $(self.el);
+      this.suggestion = kw;
+      this.entity = "employee";
+      $el.find("#typeahead-div .loading_small").addClass("employee").show();
+      var url = self.remote,
+        data = {};
+      if(2 < escape(kw).length) {
+        data.keywords = "%" + kw;
+      }
+      data.searchType = "employee";
+      $.ajax({
+        type: "get",
+        url: url,
+        dataType: "json",
+        data: data,
+        success: function(res) {
+          var employees = res.employees;
+          $el.find("#typeahead-div .loading_small").hide();
+          if(10 < employees.length) {
+            employees.push({
+              id: "all",
+              name: kw,
+              module: "all"
+            });
+          }
+          self.loadList(employees);
+        }
+      })
+    },
+    loadList: function(employees) {
+      var $el = $(this.el);
+      var suggestion = this.suggestion;
+      var entity = this.entity;
+      $el.find("#typeahead-div #searchList").empty();
+      if (employees) {
+        if (suggestion && 2 < escape(suggestion).length) {
+          for (var i = 0, count = employees.length; i < count; i++) {
+            var employee = employees[i];
+            if ((employee.name || employee.username) == suggestion) {
+              break;
+            }
+          }
+        }
+        i = 0;
+        for (count = employees.length; i < count; i++) {
+          employee = employees[i];
+          employee.createTime = Date.create(employee.createTime).format("{yyyy}-{MM}-{dd}");
+          employee.name = employee.name.replace(/</g, "&lt").replace(/>/g, "&gt").replace("/[\r\n]/g", " ");
+          var $html = $($.trim(app.utils.template("suggestion." + entity, employee)));
+          $html.data("obj", employee);
+          if(employee.avatar) {
+            $html.find(".avatar").attr("src", employee.avatar);
+          }
+          $el.find("#typeahead-div #searchList").append($html);
+        }
+        this.show();
+      }
+    },
+    hide: function() {
+      var $el = $(this.el);
+      $el.find("#typeahead-div p").remove();
+      $el.find("#typeahead-div").hide();
+      $el.addClass("hide");
+    },
+    show: function() {
+      var $el = $(this.el);
+      $el.find("#typeahead-div").show();
+      $el.removeClass("hide");
+    },
+    resetPostion: function() {
+      var $el = $(this.el);
+      var $target = this.$input;
+      var top = $target.offset().top,
+      left = $target.offset().left;
+      $el.css({
+        left: left + "px",
+        top: top + "px"
+      });
+    },
+    remove: function() {}
   });
 
   app.components.Userslider = Backbone.View.extend({
@@ -1655,7 +3327,7 @@
     render: function() {
       $(this.el);
       this.renderTimeLine();
-//      app.utils.layout("#timeline");
+      app.utils.layout("#timeline");
       $("#myReport").addClass("router").attr("href", "/workreport/" + this.userId);
     },
     changeCSS: function(el) {

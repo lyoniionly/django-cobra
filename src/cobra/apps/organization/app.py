@@ -32,6 +32,10 @@ class OrganizationApplication(Application):
     organization_search_suggestion_view = get_class('organization.ajax', 'OrganizationSearchSuggestionView')
     organization_departments_view = get_class('organization.ajax', 'OrganizationDepartmentsView')
     organization_department_view = get_class('organization.ajax', 'OrganizationDepartmentView')
+    organization_department_delete_view = get_class('organization.ajax', 'OrganizationDepartmentDeleteView')
+    organization_member_pinyin_indexs_view = get_class('organization.ajax', 'OrganizationMemberPinyinIndexsView')
+    organization_member_list_view = get_class('organization.ajax', 'OrganizationMemberListView')
+    organization_member_profile_view = get_class('organization.ajax', 'OrganizationMemberProfileView')
 
     def get_urls(self):
         urls = [
@@ -80,6 +84,15 @@ class OrganizationApplication(Application):
                 name='ajax-departments'),
             url(r'^(?P<organization_slug>[\w_-]+)/ajax/department/(?P<department_id>\d+).json$', self.organization_department_view.as_view(),
                 name='ajax-department'),
+            url(r'^(?P<organization_slug>[\w_-]+)/ajax/department/delete.json$', self.organization_department_delete_view.as_view(),
+                name='ajax-department-delete'),
+
+            url(r'^(?P<organization_slug>[\w_-]+)/ajax/member/findPinyinIndexs.json$', self.organization_member_pinyin_indexs_view.as_view(),
+                name='ajax-member-pinyin'),
+            url(r'^(?P<organization_slug>[\w_-]+)/ajax/member/pageQuery.json$', self.organization_member_list_view.as_view(),
+                name='ajax-member-list'),
+            url(r'^(?P<organization_slug>[\w_-]+)/ajax/member/(?P<user_id>\d+).json$', self.organization_member_profile_view.as_view(),
+                name='ajax-member-profile'),
 
         ]
         return self.post_process_urls(urls)

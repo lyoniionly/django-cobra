@@ -16,12 +16,12 @@
           change on revision <span class="sha">{{ last_changeset }}</span></a>
 
         <div class="authorship">
-          <img alt="{{ last_changeset.author }}" class="avatar" height="20"
+          <img alt="{{ last_changeset.author }}" class="avatar avatar-inline" height="20"
                src="{% static 'cobra/img/avatar/default_avatar.png' %}" width="20">
           <span class="author-name"><a href="#" rel="contributor">{{ last_changeset.author }}</a></span>
           authored
           <time class="updated" datetime="" is="relative-time"
-                title="{{ last_changeset.date }}">{{ last_changeset.date|timesince }}</time>
+                title="{{ last_changeset.date }}">{{ last_changeset.date|timesince }} ago</time>
 
         </div>
       </div>

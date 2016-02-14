@@ -6,10 +6,12 @@
 
 {% block title %}{{ organization.name }} | {{ block.super }}{% endblock %}
 
+{% block header %}<div id="header"></div>{% endblock %}
+
 {% block content_class %}with-left-sidebar with-bg{% endblock %}
 
 {% block page_header_block %}
-  <section id="page-header" class="toolbar">
+  {% comment %}<section id="page-header" class="toolbar">
     <div class="pull-right">
       {% block actions %}
         {% if ACCESS.org_write %}
@@ -27,10 +29,10 @@
       {% endblock %}
     </div>
     <h3>{{ organization.name }} <small>Dashboard</small></h3>
-  </section>
+  </section>{% endcomment %}
 {% endblock %}
 
-{% block sidebar %}
+{% comment %}{% block sidebar %}
   <ul class="nav nav-list">
     <li class="{% block work_bench_nav %}{% endblock %}">
       <a href="#">
@@ -84,9 +86,9 @@
     {% endif %}
   </ul>
   {% block org_sidebar_nav_extra %}
-    {% comment %}This block is used by getsentry.com{% endcomment %}
+    {% endcomment %}{% comment %}This block is used by cobar.com{% endcomment %}{% comment %}
   {% endblock %}
-{% endblock %}
+{% endblock %}{% endcomment %}
 
 {% block main %}
   <section class="body maskable">

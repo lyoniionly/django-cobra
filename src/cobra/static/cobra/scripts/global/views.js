@@ -1,3 +1,7 @@
+/**
+ * Base view
+ */
+
 (function (window, app, Backbone, jQuery, _, moment) {
   "use strict";
 
@@ -1008,7 +1012,7 @@
         if(this.editable) {
           $("#effect-content").val(report.content).data("content", report.content);
         } else {
-          $("#effect-content").html(f.convert2Html(report.content));
+          $("#effect-content").html(app.utils.convert2Html(report.content));
         }
       } else {
         $("#effect-content").val("").data("content", "");
@@ -1017,7 +1021,7 @@
         if(this.editable) {
           $("#experience-summary").val(report.summary).data("summary", report.summary);
         } else {
-          $("#experience-summary").html(f.convert2Html(report.summary));
+          $("#experience-summary").html(app.utils.convert2Html(report.summary));
         }
       } else {
         $("#experience-summary").val("").data("summary", "");
@@ -1026,7 +1030,7 @@
         if(this.editable) {
           $("#work-plan").val(report.plan).data("plan", report.plan);
         } else {
-          $("#work-plan").html(f.convert2Html(report.plan));
+          $("#work-plan").html(app.utils.convert2Html(report.plan));
         }
       } else {
         $("#work-plan").val("").data("plan", "");
@@ -1082,7 +1086,29 @@
       return Math.ceil((daysOfYear - date.getDay()) / 7);
     },
     isDisable: function() {
-      var nowTime = Date.create(app.config.organization.nowTime),
+      var a = Date.create(app.config.organization.nowTime),
+      a = app.utils.getWeekDate(a),
+      b = a.month,
+      c = a.week;
+      if (this.year == a.year) switch (this.type) {
+      case "month":
+        if (this.serialNumber > b) return ! 0;
+        break;
+      case "week":
+        if (this.serialNumber > c) return ! 0
+      }
+      switch (this.type) {
+      case "season":
+        if (1 != this.serialNumber && 3 != this.serialNumber) return ! 0;
+        break;
+      case "month":
+        if (12 < this.serialNumber) return ! 0;
+        break;
+      case "week":
+        if (this.serialNumber > app.utils.getWeeksOfYear(this.year)) return ! 0
+      }
+      return ! 1
+      /*var nowTime = Date.create(app.config.organization.nowTime),
           year = nowTime.getFullYear(),
           month = nowTime.getMonth() + 1,
           week = nowTime.getISOWeek();
@@ -1091,7 +1117,7 @@
         year = parseInt(year) + 1;
         month = 1;
       }
-      if(this.year && (2015 < parseInt(this.year) || 2013 > parseInt(this.year))){
+      if(this.year && (2016 < parseInt(this.year) || 2013 > parseInt(this.year))){
         return true;
       }
       if (this.year == year) {
@@ -1138,7 +1164,7 @@
             return true
           }
       }
-      return false;
+      return false;*/
     },
     remove: function() {
       $(this.el).off(".workreportcontent");

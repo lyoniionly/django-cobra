@@ -24,7 +24,7 @@
           m = m.offset().top,
           q = $(window).height() - q - m,
           f = f - q;
-          q = d.attr("theme") ? d.attr("theme") : "darkblue";
+          q = d.attr("theme") ? d.attr("theme") : "minimal-dark";
           if (!d.hasClass("mCustomScrollbar")) {
             m = {
               onScroll: function() {
@@ -228,12 +228,51 @@
     },
 
     layout: function(a, b, d) {
-//      scrollbar.setLayout(a, b, d)
+      scrollbar.setLayout(a, b, d)
     },
 
     template: function(templateName, data) {
       var html = app.templates[templateName];
       return data ? _.template(html, data) : html;
+    },
+    
+    confirm: function(txt, callback) {
+      swal({
+        title: "确定吗?",
+        text: txt,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "确认",
+        cancelButtonText: "取消"
+      }, function(isConfirm){
+        if(callback) {
+          callback(isConfirm);
+        }
+      });
+    },
+    uuid: function() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+      });
+    },
+    convert2Html: function(html) {
+      return html ? html.replace(/\r\n|\n/g, "<br/>").replace(/[ ]/g, "&nbsp;") : html
+    },
+    getWeekDate: function(a) {
+      a = a.clone().endOfISOWeek();
+      return {
+        year: a.getFullYear(),
+        month: a.getMonth() + 1,
+        week: 1 + Math.floor(a.daysSince(a.clone().beginningOfYear()) / 7)
+      }
+    },
+    getWeeksOfYear: function(a) {
+      var b = 0 == a % 4 && 0 != a % 100 || 0 == a % 400 ? 366 : 365;
+      a = new Date(a, 11, 31);
+      7 > a.getDay() && (b -= a.getDay());
+      return Math.ceil(b / 7)
     }
 
   };

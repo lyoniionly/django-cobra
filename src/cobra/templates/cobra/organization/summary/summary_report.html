@@ -1,11 +1,12 @@
-{% extends "layouts/organization.html" %}
+{% extends "layouts/organizationV2.html" %}
 {% load i18n helper_tags %}
 
 {% block title %}{% trans 'Summary Report' %} | {{ block.super }}{% endblock %}
 
-{% block body_class %}summary{% endblock %}
+{% block body_class %}{{ block.super }} summary{% endblock %}
 {% block org_summary_report_nav %}active{% endblock %}
 
+{% comment %}
 {% block inner %}
   <div id="mainContainer">
     <div class="loading_cobra"></div>
@@ -14,4 +15,4 @@
 
 {% block onbodyload %}
   {{ block.super }}
-{% endblock %}
+{% endblock %}{% endcomment %}

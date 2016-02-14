@@ -3,6 +3,389 @@
 
   app.models = {};
 
+  app.models.CustMenuModel = Backbone.Model.extend({
+    initialize: function() {
+      this.baseUrl = app.config.urlPrefix + '/menu/ajax/';
+      this.menu = {
+        1 : '<li><a class="router-fake j_modnav-daily" href="/organizations/'+app.config.organizationId+'/workreport/daily/'+app.config.currentUser.account+'/" data-url="/organizations/'+app.config.organizationId+'/workreport/daily/'+app.config.currentUser.account+'/"><span>日报</span></a></li>',
+        2 : '<li><a class="router-fake j_modnav-workreport" href="/organizations/'+ app.config.organizationId +'/summary/'+ app.config.currentUser.account +'/#workreport" data-url="/organizations/'+ app.config.organizationId +'/summary/'+ app.config.currentUser.account +'/#workreport"><span>报告</span></a></li>',
+        3 : '<li><a class="router-fake j_modnav-task" href="/organizations/'+ app.config.organizationId + '/#tasks" data-url="/organizations/'+ app.config.organizationId + '/#tasks"><span>任务协作</span></a></li>',
+        4 : '<li><a class="router j_modnav-document" href="/documents" data-url="/documents"><span>项目</span></a></li>',
+        5 : '<li><a class="router j_modnav-customers" href="/crms/customer" data-url="/crms/customer"><span>知识文档</span></a></li>'
+      }
+    },
+    loadEmpAllMenus: function(d) {
+      var c = this;
+      $.ajax({
+        type: "get",
+        url: this.baseUrl + "member/queryMenus.json",
+        cache: false,
+        dataType: "json",
+        success: function(b) {
+          d && d.call(c, b.empmenus)
+        }
+      })
+    },
+    updateMenuStatus: function(d, c) {
+      var b = this;
+      $.ajax({
+        type: "post",
+        url: this.baseUrl + "member/updateMemberCustMenuStatus.json",
+        data: d,
+        dataType: "json",
+        success: function(a) {
+          c && c.call(b, a)
+        }
+      })
+    },
+    updateMenuOrders: function(d, c) {
+      var b = this;
+      $.ajax({
+        type: "post",
+        url: this.baseUrl + "member/updateMemberCustMenuOrder.json",
+        data: d,
+        dataType: "json",
+        success: function(a) {
+          c && c.call(b, a)
+        }
+      })
+    },
+    getMenuElTpl: function(d) {
+      for (var c = [], b = 0, a = d.length; b < a; b++) {
+        c.push(this.menu[d[b].id]);
+      }
+      return c
+    },
+    resetNavsetting: function(d) {
+      $.ajax({
+        type: "post",
+        url: this.baseUrl + "member/resetMenuSetting.json",
+        dataType: "json",
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    }
+  });
+
+  app.models.ProfileModel = Backbone.Model.extend({
+    sids: "",
+    businessSuperiorId: "",
+    subordinateUserId: "",
+    assistantId: "",
+    openAccessId: "",
+    initialize: function(f) {
+      this.userId = f.userId;
+      this.baseUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/ajax/';
+    },
+    loadSummary: function(f, d) {
+      $.ajax({
+        type: "get",
+        url: "/profile/summary/" + f + ".json",
+        dataType: "json",
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    loadProfile: function(f, d) {
+      $.ajax({
+        url: this.baseUrl + "member/" + f + ".json",
+        type: "get",
+        dataType: "json",
+        beforeSend: function() {},
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    updateUserRole: function(f, d, c, b) {
+      $.ajax({
+        url: "/base/role/updateUserRole.json",
+        type: "post",
+        dataType: "json",
+        data: {
+          id: f,
+          "role.roleKey": d,
+          type: c
+        },
+        success: function(a) {
+          b && b(a)
+        }
+      })
+    },
+    saveEmployeeProperty: function(f, d) {
+      $.ajax({
+        url: "/base/employee/saveProperty.json",
+        type: "post",
+        dataType: "json",
+        data: f,
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    saveOtherSenior: function(f) {
+      $.ajax({
+        url: "/base/employee/saveOtherSenior.json",
+        type: "post",
+        dataType: "json",
+        data: {
+          sids: this.sids,
+          subordinateUserId: this.subordinateUserId
+        },
+        success: function(d) {
+          f && f(d)
+        }
+      })
+    },
+    saveAssistant: function(f) {
+      $.ajax({
+        url: "/base/employee/saveAssistant.json",
+        type: "post",
+        dataType: "json",
+        data: {
+          sids: this.sids,
+          assistantId: this.assistantId
+        },
+        success: function(d) {
+          f && f(d)
+        }
+      })
+    },
+    saveOpenAccess: function(f) {
+      $.ajax({
+        url: "/base/employee/saveOpenAccess.json",
+        type: "post",
+        dataType: "json",
+        data: {
+          sids: this.sids,
+          openAccessId: this.openAccessId
+        },
+        success: function(d) {
+          f && f(d)
+        }
+      })
+    },
+    deleteOtherSenior: function(f) {
+      $.ajax({
+        url: "/base/employee/deleteOtherSenior.json",
+        type: "post",
+        dataType: "json",
+        data: {
+          sids: this.sids,
+          subordinateUserId: this.subordinateUserId
+        },
+        success: function(d) {
+          f && f(d)
+        }
+      })
+    },
+    deleteAssistant: function(f) {
+      $.ajax({
+        url: "/base/employee/deleteAssistant.json",
+        type: "post",
+        dataType: "json",
+        data: {
+          sids: this.sids,
+          assistantId: this.assistantId
+        },
+        success: function(d) {
+          f && f(d)
+        }
+      })
+    },
+    deleteOpenAccess: function(f) {
+      $.ajax({
+        url: "/base/employee/deleteOpenAccess.json",
+        type: "post",
+        dataType: "json",
+        data: {
+          sids: this.sids,
+          openAccessId: this.openAccessId
+        },
+        success: function(d) {
+          f && f(d)
+        }
+      })
+    },
+    deleteUser: function(f, d) {
+      $.ajax({
+        url: "/base/employee/delete.json",
+        type: "post",
+        dataType: "json",
+        data: {
+          id: f
+        },
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    changePassword: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: "/base/account/changePassword.json",
+        dataType: "json",
+        data: {
+          "employee.id": f.employeeId,
+          oldPassword: f.oldPassword,
+          newPassword: f.newPassword
+        },
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    resetPassword: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: "/base/account/resetPassword.json",
+        dataType: "json",
+        data: {
+          "employee.id": f.employeeId,
+          newPassword: f.newPassword
+        },
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    cut: function(f, d) {
+      $.ajax({
+        contentType: "application/json;charset\x3dUTF-8",
+        type: "post",
+        url: "/profile/cut.json",
+        dataType: "json",
+        data: '{"id":' + this.userId + ',"imageArea":{"id":' + f.id + ',"x":' + f.x + ',"y":' + f.y + ',"width":' + f.width + ',"height":' + f.height + "}}",
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    sendCaptcha: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: "/base/account/sendCaptcha.json",
+        dataType: "json",
+        data: {
+          "employee.id": f.employeeId,
+          propertyName: f.propertyName,
+          "employee.email": f.email,
+          "employee.mobile": f.mobile
+        },
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    detectCaptcha: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: "/base/account/detectCaptcha.json",
+        dataType: "json",
+        data: {
+          captcha: f.captcha,
+          "employee.email": f.email,
+          "employee.mobile": f.mobile
+        },
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    updateBinding: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: "/base/account/updateBinding.json",
+        dataType: "json",
+        data: {
+          "employee.id": f.employeeId,
+          propertyName: f.propertyName,
+          "employee.email": f.email,
+          "employee.mobile": f.mobile,
+          captcha: f.captcha
+        },
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    accountIsOccupied: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: "/base/account/accountIsOccupied.json",
+        dataType: "json",
+        data: {
+          propertyName: f.propertyName,
+          "employee.email": f.email,
+          "employee.mobile": f.mobile
+        },
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    countAllAdmin: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: "/base/employee/countAllAdmin.json",
+        dataType: "json",
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    resignation: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: "/base/account/resignation.json",
+        dataType: "json",
+        data: {
+          "employee.id": f
+        },
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    quitCompany: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: "/base/account/quitCompany.json",
+        dataType: "json",
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    quitTransfer: function(f, d) {
+      $.ajax({
+        contentType: "application/json;charset\x3dUTF-8",
+        type: "post",
+        url: "/profile/quitTransfer.json",
+        dataType: "json",
+        data: f,
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    },
+    rehire: function(f, d) {
+      $.ajax({
+        type: "post",
+        url: "/base/account/rehire.json",
+        dataType: "json",
+        data: {
+          "employee.id": f
+        },
+        success: function(c) {
+          d && d(c)
+        }
+      })
+    }
+  });
+
   app.models.Group = Backbone.Model.extend({
 
     defaults: {

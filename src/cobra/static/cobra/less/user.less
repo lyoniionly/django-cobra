@@ -1,0 +1,461 @@
+.user-panel {
+    width: 220px;
+    float: left;
+    padding: 0 15px 0 10px;
+    height: 100%;
+    position: relative;
+    -webkit-transition: background-color .2s linear;
+    -o-transition: background-color .2s linear;
+    transition: background-color .2s linear
+}
+
+.user-panel.open,
+.user-menu .teampanel {
+    background: #313944
+}
+
+.user-panel .user-avatar {
+    margin: 5px 9px 0 0;
+    border-radius: 50%
+}
+
+.user-panel .user-avatar img {
+    height: 38px;
+    width: 38px;
+    border-radius: 50%;
+  border: 1px solid #757575;
+}
+
+.user-panel .user-item em {
+    font-style: normal;
+    display: inline-block;
+    width: 60px;
+    vertical-align: middle
+}
+
+.selector-employee .modal-dialog {
+    width: 950px;
+    z-index: 9999
+}
+
+.selector-employee.modal .org-title {
+    display: none
+}
+
+.selector-employee.modal .users-list-checkbox {
+    display: none
+}
+
+.selector-employee .modal-body {
+    max-height: 600px;
+    padding: 10px
+}
+
+.selector-employee .suggestion {
+    margin: 0
+}
+
+.selector-employee .selected-container {
+    margin-top: 10px;
+    font-size: 0
+}
+
+.selector-employee .selected-container .add-group-user {
+    display: inline-block;
+    vertical-align: top
+}
+
+.selector-employee .users-list li {
+    cursor: pointer
+}
+
+.selector-employee table.table-pinyin {
+    float: right;
+    margin-left: 10px;
+    border-collapse: separate;
+    border-spacing: 1px;
+    background-color: #fff
+}
+
+.selector-employee table.table-pinyin td {
+    background-color: #f2f2f2;
+    text-align: center;
+    line-height: 25px;
+    width: 25px
+}
+
+.selector-employee table.table-pinyin td.highlight {
+    background-color: #08c;
+    color: #fff;
+    cursor: pointer
+}
+
+.selector-employee table.table-pinyin td.all {
+    background-color: #333;
+    color: #fff;
+    cursor: pointer
+}
+
+.selector-employee .pinyin-container {
+    margin: 10px 0
+}
+
+.selector-employee .pinyin {
+    float: left;
+    width: 25px;
+    text-align: center
+}
+
+.selector-employee .users-list {
+    margin-left: 1px;
+    border-left: 1px
+}
+
+.user-selector-body {
+    margin-top: 5px;
+    border: 1px solid #e7e7e7
+}
+
+.user-selector-body-l {
+    width: 27%;
+    border-right: 1px solid #e7e7e7
+}
+
+.user-selector-body-r {
+    margin-left: 27%
+}
+
+.selector-employee .selected-users>a {
+    display: inline-block;
+    vertical-align: top;
+    line-height: 30px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    color: #333;
+    padding: 0 10px;
+    background: #eee;
+    border-radius: 2px;
+    text-decoration: none;
+    font-size: 12px
+}
+
+.user-menu>a {
+    height: 48px;
+    font-size: 14px;
+    color: #fff;
+    display: block;
+    text-decoration: none;
+    position: relative
+}
+
+.user-menu>a>p {
+    line-height: 18px;
+  margin: 0;
+}
+
+.user-menu>a>p.user-team {
+    color: rgba(255,255,255,0.8);
+    font-size: 12px
+}
+
+.user-menu>a>.user-person {
+    padding-top: 6px
+}
+
+.user-menu>a>p.single {
+    padding-top: 0;
+    line-height: 48px
+}
+
+.user-menu .user-name {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 60px
+}
+
+.user-menu>a span.hide {
+    display: none
+}
+
+.user-menu>a>p>i {
+    font-size: 16px;
+    padding: 0 5px;
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transition: all .15s ease;
+    -o-transition: all .15s ease;
+    transition: all .15s ease
+}
+
+.dropdown.open .user-menu>a>p>i {
+    -webkit-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    transform: rotate(-90deg)
+}
+
+.top-user-menu>a>p {
+    display: block;
+  margin: 0;
+}
+
+.top-user-menu>a>p.user-team.hide {
+    display: none
+}
+
+.user-menu .dropdown-user {
+    width: 757px;
+    overflow-y: auto;
+    padding: 0;
+//    background: #ededed;
+    border: 0;
+    z-index: 501
+}
+
+.user-menu-backdrop {
+    background: rgba(0,0,0,0.5);
+    z-index: 500;
+    position: fixed;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0
+}
+
+.user-menu .teampanel {
+    padding: 12px 20px
+}
+
+.user-menu .teampanel .a-team {
+    background: transparent;
+    color: #fff;
+    border: 1px solid #fff;
+}
+
+.user-menu .teampanel .a-team:hover {
+    background-color: #23b7e5;
+    border-color: #18aedb
+}
+
+.user-menu .teampanel .a-team:active {
+    background-color: #1f9fd1
+}
+
+.user-menu .teampanel .teams-swich .e-selectui {
+    width: 250px
+}
+
+.user-menu .teampanel .teams-swich .selectui-result {
+    background: 0;
+    color: #fff;
+    border-color: #fff
+}
+
+.user-menu .teampanel .teams-swich .e-selectui.open .selectui-result {
+  background: #fff;
+  color: #000;
+}
+
+.user-menu .teampanel .teams-swich .selectui-result:hover {
+    background: #fff;
+    color: #000;
+}
+
+.user-menu .teampanel .teams-swich .txt {
+    line-height: 30px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    display: inline-block;
+    margin-right: 5px
+}
+
+.user-menu .mypanel {
+    width: 166px;
+    padding: 0 16px
+}
+
+.user-menu .mypanel .avatar {
+    width: 54px;
+    height: 54px;
+    margin: 16px auto 25px;
+  float: none;
+}
+
+.user-menu .mypanel .avatar img {
+    width: 52px;
+    height: 52px;
+    border: 2px solid #fff;
+    border-radius: 50%
+}
+
+.user-menu .mypanel .myoption {
+    margin: 0 auto;
+    width: 90%
+}
+
+.user-menu .mypanel .myoption .btn {
+    border-radius: 3px;
+    background-color: transparent;
+    color: #666
+}
+
+.user-menu .mypanel .myoption .btn.on {
+    background-color: #488fbc;
+    border-color: #397ca7;
+    color: #fff
+}
+
+.user-menu .mypanel .myoption .btn:hover {
+    background-color: #2dc1e6;
+    color: #fff;
+    border-color: #02aed9
+}
+
+.user-menu .mypanel .myoption .btn+.btn {
+    margin-top: 10px
+}
+
+.user-menu .otherspanel {
+    width: 566px
+}
+
+.user-menu .hint {
+    font-style: italic;
+    color: #979797;
+    line-height: 30px;
+    padding: 12px 0
+}
+
+.user-space-search {
+    float: right;
+    position: relative
+}
+
+.user-menu .user-space-search .search-btn {
+    position: absolute;
+    height: 28px;
+    width: 28px;
+    line-height: 28px;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    color: #999;
+    top: 0;
+    right: 0
+}
+
+.user-menu .user-space-search .search-btn:hover {
+    color: #5d9cec
+}
+
+.user-menu .user-space-search input {
+    padding-right: 30px
+}
+
+.user-menu .user-tab {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    background: #f5f5f5;
+    border-bottom: 2px solid #ccc;
+    height: 40px
+}
+
+.user-menu .user-tab>li {
+    width: 33.3333%;
+    float: left
+}
+
+.user-menu .user-tab.nosub>li {
+    width: 50%
+}
+
+.user-menu .user-tab>li>a {
+    display: block;
+    line-height: 38px;
+    height: 40px;
+    color: #999;
+    background: #f5f5f5;
+    text-align: center;
+    border-bottom: 2px solid #ccc;
+    border-right: 2px solid #fff;
+    text-decoration: none
+}
+
+.user-menu .user-tab>li:last-child>a {
+    border-right: 0
+}
+
+.user-menu .user-tab>li.active>a {
+    font-weight: bold;
+    color: #2dc3e8;
+    background: #fff;
+    border-bottom-color: #2dc3e8;
+    -webkit-transition: all .15s ease-in-out;
+    -o-transition: all .15s ease-in-out;
+    transition: all .15s ease-in-out
+}
+
+.user-menu .user-list-container {
+    height: 215px!important;
+    padding: 10px 0 10px 10px;
+    background-color: #fff;
+    border-radius: 0 0 3px 3px
+}
+
+.user-list-container ul {
+    padding-right: 10px;
+    position: relative
+}
+
+.user-menu .user-item {
+    border-radius: 5px;
+    float: left;
+    height: 40px;
+    padding: 5px 10px;
+    width: 25%
+}
+
+.user-menu .user-item:hover {
+    background-color: #f5f5f5
+}
+
+.user-menu .user-item>a {
+    line-height: 30px;
+    color: #666
+}
+
+.user-menu .user-item>a:hover {
+    color: #08c
+}
+
+.user-menu .user-item .avatar {
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    vertical-align: middle;
+    margin-right: 3px
+}
+
+.user-menu .user-item .icon-comments {
+    display: none;
+    text-decoration: none
+}
+
+.user-menu .user-item:hover .icon-comments {
+    display: block
+}
+
+.user-menu .user-follow-btns {
+    margin: 10px 0;
+    text-align: center
+}
+
+.user-menu .useroption {
+    padding: 12px 25px 12px 0;
+    width: 100%
+}
+
+.user-menu .useroption .btn {
+    float: right;
+    margin-left: 18px;
+    border-radius: 2px
+}

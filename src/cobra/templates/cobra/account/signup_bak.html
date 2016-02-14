@@ -1,0 +1,39 @@
+{% extends "layouts/modal.html" %}
+
+{% load url from future %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Signup" %} | {{ block.super }}{% endblock %}
+
+{% block main %}
+  <section class="body">
+    <div class="row">
+      <div class="col-sm-6">
+        <form class="form-stacked" method="post" action="{% url 'account_signup' %}">
+          {% csrf_token %}
+          {{ form|as_crispy_errors }}
+
+          <fieldset>
+            <legend>{% trans "Sign up to use Cobra service" %}</legend>
+          </fieldset>
+          {% for field in form %}
+            {{ field|as_crispy_field }}
+          {% endfor %}
+
+          {% if redirect_field_value %}
+          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+          {% endif %}
+          <fieldset class="form-actions">
+            <div class="pull-right" style="margin-top: 5px;">
+              <a href="{{ login_url }}">{% trans "Already have an account?" %}</a>
+            </div>
+            <button type="submit" class="btn btn-primary">{% trans "Sign Up" %}</button>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+

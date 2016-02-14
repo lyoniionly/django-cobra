@@ -9,31 +9,35 @@
     initialize: function(data) {
       this.baseUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/ajax/';
     },
-    loadData: function(f, d) {
+    loadData: function(callback, data) {
       $.ajax({
         url: this.baseUrl + "departments.json",
         type: "get",
         dataType: "json",
         data: {
-          id: d,
+          id: data,
           hasUrl: this.hasUrl
         },
-        success: function(c) {
-          f && f(c)
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
       })
     },
-    deleteDepart: function(f, d, c) {
+    deleteDepart: function(depId, depParentId, callback) {
       $.ajax({
-        url: "/base/department/delete.json",
+        url: this.baseUrl + "department/delete.json",
         type: "post",
         dataType: "json",
         data: {
-          "department.id": f,
-          "department.parent": d
+          "department.id": depId,
+          "department.parent": depParentId
         },
-        success: function(b) {
-          c && c(b)
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
       })
     }
@@ -41,7 +45,7 @@
 
   app.org.DepartmentModel = Backbone.Model.extend({
     initialize: function(data) {
-      this.baseUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/ajax/';
+      this.baseUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/ajax/department/';
     },
     saveDepartment: function(f, d) {
       $.ajax({
@@ -65,16 +69,18 @@
         }
       })
     },
-    getById: function(f, d) {
+    getById: function(id, callback) {
       $.ajax({
         type: "get",
-        url: this.baseUrl + "department/" + f + ".json",
+        url: this.baseUrl + id + ".json",
         dataType: "json",
         data: "",
-        success: function(c) {
-          d && d(c)
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
-      })
+      });
     }
   });
 
@@ -206,24 +212,29 @@
       department: 1,
       status: "normal"
     },
-    queryEmp: function(f) {
-      var d = {};
-      d["employee.department"] = this.employee.department;
-      d["employee.status"] = this.employee.status;
-      d["employee.username"] = this.employee.username;
-      d["employee.email"] = this.employee.email;
-      d["employee.index"] = this.employee.index;
-      d.isContainsSub = this.isContainsSub;
-      d.pageNo = this.pageNo;
-      d.pageSize = this.pageSize;
-      d.groupId = this.groupId;
+    initialize: function(data) {
+      this.baseUrl = app.config.urlPrefix + '/organizations/' + app.config.organizationId + '/ajax/member/';
+    },
+    queryEmp: function(callback) {
+      var data = {};
+      data["member.department"] = this.employee.department;
+      data["member.status"] = this.employee.status;
+      data["member.username"] = this.employee.username;
+      data["member.email"] = this.employee.email;
+      data["member.index"] = this.employee.index;
+      data.isContainsSub = this.isContainsSub;
+      data.pageNo = this.pageNo;
+      data.pageSize = this.pageSize;
+      data.groupId = this.groupId;
       $.ajax({
-        url: "/base/employee/pageQuery.json",
-        type: "post",
+        url: this.baseUrl + "pageQuery.json",
+        type: "get",
         dataType: "json",
-        data: d,
-        success: function(c) {
-          f && f(c)
+        data: data,
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
       })
     },
@@ -270,18 +281,20 @@
         }
       })
     },
-    findPinyinIndexs: function(f) {
-      var d = {};
-      d["employee.department"] = this.employee.department;
-      d["employee.status"] = this.employee.status;
-      d.isContainsSub = this.isContainsSub;
+    findPinyinIndexs: function(callback) {
+      var data = {};
+      data["member.department"] = this.employee.department;
+      data["member.status"] = this.employee.status;
+      data.isContainsSub = this.isContainsSub;
       $.ajax({
         type: "get",
-        url: "/base/employee/findPinyinIndexs.json",
+        url: this.baseUrl + "findPinyinIndexs.json",
         dataType: "json",
-        data: d,
-        success: function(c) {
-          f && f(c)
+        data: data,
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
       })
     },
@@ -509,7 +522,7 @@
       e.attr("id", b.id);
       var d = "\u5df2\u63a5\u53d7";
       "refused" == b.status && (d = "\u5df2\u62d2\u7edd");
-      "unreceived" == b.status ? (TEAMS.currentUser.admin || c.find(".btn-danger").remove(), b.url && c.find(".btn-warning").attr("data-entity", b.url)) : c.html(d);
+      "unreceived" == b.status ? (app.config.currentUser.admin || c.find(".btn-danger").remove(), b.url && c.find(".btn-warning").attr("data-entity", b.url)) : c.html(d);
       e.find("div.username a").eq(1).html(b.invitee);
       e.find("div.call").html(b.contact);
       b.inviteTime && (c = Date.create(b.inviteTime).format("{yyyy}-{MM}-{dd} {HH}:{mm}"), e.find("div.date").html(c));
@@ -598,7 +611,7 @@
       function(b) {
         var e = $(this).parents("li");
         b = e.attr("id");
-        a.followModel.follow(b, TEAMS.currentUser.id,
+        a.followModel.follow(b, app.config.currentUser.id,
         function(b) {
           a.rendFollow(e, b);
           "approved" == b ? f.notify("\u6dfb\u52a0\u5173\u6ce8\u6210\u529f") : f.notify("\u5173\u6ce8\u7533\u8bf7\u5df2\u53d1\u9001")
@@ -608,7 +621,7 @@
       function() {
         var b = $(this).parents("li"),
         e = b.attr("id");
-        a.followModel.unfollow(e, TEAMS.currentUser.id,
+        a.followModel.unfollow(e, app.config.currentUser.id,
         function(e) {
           a.rendFollow(b, e.relation);
           f.notify("\u5df2\u53d6\u6d88\u5173\u6ce8")
@@ -636,7 +649,7 @@
       });
       $(this.el).on("click.userView", "#employee-container .clearfix div.username input", function(b) {
         var e = $(this).parents(".clearfix").data("user");
-        len = $(this).filter(":checked").length;
+        var len = $(this).filter(":checked").length;
         0 < len ? $(this).trigger("addUser", [e, a.id]) : $(this).trigger("deleteUser", [e, a.id]);
         var len1 = $(a.el + " #employee-container .clearfix div.username input:checked").length;
         var len2 = $(a.el + " #employee-container .clearfix").length;
@@ -666,7 +679,7 @@
           $(this).trigger("addAllUser", [b, a.id])
         } else $(a.el + " #employee-container .clearfix div.username input").each(function() {
           var e = $(this).parents(".clearfix").data("user");
-          if (e.id != TEAMS.currentUser.id || "editgroup" != a.userOrg) b.push(e),
+          if (e.id != app.config.currentUser.id || "editgroup" != a.userOrg) b.push(e),
           $(this).prop("checked", !1)
         }),
         $(this).prop("checked", !1),
@@ -699,7 +712,7 @@
       $(this.el + " #checkAll").prop("checked", !1);
       "search" != this.operation && "edit" != this.operation || this.renderEdit();
       this.loadUsersAndIndexs(a);
-      this.creator && TEAMS.currentUser.id != this.creator && $("#edit-group-user").addClass("hide");
+      this.creator && app.config.currentUser.id != this.creator && $("#edit-group-user").addClass("hide");
       $(this.el).hasClass("user-selector-body-r") ? app.utils.layout("#userSelector-multi .j_userlistScr") : app.utils.layout("#employee-container .j_userlistScr")
     },
     loadUsersAndIndexs: function(a) {
@@ -754,8 +767,7 @@
       })
     },
     loadUserlist: function(a, b) {
-      for (var c = a.page,
-      d = 0; d < c.result.length; d++) {
+      for (var c = a.page, d = 0; d < c.result.length; d++) {
         var k = c.result[d];
         this.loadUser(k, !1, b)
       }
@@ -784,7 +796,7 @@
       a.mobile ? d.find(".call").html(a.mobile) : d.find(".call").html(a.email);
       d.find(".dept").html(a.department.name);
       this.editable && d.find("a.avatar").attr("userId", a.id);
-      a.avatar && a.avatar.p4 && (d.find("a.avatar img").attr("src", "/base/download/" + a.avatar.p4), this.editable && (d.find("a.avatar img").attr("id", a.id), d.find("a.avatar img").data("user", a)));
+      a.avatar && (d.find("a.avatar img").attr("src", a.avatar), this.editable && (d.find("a.avatar img").attr("id", a.id), d.find("a.avatar img").data("user", a)));
       c = "";
       c = "normal" == a.status ? "": "(\u79bb\u804c)";
       c = "<font color='red'>" + c + "</font>";
@@ -796,7 +808,7 @@
       $(this.el).find("#userlistCon");
       a.department && 1 == a.department.rank ? d.find("span.department").text("") : d.find("span.department").attr("title", a.department.name).html(a.department.name);
       this.editable && (a.lastLoginTime ? (c = Date.create(a.lastLoginTime).format("{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}"), d.find("span.lastlogin").attr("title", "\u6700\u8fd1\u767b\u5165" + c + "/\u767b\u5f55\u603b\u6b21\u6570" + a.loginCount + "\u6b21").html("\u6700\u8fd1\u767b\u5165" + c + "/" + a.loginCount + "\u6b21")) : d.find("span.lastlogin").attr("title", "\u672a\u767b\u5f55").append("\u672a\u767b\u5f55"));
-      TEAMS.currentUser.id != a.id ? d.find("span." + a.relation).removeClass("hide") : "editgroup" == this.userOrg && d.find("div.username input").attr("disabled", "disabled");
+      app.config.currentUser.id != a.id ? d.find("span." + a.relation).removeClass("hide") : "editgroup" == this.userOrg && d.find("div.username input").attr("disabled", "disabled");
       b ? $(this.el).find("#userlistCon").prepend(d) : $(this.el).find("#userlistCon").append(d)
     },
     rendFollow: function(a, b) {
@@ -1030,7 +1042,7 @@
         k = c[a].createTime ? Date.create(c[a].createTime).format("{yyyy}-{MM}-{dd}") : "",
         h = h + ("<li><a id='" + c[a].id + "' class='router' title='" + c[a].creator.username + "\u521b\u5efa\u4e8e" + k + "' href='" + d + "'>" + c[a].name + "\u3010" + (null == c[a].member ? 0 : c[a].member.length) + "\u4eba\u3011</a>"),
         d = this.noUrl ? "": "/organization/" + c[a].id + "/user/edit/editgroup";
-        this.readonly || TEAMS.currentUser.id != c[a].creator.id || (h += "<span class='actions'><a class='router'  href='" + d + "' title='\u7f16\u8f91'>\u8bbe\u7f6e\u7fa4\u7ec4\u6210\u5458</a>", h += "<a id='delete-group' groupid='" + c[a].id + "' class='router' title='\u5220\u9664'><i class='fa fa-trash'></i></a></span>");
+        this.readonly || app.config.currentUser.id != c[a].creator.id || (h += "<span class='actions'><a class='router'  href='" + d + "' title='\u7f16\u8f91'>\u8bbe\u7f6e\u7fa4\u7ec4\u6210\u5458</a>", h += "<a id='delete-group' groupid='" + c[a].id + "' class='router' title='\u5220\u9664'><i class='fa fa-trash'></i></a></span>");
         h += "</li>";
         b += h
       }
@@ -1146,12 +1158,11 @@
       });
       $(a.el).on("click.departmenttree", "#delete-department", function(b) {
         var c = $(this);
-        f.confirm("\u786e\u5b9a\u8981\u5220\u9664\u90e8\u95e8\u5417\uff1f\u5220\u9664\u540e\u5c06\u65e0\u6cd5\u6062\u590d",
-        function(b) {
+        app.utils.confirm("确定要删除部门吗？删除后将无法恢复", function(b) {
           b && (b = $(a.el).find("#" + c.attr("nodeid")).data("node").nodeObj, a.model.deleteDepart(b.id, b.parent.id,
           function(b) {
             a.deleteSelectedNode(a.operation);
-            f.notify("\u5220\u9664\u6210\u529f")
+            app.alert('success', "删除成功")
           }))
         })
       });
@@ -1165,7 +1176,7 @@
           b && (b = $(a.el).find(c).attr("groupid"), a.groupModel.deleteGroup(b,
           function(b) {
             f.notify("\u5220\u9664\u6210\u529f"); - 1 != d ? (b = "/organization/" + d + "/user/edit/editgroup", $("#center-pane").find("#show-first-group").attr("href", b), $("#center-pane").find("#show-first-group").click()) : ($("#right-pane").find("#employee-container").addClass("hide"), $("#right-pane").find("#group-user-info").addClass("hide"));
-            a.reloadGroup(TEAMS.currentUser.id)
+            a.reloadGroup(app.config.currentUser.id)
           }))
         })
       });
@@ -1181,7 +1192,7 @@
         $("#add-dept-group").show();
         if ("" != $.trim(b)) {
           var c = {};
-          20 < $.trim(b).length ? f.notify("\u7fa4\u7ec4\u540d\u79f0\u4e0d\u5f97\u8d85\u8fc720\u4e2a\u5b57\u7b26") : (c["group.name"] = $.trim(b), c.employeeId = TEAMS.currentUser.id, a.groupModel.saveGroup(c, function(b) {
+          20 < $.trim(b).length ? f.notify("\u7fa4\u7ec4\u540d\u79f0\u4e0d\u5f97\u8d85\u8fc720\u4e2a\u5b57\u7b26") : (c["group.name"] = $.trim(b), c.employeeId = app.config.currentUser.id, a.groupModel.saveGroup(c, function(b) {
             f.notify("\u6dfb\u52a0\u6210\u529f");
             a.reloadGroup(app.config.currentUser.id);
             b = "/organization/" + b.group.id + "/user/edit/editgroup";
@@ -1215,8 +1226,7 @@
       b = a.id,
       c = $(a.el),
       d = a.type;
-      this.treeView.render(b,
-      function() {
+      this.treeView.render(b, function() {
         "department" == d ? a.treeView.highLight(b) : b && 0 < c.find("#" + a.id).length ? c.find("#" + a.id).trigger("click") : c.find(".root").addClass("selected")
       });
       $(a).find("#organization-users").trigger("click")
@@ -1261,40 +1271,43 @@
 
   app.org.DepartmentView = Backbone.View.extend({
     department: {},
-    initialize: function(b) {
-      this.id = b.id;
-      this.operation = b.operation;
+    initialize: function(options) {
+      this.id = options.id;
+      this.operation = options.operation;
       this.model = new app.org.DepartmentModel();
-      this.el == b.el;
+      this.el == options.el;
       $(this.el).html(app.utils.template("org.department"));
-      app.utils.layout("#department-info")
+      app.utils.layout("#department-info");
     },
     delegateEvents: function() {
-      var b = this;
-      $(this.el).on("blur.department", "#department-info :input", function(a) {
-        a = $(a.currentTarget);
-        var e = $("#department-id").val();
-        a.val();
-        e ? b.saveDepartmentProperty(a) : b.saveDepart(a)
+      var self = this;
+      $(this.el).on("blur.department", "#department-info :input", function(e) {
+        var $el = $(e.currentTarget);
+        var depId = $("#department-id").val();
+        depId ? self.saveDepartmentProperty($el) : self.saveDepart($el);
       });
       app.components.typeahead.init([{
         el: "#department-info #typeahead-department",
-        callback: function(a) {
-          if (a) {
-            if (b.id == a.id) return;
-            $("#departmentSelector a").text(a.name);
-            $("#department-parent").val(a.id)
+        callback: function(department) {
+          if (department) {
+            if (self.id == department.id) {
+              return;
+            }
+            $("#departmentSelector a").text(department.name);
+            $("#department-parent").val(department.id);
           }
-          b.saveDepartmentProperty($("#department-info #department-parent"))
+          self.saveDepartmentProperty($("#department-info #department-parent"));
         },
-        resultHandler: function(a) {
-          var e = [];
-          $.each(a, function(a, c) {
-            b.id != c.id && e.push(c)
+        resultHandler: function(res) {
+          var departments = [];
+          $.each(res, function(index, department) {
+            if(self.id != department.id) {
+              departments.push(department);
+            }
           });
-          return e
+          return departments;
         }
-      }])
+      }]);
     },
     render: function() {
       if(app.config.currentUser.admin) {
@@ -1312,92 +1325,130 @@
       }
     },
     renderAdd: function() {
-      var b = this,
-      a = this.model,
-      e = b.id,
-      c = $("#department-info").removeClass("hide");
-      c.find("input:not(#departmentSelector)").val("");
-      c.find("textarea").val("");
-      a.getById(e, function(a) {
-        var e = a.department;
-        b.department = a.department;
-        c.find("#department-parent").val(e.id);
-        c.find("#departmentSelector a").html(e.name)
+      var self = this,
+        model = this.model,
+        id = self.id,
+        $departmentInfo = $("#department-info").removeClass("hide");
+      $departmentInfo.find("input:not(#departmentSelector)").val("");
+      $departmentInfo.find("textarea").val("");
+      model.getById(id, function(res) {
+        var department = res.department;
+        self.department = res.department;
+        $departmentInfo.find("#department-parent").val(department.id);
+        $departmentInfo.find("#departmentSelector a").html(department.name);
       })
     },
     renderEdit: function() {
-      var b = this;
-      this.model.getById(b.id, function(a) {
-        b.department = a.department;
-        $("#department-info").data("departmentName", b.department.name);
-        b.loadDepartment(a.department);
+      var self = this;
+      this.model.getById(self.id, function(res) {
+        self.department = res.department;
+        $("#department-info").data("departmentName", self.department.name);
+        self.loadDepartment(res.department);
       })
     },
     renderShow: function() {
-      var b = this;
-      this.model.getById(b.id,
-      function(a) {
-        b.department = a.department;
-        b.loadDepartmentRead(a.department)
+      var self = this;
+      this.model.getById(self.id, function(res) {
+        self.department = res.department;
+        self.loadDepartmentRead(res.department);
       })
     },
     saveDepart: function() {
-      var b = this,
-      a = $("#department-info"),
-      e = {},
-      c = $("#department-name").val();
-      20 < $.trim(c).length ? app.alert('warning', "部门名称不得超过20个字符") : 0 == $.trim(c).length ? app.alert('warning', "部门名称不得为空") : (a.find("input").each(function() {
-        name = $(this).attr("name");
-        val = $(this).val();
-        name && val && (e[name] = val)
-      }), a.find("textarea").each(function() {
-        name = $(this).attr("name");
-        val = $(this).val();
-        name && val && (e[name] = val)
-      }), e["department.parent.id"] && 0 != $.trim(e["department.parent.id"]).length ? this.model.saveDepartment(e,
-      function(e) {
-        e.message ? f.notify(e.message) : e.department.id ? (a.find("#department-id").val(e.department.id), $("#department-info").data("department", e.department), e.department.name && b.trigger("addNode", e.department.id), f.notify("\u4fdd\u5b58\u6210\u529f")) : f.notify("\u6570\u636e\u9519\u8bef\uff0c\u6dfb\u52a0\u5931\u8d25")
-      }) : f.notify("\u4e0a\u7ea7\u90e8\u95e8\u4e0d\u80fd\u4e3a\u7a7a"))
-    },
-    saveDepartmentProperty: function(b) {
-      var a = $("#department-info").data("departmentName"),
-      e = this,
-      c = $("#department-info").data("department"),
-      d = b.val();
-      b = b.attr("name");
-      var k = $("#department-name").val();
-      if (20 < $.trim(k).length) $("#department-info").data("departmentName", k),
-      f.notify("部门名称不得超过20个字符");
-      else if (0 == $.trim(k).length) app.alert('warning', "部门名称不得为空"),
-      $("#department-name").val(a);
-      else {
-        var q = "";
-        b && (q = b.replace("department.", ""));
-        a = {};
-        a["department.id"] = $("#department-id").val();
-        a.propertyName = q;
-        a[b] = d;
-        $.trim(c[q]) != $.trim(a[b]) && e.model.saveDepartmentProperty(a,
-        function(a) {
-          "parent.id" === q || "disporder" === q ? e.trigger("rerenderTree") : e.trigger("updateNode", {
-            propertyName: q,
-            value: d
+      var self = this,
+        $departmentInfo = $("#department-info"),
+        department = {},
+        departmentName = $("#department-name").val();
+      if($.trim(departmentName).length > 20) {
+        app.alert('warning', "部门名称不得超过20个字符");
+      } else {
+        if($.trim(departmentName).length == 0) {
+          app.alert('warning', "部门名称不得为空");
+        } else {
+          $departmentInfo.find("input").each(function() {
+            var name = $(this).attr("name");
+            var val = $(this).val();
+            if(name && val) {
+              department[name] = val;
+            }
           });
-          $("#department-info").data("departmentName", a.department.name);
-          f.notify("\u4fdd\u5b58\u6210\u529f")
-        })
+          $departmentInfo.find("textarea").each(function() {
+            var name = $(this).attr("name");
+            var val = $(this).val();
+            if(name && val) {
+              department[name] = val;
+            }
+          });
+          if(department["department.parent.id"] && $.trim(department["department.parent.id"]).length != 0) {
+            this.model.saveDepartment(department, function(res) {
+              if(res.message) {
+                app.alert('success', res.message);
+              } else {
+                if(res.department.id) {
+                  $departmentInfo.find("#department-id").val(res.department.id);
+                  $("#department-info").data("department", res.department);
+                  if(res.department.name) {
+                    self.trigger("addNode", res.department.id);
+                  }
+                  app.alert('success', "保存成功");
+                } else {
+                  app.alert('error', "数据错误，添加失败");
+                }
+              }
+            });
+          } else {
+            app.alert('warning', "上级部门不能为空");
+          }
+        }
       }
     },
-    loadDepartment: function(b) {
-      $("#department-info").removeClass("hide").data("department", b);
+    saveDepartmentProperty: function($el) {
+      var departmentName = $("#department-info").data("departmentName"),
+        self = this,
+        originalDepartment = $("#department-info").data("department"),
+        propertyValue = $el.val();
+      var propertyKey = $el.attr("name");
+      var dn = $("#department-name").val();
+      if (20 < $.trim(dn).length) {
+        $("#department-info").data("departmentName", dn);
+        app.alert('warning', "部门名称不得超过20个字符");
+      } else if (0 == $.trim(dn).length) {
+        app.alert('warning', "部门名称不得为空");
+        $("#department-name").val(departmentName);
+      } else {
+        var propertyName = "";
+        if(propertyKey) {
+          propertyName = propertyKey.replace("department.", "");
+        }
+        var department = {};
+        department["department.id"] = $("#department-id").val();
+        department.propertyName = propertyName;
+        department[propertyKey] = propertyValue;
+        if($.trim(originalDepartment[propertyName]) != $.trim(department[propertyKey])) {
+          self.model.saveDepartmentProperty(department, function(res) {
+            if("parent.id" === propertyName || "disporder" === propertyName) {
+              self.trigger("rerenderTree");
+            } else {
+              self.trigger("updateNode", {
+                propertyName: propertyName,
+                value: propertyValue
+              });
+            }
+            $("#department-info").data("departmentName", res.department.name);
+            app.alert('success', "保存成功")
+          });
+        }
+      }
+    },
+    loadDepartment: function(department) {
+      $("#department-info").removeClass("hide").data("department", department);
       $("#departmentSelector").removeAttr("disabled");
-      $("#department-id").val(b.id);
-      $("#department-name").val(b.name);
-      $("#department-code").val(b.code);
-      $("#department-disporder").val(b.disporder);
-      if(b.parent) {
-        $("#department-parent").val(b.parent.id);
-        $("#departmentSelector a").html(b.parent.name);
+      $("#department-id").val(department.id);
+      $("#department-name").val(department.name);
+      $("#department-code").val(department.code);
+      $("#department-disporder").val(department.disporder);
+      if(department.parent) {
+        $("#department-parent").val(department.parent.id);
+        $("#departmentSelector a").html(department.parent.name);
         $("#btn-delete-department").removeClass("hide");
       } else {
         $("#department-parent").val("");
@@ -1405,22 +1456,24 @@
         $("#btn-delete-department").addClass("hide");
         $("#department-info #department-root").hide();
       }
-      if(b.manager) {
-        $("#department-manager").val(b.manager.id);
-        $("#userSelector").val(b.manager.username);
+      if(department.manager) {
+        $("#department-manager").val(department.manager.id);
+        $("#userSelector").val(department.manager.username);
       }
-      $("#department-description").val(b.description);
+      $("#department-description").val(department.description);
     },
-    loadDepartmentRead: function(b) {
+    loadDepartmentRead: function(department) {
       $("#department-info-read").removeClass("hide");
-      $("#department-name-div .controls span").html(b.name);
-      $("#department-code-div .controls span").html(b.code);
-      $("#department-disporder-div .controls span").html(b.disporder);
-      b.parent && $("#department-parent-div .controls span").html(b.parent.name);
-      $("#department-description-div .controls span").html(b.description)
+      $("#department-name-div .controls span").html(department.name);
+      $("#department-code-div .controls span").html(department.code);
+      $("#department-disporder-div .controls span").html(department.disporder);
+      if(department.parent) {
+        $("#department-parent-div .controls span").html(department.parent.name);
+      }
+      $("#department-description-div .controls span").html(department.description);
     },
     remove: function() {
-      $(this.el).off(".department")
+      $(this.el).off(".department");
     }
   });
 

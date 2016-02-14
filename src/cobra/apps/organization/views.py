@@ -32,14 +32,14 @@ AuditLogEntryEvent = get_class('auditlog.utils', 'AuditLogEntryEvent')
 
 class OrganizationHomeView(OrganizationView):
     def get(self, request, organization):
-        team_list = Team.objects.get_for_user(
-            organization=organization,
-            user=request.user,
-            with_projects=True,
-        )
+        # team_list = Team.objects.get_for_user(
+        #     organization=organization,
+        #     user=request.user,
+        #     with_projects=True,
+        # )
 
         context = {
-            'team_list': team_list,
+            # 'team_list': team_list,
         }
 
         return self.respond('organization/home.html', context)

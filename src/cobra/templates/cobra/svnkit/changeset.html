@@ -56,7 +56,7 @@
         {% endwith %}
 
       <div class="authorship">
-        <img alt="{{ changeset.author }}" class="avatar" height="24" src="{% static 'cobra/img/avatar/default_avatar.png' %}" width="24">
+        <img alt="{{ changeset.author }}" class="avatar avatar-inline" height="24" src="{% static 'cobra/img/avatar/default_avatar.png' %}" width="24">
         <span class="author-name"><a href="#" rel="author">{{ changeset.author }}</a></span>
 
         last changed <time datetime="{{ changeset.date }}" title="{{ changeset.date }}">{{ changeset.date|timesince }} ago</time>

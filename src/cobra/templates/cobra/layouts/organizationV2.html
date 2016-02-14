@@ -1,0 +1,97 @@
+{% extends "layoutV2.html" %}
+
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load helper_tags %}
+
+{% block title %}{{ organization.name }} | {{ block.super }}{% endblock %}
+
+{% block body_class %}{{ block.super }} org-v2{% endblock %}
+
+{% block page_header_block %}
+  {% comment %}<section id="page-header" class="toolbar">
+    <div class="pull-right">
+      {% block actions %}
+        {% if ACCESS.org_write %}
+          <a href="{% url 'team:create' organization.slug %}"
+             class="btn btn-small btn-primary"><i class="fa fa-plus"></i> {% trans "New Team" %}</a>
+        {% endif %}
+        {% if ACCESS.team_write %}
+          <a href="{% url 'project:create' organization.slug %}"
+             class="btn btn-small btn-primary"><i class="fa fa-plus"></i> {% trans "New Project" %}</a>
+        {% endif %}
+        {% if ACCESS.org_write %}
+          <a href="{% url 'organization:member-create' organization.slug %}"
+             class="btn btn-small btn-primary"><i class="fa fa-plus"></i> {% trans "New Member" %}</a>
+        {% endif %}
+      {% endblock %}
+    </div>
+    <h3>{{ organization.name }} <small>Dashboard</small></h3>
+  </section>{% endcomment %}
+{% endblock %}
+
+{% comment %}
+{% block sidebar %}
+  <ul class="nav nav-list">
+    <li class="{% block work_bench_nav %}{% endblock %}">
+      <a href="#">
+        {% trans "Work Bench" %}
+      </a>
+    </li>
+    <li class="{% block org_teams_nav %}{% endblock %}">
+      <a href="{% url 'organization:home' organization.slug %}">
+        {% trans "Projects" %}
+      </a>
+    </li>
+    <li class="{% block org_daily_report_nav %}{% endblock %}">
+      <a href="{% url 'organization:workreport:daily-member' organization.slug request.user.username %}">
+        {% trans "Daily Report" %}
+      </a>
+    </li>
+    <li class="{% block org_summary_report_nav %}{% endblock %}">
+      <a href="{% url 'organization:summary:summary-member' organization.slug request.user.username %}#workreport">
+        {% trans "Summary Report" %}
+      </a>
+    </li>
+    <li class="{% block org_tasks_nav %}{% endblock %}">
+      <a href="#">
+        {% trans "Tasks Co" %}
+      </a>
+    </li>
+    {% if ACCESS.org_read %}
+    <li class="{% block org_stats_nav %}{% endblock %}">
+      <a href="#">
+        {% trans "Statistic" %}
+      </a>
+    </li>
+    <li class="{% block org_members_nav %}{% endblock %}">
+      <a href="{% url 'organization:members' organization.slug %}#organization">
+        {% trans "Members" %}
+      </a>
+    </li>
+    <li class="{% block org_auditlog_nav %}{% endblock %}">
+      <a href="{% url 'auditlog:for-organization' organization.slug %}">
+        {% trans "Audit Log" %}
+      </a>
+    </li>
+    {% endif %}
+    {% if ACCESS.org_write %}
+      <hr>
+      <li class="{% block org_settings_nav %}{% endblock %}">
+        <a href="{% url 'organization:settings' organization.slug %}">
+          {% trans "Settings" %}
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+  {% block org_sidebar_nav_extra %}
+    {% endcomment %}
+{% comment %}This block is used by cobra.com{% endcomment %}{% comment %}
+
+  {% endblock %}
+{% endblock %}
+
+{% block main %}
+  {% block inner %}{% endblock %}
+{% endblock %}
+{% endcomment %}

@@ -3,7 +3,7 @@
 {% load helper_tags workreport_tags organization_tags %}
 
 {% block report_content %}
-  <section class="{% ifequal request.user report_user %}report-2-col{% endifequal %}">
+  <section class="{% ifequal request.user report_user %}report-2-col{% endifequal %} container-fluid">
     <div class="row">
       {% ifnotequal request.user report_user %}
         <div class="col-sm-3 page-aside-inner">
@@ -13,7 +13,7 @@
             <li class="list-group-item redirect_to {% ifequal member.user report_user %}active{% endifequal %}" data-url="{% url 'organization:workreport:daily-member' organization.slug member.user.username %}">
               <div class="media">
                 <div class="media-left">
-                  <a class="avatar avatar-online" href="javascript:void(0)">
+                  <a class="avatar avatar-online s40" href="javascript:void(0)">
                     <img class="img-responsive img-circle" src="{% get_avatar_url member.user %}" alt="...">
                   </a>
                 </div>

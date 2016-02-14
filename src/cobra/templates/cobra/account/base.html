@@ -1,3 +1,21 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
+{% load i18n static %}
+{% load compress %}
 
+{% block body_class %}page-account{% endblock %}
+
+{% block layout %}
+  <div id="wrapper">
+    <div class="inner">
+      <div class="head">
+        <img src="{% static 'cobra/img/logo/logo_white.png' %}" alt="{% trans 'Cobra logo' %}"/>
+        <h1>{% block page_account_title %}{% endblock page_account_title %}</h1>
+      </div>
+      <div class="content">
+        {% block page_account_content %}{% endblock page_account_content %}
+      </div>
+    </div>
+    {% block page_account_bottom %}{% endblock page_account_bottom %}
+  </div>
+{% endblock %}
 

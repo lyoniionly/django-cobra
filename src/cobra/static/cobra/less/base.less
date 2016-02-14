@@ -1,0 +1,135 @@
+// FORMS
+// -----
+
+.input-mini {
+  width: 60px;
+}
+
+.input-small {
+  width: 90px;
+}
+
+.input-medium {
+  width: 150px;
+}
+
+.input-large {
+  width: 210px;
+}
+
+.input-xlarge {
+  width: 270px;
+}
+
+.input-xxlarge {
+  width: 530px;
+}
+
+input.no-border,
+textarea.no-border {
+  border: 0;
+}
+
+input.no-border:focus,
+textarea.no-border:focus {
+  outline: 0;
+}
+
+form .has-error {
+  background: #ffc;
+  padding: 5px;
+}
+
+.has-error .help-block,
+.has-error .control-label,
+.has-error .radio,
+.has-error .checkbox,
+.has-error .radio-inline,
+.has-error .checkbox-inline,
+.has-error.radio label,
+.has-error.checkbox label,
+.has-error.radio-inline label,
+.has-error.checkbox-inline label {
+  color: #a94442 !important;
+}
+
+form.hack-form input[type='text'],
+form.hack-form input[type='email'],
+form.hack-form input[type='url'],
+form.hack-form textarea {
+  width: 260px;
+}
+
+form.hack-form textarea {
+  height: 6em !important;
+}
+
+label {
+  display: block;
+}
+
+// LINKS
+// -----
+
+a {
+  color: @linkColor;
+  text-decoration: none;
+  -webkit-transition: color linear 0.2s;
+  -moz-transition: color linear 0.2s;
+  -o-transition: color linear 0.2s;
+  transition: color linear 0.2s;
+}
+
+a:hover {
+  color: @linkColorHover;
+  text-decoration: none;
+}
+
+p {
+  font-size: 14px;
+  line-height: 22px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+h2 {
+  font-weight: normal;
+  font-size: 24px;
+  line-height: 36px;
+}
+
+h3 {
+  line-height: 27px;
+  font-size: 18px;
+}
+
+// POPOVERS
+
+.popover {
+  width: auto;
+  min-width: 236px;
+  max-width: 600px;
+  border-radius: 0;
+}
+
+.popover * {
+  //font-size: 11px;
+  //line-height: 14px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.popover-title {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 18px;
+  border-radius: 0;
+  color: #666464;
+}
+
+.popover-title,
+.popover-content {
+  padding: 4px 10px;
+}

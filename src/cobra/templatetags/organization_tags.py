@@ -72,3 +72,21 @@ def organization_current_user(organization, user):
     current_user = get_user_info(user)
     current_user['admin'] = can_manage_org(user, organization)
     return SafeString(json.dumps(current_user))
+
+
+@register.assignment_tag
+def organization_json(organization):
+    return SafeString(json.dumps(organization.to_dict()))
+
+
+@register.assignment_tag
+def organizations_json(organization, user):
+    orgs_list = []
+    orgs = Organization.objects.get_for_user(user=user)
+    for org in orgs:
+        org_dict = org.to_dict()
+        org_dict.update({
+            'isCurrent': org==organization
+        })
+        orgs_list.append(org_dict)
+    return SafeString(json.dumps(orgs_list))

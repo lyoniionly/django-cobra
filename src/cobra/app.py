@@ -27,6 +27,7 @@ class Frame(Application):
     # search_app = get_class('search.app', 'application')
     dashboard_app = get_class('dashboard.app', 'application')
     share_app = get_class('share.app', 'application')
+    menu_app = get_class('menu.app', 'application')
 
     # password_reset_form = get_class('accounts.forms', 'PasswordResetForm')
     # set_password_form = get_class('accounts.forms', 'SetPasswordForm')
@@ -45,6 +46,7 @@ class Frame(Application):
             # url(r'^search/', include(self.search_app.urls)),
             url(r'^dashboard/', include(self.dashboard_app.urls)),
             url(r'^share/', include(self.share_app.urls)),
+            url(r'^menu/', include(self.menu_app.urls)),
 
             # Password reset - as we're using Django's default view functions,
             # we can't namespace these urls as that prevents

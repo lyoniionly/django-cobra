@@ -1,4 +1,4 @@
-{% extends "layouts/organization.html" %}
+{% extends "layouts/organizationV2.html" %}
 
 {% load crispy_forms_tags %}
 {% load i18n %}
@@ -6,7 +6,8 @@
 
 {% block title %}{% trans "Members" %} | {{ block.super }}{% endblock %}
 
-{% block body_class %}org-members{% endblock %}
+{% block body_class %}{{ block.super }} org-members{% endblock %}
+{% comment %}
 {% block org_members_nav %}active{% endblock %}
 
 {% block inner %}
@@ -17,4 +18,4 @@
 
 {% block onbodyload %}
   {{ block.super }}
-{% endblock %}
+{% endblock %}{% endcomment %}
