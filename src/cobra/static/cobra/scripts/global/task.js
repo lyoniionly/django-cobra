@@ -237,28 +237,28 @@
       });
     },
     _cache$: function() {
-      var a = this.$el.find("#mytask-container .j_begin"),
-      e = this.$el.find("#mytask-container .j_due");
+      var $beginDate = this.$el.find("#mytask-container .j_begin"),
+      $dueDate = this.$el.find("#mytask-container .j_due");
       this._$MAP = {
         body: $("body"),
         beginDate: {
-          divs: a,
+          divs: $beginDate,
           ulMap: {
-            past: a.filter(".past").children(".task-list"),
-            today: a.filter(".today").children(".task-list"),
-            tomorrow: a.filter(".tomorrow").children(".task-list"),
-            future: a.filter(".future").children(".task-list"),
-            memo: a.filter(".memo").children(".task-list")
+            past: $beginDate.filter(".past").children(".task-list"),
+            today: $beginDate.filter(".today").children(".task-list"),
+            tomorrow: $beginDate.filter(".tomorrow").children(".task-list"),
+            future: $beginDate.filter(".future").children(".task-list"),
+            memo: $beginDate.filter(".memo").children(".task-list")
           }
         },
         dueDate: {
-          divs: e,
+          divs: $dueDate,
           ulMap: {
-            delay: e.filter(".delay").children(".task-list"),
-            today: e.filter(".today").children(".task-list"),
-            tomorrow: e.filter(".tomorrow").children(".task-list"),
-            future: e.filter(".future").children(".task-list"),
-            memo: e.filter(".memo").children(".task-list")
+            delay: $dueDate.filter(".delay").children(".task-list"),
+            today: $dueDate.filter(".today").children(".task-list"),
+            tomorrow: $dueDate.filter(".tomorrow").children(".task-list"),
+            future: $dueDate.filter(".future").children(".task-list"),
+            memo: $dueDate.filter(".memo").children(".task-list")
           }
         },
         list: {
@@ -270,55 +270,50 @@
     },
     delegateEvents: function() {
       var g = this,
-      b = this.model,
-      c = this.$el;
-      this._$MAP.body.off("click.TaskList", ".goto-top").on("click.TaskList", ".goto-top",
-      function(a) {
-        f.gotoTop(".j_mainscroll")
-      });
-      c.off("click.TaskList", ".j_moretask").on("click.TaskList", ".j_moretask",
-      function() {
+        b = this.model,
+        c = this.$el;
+      /*this._$MAP.body.off("click.TaskList", ".goto-top").on("click.TaskList", ".goto-top", function(a) {
+        app.utils.gotoTop(".j_mainscroll")
+      });*/
+      c.off("click.TaskList", ".j_moretask").on("click.TaskList", ".j_moretask", function() {
         b.pageNo++;
-        g.search(!0)
+        g.search(true);
       });
-      c.off("click.TaskList", "#view-state li").on("click.TaskList", "#view-state li",
-      function() {
-        var a = $(this);
-        a.addClass("active").siblings().removeClass("active");
-        a = a.data("value");
-        g._toggleViewState(a)
+      c.off("click.TaskList", "#view-state li").on("click.TaskList", "#view-state li", function() {
+        var $this = $(this);
+        $this.addClass("active").siblings().removeClass("active");
+        $this = $this.data("value");
+        g._toggleViewState($this);
       });
-      c.off("mouseenter.TaskList", "#task-filter").on("mouseenter.TaskList", "#task-filter",
-      function(a) {
+      c.off("mouseenter.TaskList", "#task-filter").on("mouseenter.TaskList", "#task-filter", function(a) {
         $(this).addClass("open");
-        var b = $(this).attr("data-toggle");
-        g.dropdownFilter || (g.dropdownFilter = new e({
-          el: b,
-          module: "task",
-          targetObj: $(this),
-          userId: g.userId,
-          scroll: !0
-        }), g.dropdownFilter.render(a));
-        a = setTimeout(function() {
-          $(b).parents(".dropdown-filter").slideDown("fast")
-        },
-        300);
-        $(this).data("showTimer", a)
-      }).off("mouseleave.TaskList", "#task-filter").on("mouseleave.TaskList", "#task-filter",
-      function(a) {
+        var $toggledEl = $(this).attr("data-toggle");
+        if(!g.dropdownFilter) {
+          g.dropdownFilter = new e({
+            el: $toggledEl,
+            module: "task",
+            targetObj: $(this),
+            userId: g.userId,
+            scroll: !0
+          });
+          g.dropdownFilter.render(a);
+        }
+        var timer = setTimeout(function() {
+          $($toggledEl).parents(".dropdown-filter").slideDown("fast")
+        }, 300);
+        $(this).data("showTimer", timer);
+      }).off("mouseleave.TaskList", "#task-filter").on("mouseleave.TaskList", "#task-filter", function(a) {
         $(this).removeClass("open");
         a = $(this).attr("data-toggle");
         var e = $(this).data("showTimer");
         e && clearTimeout(e);
         $(this).removeData("showTimer");
         $(a).parents(".dropdown-filter").slideUp(100)
-      }).off("filter.TaskList", "#task-filter").on("filter.TaskList", "#task-filter",
-      function(a) {
+      }).off("filter.TaskList", "#task-filter").on("filter.TaskList", "#task-filter", function(a) {
         "mine" == g.type ? g.mine() : (b.pageNo = 1, g.search(!1));
         $(this).removeClass("open")
       });
-      c.off("click.TaskList", ".orderType").on("click.TaskList", ".orderType",
-      function() {
+      c.off("click.TaskList", ".orderType").on("click.TaskList", ".orderType", function() {
         $(".orderType").parent("li").removeClass("active");
         $(this).parent("li").addClass("active");
         $("#task-order").attr("data-entity", $(this).attr("data-entity"));
@@ -328,21 +323,17 @@
           trigger: !1
         })
       });
-      c.off("click.TaskList", ".j_mineType ul li").on("click.TaskList", ".j_mineType ul li",
-      function() {
+      c.off("click.TaskList", ".j_mineType ul li").on("click.TaskList", ".j_mineType ul li", function() {
         $(this).hasClass("active") || ($(this).addClass("active").siblings("li").removeClass("active"), $(this).data("type"), $("#task-taskType").attr("data-entity", $(this).attr("data-entity")), g.mine())
       });
-      c.off("search.TaskList", "#tasksearch-keywords").on("search.TaskList", "#tasksearch-keywords",
-      function(a) {
+      c.off("search.TaskList", "#tasksearch-keywords").on("search.TaskList", "#tasksearch-keywords", function(a) {
         b.pageNo = 1;
         g.search(!1)
       });
-      c.off("keyup.TaskList", "#tasksearch-keywords").on("keyup.TaskList", "#tasksearch-keywords",
-      function(a) {
+      c.off("keyup.TaskList", "#tasksearch-keywords").on("keyup.TaskList", "#tasksearch-keywords", function(a) {
         13 == a.which && $(this).trigger("search")
       });
-      c.on("click.TaskList", ".task-watchs",
-      function() {
+      c.on("click.TaskList", ".task-watchs", function() {
         var a = g.findSelectedLi();
         0 < a.length ? g.watchModel.watch('{"module":"task","ids":"' + a + '"}',
         function(e) {
@@ -350,8 +341,7 @@
           g.updateFastKey("watch", a)
         }) : f.notify("\u8bf7\u5148\u9009\u4e2d\u8bb0\u5f55")
       });
-      this._$MAP.body.off("click.TaskList", ".task-reminds").on("click.TaskList", ".task-reminds",
-      function(e) {
+      this._$MAP.body.off("click.TaskList", ".task-reminds").on("click.TaskList", ".task-reminds", function(e) {
         e = g.findSelectedLi();
         if (0 < e.length) {
           var b = $(this);
@@ -361,22 +351,19 @@
           })).render()
         } else f.notify("\u8bf7\u5148\u9009\u4e2d\u8bb0\u5f55")
       });
-      c.off("click.TaskList", ".shortcut .watch").on("click.TaskList", ".shortcut .watch",
-      function(a) {
+      c.off("click.TaskList", ".shortcut .watch").on("click.TaskList", ".shortcut .watch", function(a) {
         a.stopPropagation();
         var e = {},
         b = $(this);
         e.module = b.attr("module");
         e.id = b.attr("targetId");
-        "true" == b.attr("watched") ? (e._method = "DELETE", g.watchModel.watchOne(e,
-        function(a) {
+        "true" == b.attr("watched") ? (e._method = "DELETE", g.watchModel.watchOne(e, function(a) {
           f.notify("\u53d6\u6d88\u5173\u6ce8\u6210\u529f");
           b.html('\x3ci class\x3d"icon-favourite"\x3e\x3c/i\x3e\x26nbsp;\u5173\u6ce8');
           b.attr("watched", "false");
           a = g.subView;
           a.id && a.id == e.id && a.changeWatch(!1)
-        })) : (e._method = "PUT", g.watchModel.watchOne(e,
-        function(a) {
+        })) : (e._method = "PUT", g.watchModel.watchOne(e, function(a) {
           f.notify("\u5173\u6ce8\u6210\u529f");
           b.html('\x3ci class\x3d"icon-star"\x3e\x3c/i\x3e\x26nbsp;\u53d6\u6d88\u5173\u6ce8');
           b.attr("watched", "true");
@@ -384,8 +371,7 @@
           a.id && a.id == e.id && a.changeWatch(!0)
         }))
       });
-      c.off("confirmHandler.TaskList", ".task-share").on("confirmHandler.TaskList", ".task-share",
-      function(a, e) {
+      c.off("confirmHandler.TaskList", ".task-share").on("confirmHandler.TaskList", ".task-share", function(a, e) {
         var b = e.objs;
         if (b && !$.isEmptyObject(b)) {
           b = $.isArray(b) ? b: [b];
@@ -400,8 +386,7 @@
           })
         }
       });
-      c.off("click.TaskList", ".task-share").on("click.TaskList", ".task-share",
-      function(a) {
+      c.off("click.TaskList", ".task-share").on("click.TaskList", ".task-share", function(a) {
         a.stopPropagation();
         a = g.findSelectedLi();
         0 < a.length ? (new k({
@@ -409,8 +394,7 @@
           entityIdArr: a
         })).render() : f.notify("\u8bf7\u5148\u9009\u4e2d\u8bb0\u5f55")
       });
-      c.off("click.TaskList", ".task-finished").on("click.TaskList", ".task-finished",
-      function() {
+      c.off("click.TaskList", ".task-finished").on("click.TaskList", ".task-finished", function() {
         var a = g.findSelectedUsefulLi();
         0 < a.length ? g.model.updateStatus("finished", a,
         function(e) {
@@ -418,8 +402,7 @@
           g.updateFastKey("finished", a)
         }) : f.notify("\u8bf7\u9009\u62e9\u6709\u5b8c\u6210\u6743\u9650\u7684\u8bb0\u5f55")
       });
-      c.off("click.TaskList", ".shortcut .finish").on("click.TaskList", ".shortcut .finish",
-      function(a) {
+      c.off("click.TaskList", ".shortcut .finish").on("click.TaskList", ".shortcut .finish", function(a) {
         a.stopPropagation();
         var e = $(this);
         if ($(this).attr("targetId") && $(this).attr("status") && !e.data("post")) {
@@ -433,14 +416,12 @@
           })
         } else f.notify("\u6ca1\u6709\u5b8c\u6210\u6743\u9650")
       });
-      c.off("keyup.TaskList", "li.task input.input").on("keyup.TaskList", "li.task input.input",
-      function(a, e) {
+      c.off("keyup.TaskList", "li.task input.input").on("keyup.TaskList", "li.task input.input", function(a, e) {
         var b = $(this),
         c = b.parents("ul:first");
         13 == a.which && (b = b.val()) && $.trim(b) && g._insertBlank(c)
       });
-      c.off("confirmHandler.TaskList", ".shortcut .share").on("confirmHandler.TaskList", ".shortcut .share",
-      function(a, e) {
+      c.off("confirmHandler.TaskList", ".shortcut .share").on("confirmHandler.TaskList", ".shortcut .share", function(a, e) {
         var b = e.objs;
         if (b && !$.isEmptyObject(b)) {
           b = $.isArray(b) ? b: [b];
@@ -457,27 +438,23 @@
           })
         }
       });
-      c.off("click.TaskList", ".shortcut .share").on("click.TaskList", ".shortcut .share",
-      function(a) {
+      c.off("click.TaskList", ".shortcut .share").on("click.TaskList", ".shortcut .share", function(a) {
         a.stopPropagation();
         $(this).hasClass("selector-toggle") ? (new n({
           $target: $(this)
         })).open() : f.notify("\u6ca1\u6709\u5171\u4eab\u6743\u9650")
       });
-      c.off("click.TaskList", ".e-list-head").on("click.TaskList", ".e-list-head",
-      function(a) {
+      c.off("click.TaskList", ".e-list-head").on("click.TaskList", ".e-list-head", function(a) {
         if (! (0 < $(a.target).closest(".group-add").length)) {
           a = $(this).find(".group-switch");
           var e = a.parents(".group-view").find(".task-list");
           "on" == a.attr("data-status") ? (a.attr("title", "\u5c55\u5f00"), a.attr("data-status", "off"), a.find("i:last").removeClass().addClass("icon-angle-down"), e.slideUp()) : (a.attr("title", "\u6298\u53e0"), a.attr("data-status", "on"), a.find("i:last").removeClass().addClass("icon-angle-right"), e.slideDown())
         }
       });
-      c.off("click.TaskList", "#mytask-container .notask").on("click.TaskList", "#mytask-container .notask",
-      function(a, e) {
+      c.off("click.TaskList", "#mytask-container .notask").on("click.TaskList", "#mytask-container .notask", function(a, e) {
         $(this).parent().siblings().children(".group-add").trigger("click")
       });
-      c.off("click.TaskList", "#mytask-container .group-view .group-add").on("click.TaskList", "#mytask-container .group-view .group-add",
-      function() {
+      c.off("click.TaskList", "#mytask-container .group-view .group-add").on("click.TaskList", "#mytask-container .group-view .group-add", function() {
         var a = $(this).parents(".group-view"),
         e = a.find(".task-list");
         if (e.find("input").size()) e.find("input").focus();
@@ -487,8 +464,7 @@
           g._insertBlank(e)
         }
       });
-      c.off("focusout.TaskList", "li.task input.input:not([readonly])").on("focusout.TaskList", "li.task input.input:not([readonly])",
-      function(a, e) {
+      c.off("focusout.TaskList", "li.task input.input:not([readonly])").on("focusout.TaskList", "li.task input.input:not([readonly])", function(a, e) {
         var c = $(this),
         k = c.parents("li:first"),
         n = c.parents("ul:first");
@@ -516,8 +492,7 @@
           }))
         }
       });
-      c.off("click.TaskList", "li.task").on("click.TaskList", "li.task",
-      function(a) {
+      c.off("click.TaskList", "li.task").on("click.TaskList", "li.task", function(a) {
         $(this).hasClass("unread") ? (a = $(".j_unread").text().trim(), a = $.isNumeric(a) ? a: 0, 0 >= a - 1 ? $(".j_unread").addClass("hide") : $(".j_unread").text(a - 1)) : $(this).hasClass("newComment") && (a = $(".j_feed").text().trim(), a = $.isNumeric(a) ? a: 0, $.isNumeric(a) && 0 >= a - 1 ? $(".j_feed").addClass("hide") : $(".j_feed").text(a - 1));
         $(this).removeClass("unread");
         $(this).removeClass("newComment")
@@ -550,25 +525,20 @@
         update: function(a, e) {
           e.item.data("cancel") ? $(this).sortable("cancel") : (g.rebuildSN(e.item.parent()), g.changeGroupWhileSort(e.item), "list" != g.viewState && e.sender && (g.rebuildSN(e.sender), g._changDateGroupByDrag(e.item), g._refreshViewBaseCount()))
         }
-      }).disableSelection().off("click.mytask").on("click.mytask",
-      function() {
+      }).disableSelection().off("click.mytask").on("click.mytask", function() {
         $("textarea:focus, input:focus").length && $("textarea:focus, input:focus").trigger("focusout")
       });
-      c.off("focusin.mytask", "#qcreatetask").on("focusin.mytask", "#qcreatetask",
-      function() {
+      c.off("focusin.mytask", "#qcreatetask").on("focusin.mytask", "#qcreatetask", function() {
         $(this).parent().addClass("active");
         g.atmeview.render()
       });
-      c.off("focusout.mytask", "#qcreatetask").on("focusout.mytask", "#qcreatetask",
-      function() {
+      c.off("focusout.mytask", "#qcreatetask").on("focusout.mytask", "#qcreatetask", function() {
         $(this).parent().removeClass("active")
       });
-      c.off("keydown.mytask", "#qcreatetask").on("keydown.mytask", "#qcreatetask",
-      function(a) {
+      c.off("keydown.mytask", "#qcreatetask").on("keydown.mytask", "#qcreatetask", function(a) {
         a.ctrlKey && 13 == a.which && c.find(".j_qcreatetask").trigger("click")
       });
-      c.off("click.mytask", ".j_qcreatetask").on("click.mytask", ".j_qcreatetask",
-      function() {
+      c.off("click.mytask", ".j_qcreatetask").on("click.mytask", ".j_qcreatetask", function() {
         var a = $("#qcreatetask");
         if (!a.attr("readonly")) {
           var e = a.val();
@@ -657,21 +627,21 @@
       var g = Date.create(),
       b;
       switch (e) {
-      case "past":
-      case "delay":
-        b = g.addDays( - 1).format("{yyyy}-{MM}-{dd}");
-        break;
-      case "today":
-        b = g.format("{yyyy}-{MM}-{dd}");
-        break;
-      case "tomorrow":
-        b = g.addDays(1).format("{yyyy}-{MM}-{dd}");
-        break;
-      case "future":
-        b = g.addDays(7).format("{yyyy}-{MM}-{dd}");
-        break;
-      case "memo":
-        b = null
+        case "past":
+        case "delay":
+          b = g.addDays( - 1).format("{yyyy}-{MM}-{dd}");
+          break;
+        case "today":
+          b = g.format("{yyyy}-{MM}-{dd}");
+          break;
+        case "tomorrow":
+          b = g.addDays(1).format("{yyyy}-{MM}-{dd}");
+          break;
+        case "future":
+          b = g.addDays(7).format("{yyyy}-{MM}-{dd}");
+          break;
+        case "memo":
+          b = null
       }
       return b
     },
@@ -715,7 +685,7 @@
         })
       },
       1500);
-      f.layout(".j_mainscroll")
+      app.utils.layout(".j_mainscroll")
     },
     _renderAfterLoadMine: function() {
       var a = this.model;
@@ -802,33 +772,46 @@
       this._renderByViewState(e.isPaged ? e.lastPage.result: e.taskList);
       this.setConfig("viewState.task", a)
     },
-    _getConfig: function(a) {
-      var e = null;
-      return this.userId != TEAMS.currentUser.id ? null: (e = TEAMS.userConfig.find(function(e) {
-        return e.configKey == a
-      })) ? e.configValue: null
+    _getConfig: function(configKey) {
+      var config = null;
+      var configValue = null;
+      if(this.userId == app.config.currentUser.id) {
+        config = app.config.userConfig.find(function(config) {
+          return config.configKey == configKey
+        });
+        if(config) {
+          configValue = config.configValue;
+        }
+      }
+      return configValue;
     },
-    setConfig: function(a, e) {
-      if (this.userId == TEAMS.currentUser.id) {
-        var g = this.model,
-        b = null,
-        c = !1;
-        if (TEAMS.userConfig) {
-          for (var k = 0; k < TEAMS.userConfig.length; k++) if (b = TEAMS.userConfig[k], b.configKey == a) {
-            c = !0;
-            k = b.configValue;
-            b.configValue = e;
-            k != e && g.saveConfig(b);
-            break
+    setConfig: function(configKey, configValue) {
+      if (this.userId == app.config.currentUser.id) {
+        var model = this.model,
+          config = null,
+          flag = false;
+        if (app.config.userConfig) {
+          for (var i = 0; i < app.config.userConfig.length; i++) {
+            config = app.config.userConfig[i];
+            if (config.configKey == configKey) {
+              flag = true;
+              var oldValue = config.configValue;
+              config.configValue = configValue;
+              if(oldValue != configValue) {
+                model.saveConfig(config);
+              }
+              break
+            }
           }
-          c || (b = {
-            configKey: a,
-            configValue: e
-          },
-          g.saveConfig(b,
-          function() {
-            TEAMS.userConfig.push(b)
-          }))
+          if(!flag) {
+            config = {
+              configKey: configKey,
+              configValue: configValue
+            };
+            model.saveConfig(config, function() {
+              app.config.userConfig.push(config);
+            })
+          }
         }
       }
     },
@@ -1160,12 +1143,11 @@
     },
     search: function(a) {
       var e = this,
-      g = e.model,
-      b = e._buildQueryParam();
-      g.search(b,
-      function(g) {
+        g = e.model,
+        b = e._buildQueryParam();
+      g.search(b, function(g) {
         e._renderAfterSearch(a)
-      })
+      });
     },
     _renderAfterSearch: function(a) {
       var e = this.model;

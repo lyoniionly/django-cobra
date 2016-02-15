@@ -2620,8 +2620,8 @@
     },
     delegateEvents: function() {
       var self = this,
-        c = $(self.el),
-        b = self.$input;
+        $el = $(self.el),
+        $input = self.$input;
       $(window).off("resize.at").on("resize.at", function(e) {
         if(null != $("#autoTalkText")[0]) {
           var rect;
@@ -2639,11 +2639,11 @@
             height: height,
             SCTOP: "0"
           });
-          var cursorPosition = self.getCursorPosition(b);
+          var cursorPosition = self.getCursorPosition($input);
           if (!cursorPosition) {
             return self.hide();
           }
-          var txt = b.val().slice(0, cursorPosition);
+          var txt = $input.val().slice(0, cursorPosition);
           $("#autoTalkText")[0].innerHTML = txt.slice(0, txt.length).replace(/\n/g, "<br/>").replace(/\s/g, "&nbsp;") + self.positionHTML;
           rect = $("#autoUserTipsPosition")[0].getBoundingClientRect();
           var userAgent = window.navigator.userAgent.toLowerCase();
@@ -2651,14 +2651,14 @@
             document.getElementById("atdiv").style.top = rect.top + 1 + "px";
             document.getElementById("atdiv").style.left = rect.left - 5 + "px";
           } else {
-            c.css({
+            $el.css({
               top: rect.top + 1 + "px",
               left: rect.left - 5 + "px"
             });
           }
         }
       });
-      b.off("focusin.at").on("focusin.at", function(e, nil) {
+      $input.off("focusin.at").on("focusin.at", function(e, nil) {
         if(!nil) {
           $("[id=atdiv]").each(function() {
             $(this).remove();
@@ -2669,23 +2669,23 @@
           $("body").append('<div id="atdiv" class="controls hide" style="position: absolute;z-index:9999;">' + app.utils.template("component.typeahead") + "</div>")
         }
       });
-      b.off("click.at").on("click.at", function(e) {
-        b.trigger("keyup.at");
+      $input.off("click.at").on("click.at", function(e) {
+        $input.trigger("keyup.at");
       });
-      b.off("keydown.at").on("keydown.at", function(e) {
+      $input.off("keydown.at").on("keydown.at", function(e) {
         var keyCode = (e || window.event).keyCode;
-        if ((app.config.keyCode.UP == keyCode || app.config.keyCode.DOWN == keyCode) && c.find("#typeahead-div p").hasClass("employee")) {
+        if ((app.config.keyCode.UP == keyCode || app.config.keyCode.DOWN == keyCode) && $el.find("#typeahead-div p").hasClass("employee")) {
           self.preventEvent(e);
           return false;
         }
-        if(app.config.keyCode.ENTER == keyCode && c.find("#typeahead-div p").hasClass("active")) {
+        if(app.config.keyCode.ENTER == keyCode && $el.find("#typeahead-div p").hasClass("active")) {
           self.preventEvent(e);
         }
       });
-      $("body").not(b).not(c).off("click.at").on("click.at", function(e) {
+      $("body").not($input).not($el).off("click.at").on("click.at", function(e) {
         self.hide();
       });
-      b.off("keyup.at").on("keyup.at", function(e) {
+      $input.off("keyup.at").on("keyup.at", function(e) {
         var rect = self.$input[0].getBoundingClientRect();
         if(rect) {
           $("#autoTalkBox").css({
@@ -2695,39 +2695,39 @@
         var keyCode = (e || window.event).keyCode;
         var $p;
         if (app.config.keyCode.ENTER == keyCode) {
-          c.find("#typeahead-div p.active").trigger("click.at");
+          $el.find("#typeahead-div p.active").trigger("click.at");
         } else if (app.config.keyCode.ESCAPE == keyCode) {
           self.hide();
         } else if (app.config.keyCode.UP == keyCode) {
-          $p = c.find("#typeahead-div p.active");
+          $p = $el.find("#typeahead-div p.active");
           if(1 > $p.length) {
-            c.find("#typeahead-div p").last().addClass("active");
+            $el.find("#typeahead-div p").last().addClass("active");
           } else {
             $p.removeClass("active");
             if(0 < $p.prev().length) {
               $p.prev().addClass("active");
             } else {
-              c.find("#typeahead-div p").last().addClass("active");
+              $el.find("#typeahead-div p").last().addClass("active");
             }
           }
         } else if (app.config.keyCode.DOWN == keyCode) {
-          $p = c.find("#typeahead-div p.active");
+          $p = $el.find("#typeahead-div p.active");
           if(1 > $p.length) {
-            c.find("#typeahead-div p").first().addClass("active");
+            $el.find("#typeahead-div p").first().addClass("active");
           } else {
             $p.removeClass("active");
             if(0 < $p.next().length) {
               $p.next().addClass("active");
             } else {
-              c.find("#typeahead-div p").first().addClass("active");
+              $el.find("#typeahead-div p").first().addClass("active");
             }
           }
         } else {
-          var cursorPosition = self.getCursorPosition(b);
+          var cursorPosition = self.getCursorPosition($input);
           if (!cursorPosition) {
             return self.hide();
           }
-          var txt = b.val().slice(0, cursorPosition);
+          var txt = $input.val().slice(0, cursorPosition);
           $("#autoTalkText")[0].innerHTML = txt.slice(0, txt.length).replace(/\n/g, "<br/>").replace(/\s/g, "&nbsp;") + self.positionHTML;
           var copiedText = txt.slice( - txt.length);
           copiedText.match(/(\w+)?@(\w+)$|@$/);
@@ -2735,16 +2735,16 @@
             if ( - 1 == copiedText.substr(copiedText.lastIndexOf("@"), cursorPosition).indexOf(" ")) {
               var name = copiedText.substr(copiedText.lastIndexOf("@"));
               self.search($.trim(name.replace("@", "")));
-              c.removeClass("hide");
+              $el.removeClass("hide");
               var tipRect = $("#autoUserTipsPosition")[0].getBoundingClientRect(),
                 userAgent = window.navigator.userAgent.toLowerCase(),
-                left = b.data("left") || 0,
-                top = b.data("top") || 0,
+                left = $input.data("left") || 0,
+                top = $input.data("top") || 0,
                 offsetpx = 0;
-              if("true" == b.attr("isoffsetpx")) {
+              if("true" == $input.attr("isoffsetpx")) {
                 var count = txt.split("\n").length;
                 if(1 < count) {
-                  offsetpx = b.data("offsetpx") || 0;
+                  offsetpx = $input.data("offsetpx") || 0;
                   if(1 <= userAgent.indexOf("firefox") && 0 != offsetpx) {
                     offsetpx += 1;
                   }
@@ -2755,77 +2755,79 @@
                 document.getElementById("atdiv").style.top = tipRect.top + 1 + top + offsetpx + "px";
                 document.getElementById("atdiv").style.left = tipRect.left - 5 + left + "px";
               } else {
-                c.css({
+                $el.css({
                   top: tipRect.top + 1 + top + offsetpx + "px",
                   left: tipRect.left - 5 + left + "px"
                 });
               }
             }
-            c.removeClass("hide");
+            $el.removeClass("hide");
           } else {
             return self.hide();
           }
         }
       });
-      c.off("click.at", "#typeahead-div p").on("click.at", "#typeahead-div p", function(e) {
+      $el.off("click.at", "#typeahead-div p").on("click.at", "#typeahead-div p", function(e) {
         var obj = $(this).data("obj");
         if (self.clickHandler) {
-          self.clickHandler(obj, b);
+          self.clickHandler(obj, $input);
         } else {
-          var cursorPosition = self.getCursorPosition(b);
+          var cursorPosition = self.getCursorPosition($input);
           var userDatas = self.$input.data("userData");
-          var f = obj.id,
-            k = obj.name,
-            p = k + " ",
-            q = self.$input.val(),
-            m = 0,
-            h = g = "";
-          if (q && (g = q.substr(0, cursorPosition))) {
-            m = g.length;
-            h = g.split("@");
-            var v = "";
-            for (var g = 0; g < h.length; g++) {
-              if(0 == g) {
-                v = v + h[g];
+          var userId = obj.id,
+            userName = obj.name,
+            userNameWithBlank = userName + " ",
+            inputVal = self.$input.val(),
+            atIndex = 0;
+          var atContents = "";
+          var newInputVal = "";
+          var subTxt;
+          if (inputVal && (subTxt = inputVal.substr(0, cursorPosition))) {
+            atIndex = subTxt.length;
+            atContents = subTxt.split("@");
+            var withoutLastAtContent = "";
+            for (var i = 0; i < atContents.length; i++) {
+              if(0 == i) {
+                withoutLastAtContent = withoutLastAtContent + atContents[i];
               } else {
-                if(g != h.length - 1) {
-                  v = v + "@" + h[g];
+                if(i != atContents.length - 1) {
+                  withoutLastAtContent = withoutLastAtContent + "@" + atContents[i];
                 } else {
-                  v = v + "@";
+                  withoutLastAtContent = withoutLastAtContent + "@";
                 }
               }
             }
-            h = v + p + q.substr(cursorPosition);
+            newInputVal = withoutLastAtContent + userNameWithBlank + inputVal.substr(cursorPosition);
           }
           var userObj = {
-            userId: f,
-            userName: k,
-            atIndex: m
+            userId: userId,
+            userName: userName,
+            atIndex: atIndex
           };
           if (userDatas) {
-            for (g = k = 0; g < userDatas.length; g++) {
-              if(userDatas[g].userId != f) {
+            for (var g = 0, k = 0; g < userDatas.length; g++) {
+              if(userDatas[g].userId != userId) {
                 k++;
               } else {
-                if(-1 == b.val().indexOf(userDatas[g].userName)) {
+                if(-1 == $input.val().indexOf(userDatas[g].userName)) {
                   k++;
                 }
               }
             }
             if(k == userDatas.length) {
               userDatas.push(userObj);
-              self.$input.val("").focus().val(h);
+              self.$input.val("").focus().val(newInputVal);
             } else {
-              self.$input.val("").focus().val(h + " ");
+              self.$input.val("").focus().val(newInputVal + " ");
             }
           } else {
             userDatas = [];
             userDatas.push(userObj);
-            self.$input.val("").focus().val(h);
+            self.$input.val("").focus().val(newInputVal);
           }
           self.$input.data("userData", userDatas);
           self.$input.focus();
-          $("body").find(c).addClass("hide");
+          $("body").find($el).addClass("hide");
           self.hide();
         }
       });
