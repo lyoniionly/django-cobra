@@ -289,7 +289,7 @@
         $(this).addClass("open");
         var $toggledEl = $(this).attr("data-toggle");
         if(!g.dropdownFilter) {
-          g.dropdownFilter = new e({
+          g.dropdownFilter = new app.components.filter({
             el: $toggledEl,
             module: "task",
             targetObj: $(this),

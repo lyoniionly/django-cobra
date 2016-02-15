@@ -8,6 +8,78 @@
     [1000, 'k']
   ];
 
+  var _datetimeFrame = {
+    defaults: {
+      el: "input.datepicker",
+      callback: function(ev) {},
+      eventType: "focusin.datePicker"
+    },
+    init: function(a) {
+      var b = [];
+      $.isArray(a) ? b = a: b.push(a);
+      for (var c = 0; c < b.length; c++) {
+        a = b[c];
+        if ($.isFunction(a)) {
+          var d = a;
+          a = {};
+          a.callback = d
+        }
+        a = $.extend(!0, {}, this.defaults, a);
+        (function(a) {
+          var b = $(a.el),
+          c = b.attr("format") || "yyyy-mm-dd",
+          e = b.attr("startView") || "month",
+          d = b.attr("minView") || "month",
+          g = b.attr("maxView") || "decade",
+          f = b.attr("position") || "bottom-right",
+          h = b.attr("dateGroup"),
+          n = b.attr("writeValue"),
+          l = b.attr("insertAfter"),
+          z = a.startDate || null,
+          r = a.endDate || null,
+          D = a.callback;
+          b.each(function() {
+            var a = $(this);
+            a.on("focusin.datePicker",
+            function() {
+              a.datetimepicker({
+                format: c,
+                language: "zh-CN",
+                todayHighlight: !0,
+                todayBtn: h,
+                autoclose: !0,
+                initialDate: new Date,
+                startView: e,
+                minView: d,
+                maxView: g,
+                pickerPosition: f,
+                showMeridian: !1,
+                writeValue: n,
+                startDate: z,
+                endDate: r
+              }).on("show",
+              function() {
+                l && !a.attr("relocated") && (a.data("datetimepicker").picker.insertAfter(a).css("position", "fixed"), a.attr("relocated", !0))
+              });
+              a.datetimepicker("show");
+              a.off("focusin.datePicker")
+            }).on("changeDate",
+            function(ev) {
+              D(ev);
+            })
+          })
+        })(a)
+      }
+    },
+    remove: function(e) {
+      if (arguments) {
+        for (var i = 0; i < arguments.length; i++) {
+          $(arguments[i]).datetimepicker("remove");
+        }
+      }
+    }
+  };
+
   var scrollbar = {
     setLayout: function(a, b, c) {
       if (0 == a.indexOf("#print")) $(a).removeClass("scrollwrapper");
@@ -273,6 +345,9 @@
       a = new Date(a, 11, 31);
       7 > a.getDay() && (b -= a.getDay());
       return Math.ceil(b / 7)
+    },
+    datepicker: function(data) {
+      _datetimeFrame.init(data);
     }
 
   };

@@ -1969,6 +1969,271 @@
     }
   };
 
+  app.components.filter = Backbone.View.extend({
+    initialize: function(options) {
+      this.managers = [];
+      this.tags = [];
+      this.mainlines = [];
+      this.comments = [];
+      this.searchs = [];
+      this.el = options.el;
+      this.module = options.module;
+      this.userId = options.userId;
+      this.scroll = options.scroll;
+      this.targetObj = options.targetObj;
+      $(this.el).append(app.utils.template("component.filter"));
+    },
+    delegateEvents: function() {
+      var d = this;
+      var c = $(this.el).find("#filter-div");
+      c.off("click.filter", ".filter-cancle").on("click.filter", ".filter-cancle", function(e) {
+        d.resetArray();
+        c.find(".employee-click").removeClass("checked");
+        c.find(".comment-click").removeClass("checked");
+        c.find(".tag-click").removeClass("checked");
+        c.find(".mainline-click").removeClass("checked");
+        c.find(".datepicker").val("");
+        if("formdatareport" === d.module) {
+          d.queryDefaultData("", "formdatareport", function(res) {
+            d.renderDataList(res.employees, "employee");
+            var newForms = res.newForms;
+            var $datareportFormList = $(d.el).find("#datareport-form-list").html("");
+            for (var i = 0; i < newForms.length; i++) {
+              var newForm = newForms[i];
+              $datareportFormList.append('<span class="filter-item"><a data-entity="' + newForm.id + '" class="comment-click">' + newForm.name + "</a></span>")
+            }
+          });
+        } else {
+          d.queryDefaultData("", d.module, function(res) {
+            d.renderDataList(res.employees, "employee");
+            d.renderDataList(res.tags, "tag");
+            d.renderDataList(res.mainlines, "mainline")
+          });
+        }
+        $(".typehead").val("");
+        d.triggerFilter();
+      });
+      c.off("click.filter", ".filter-submit").on("click.filter", ".filter-submit", function(e) {
+        var filterItems = [],
+          tags = false,
+          primarys = false,
+          mainlines = false;
+        if ("formdatareport" === d.module) {
+          d.targetObj.trigger("filter");
+          return true;
+        }
+        $.each(d.$el.find("#due-time-filter input"), function(index, el) {
+          var $e = $(el);
+          if($e.val()) {
+            filterItems.push('"' + $e.attr("name") + '" : "' + $e.val() + '"');
+          }
+        });
+        if(d.managers && 0 < d.managers.length) {
+          primarys = '"primarys":' + JSON.stringify(d.managers);
+        }
+        if(d.tags && 0 < d.tags.length) {
+          tags = '"tags":' + JSON.stringify(d.tags);
+        }
+        if(d.mainlines && 0 < d.mainlines.length) {
+          mainlines = '"mainlines":' + JSON.stringify(d.mainlines);
+        }
+        primarys && filterItems.push(primarys);
+        tags && filterItems.push(tags);
+        mainlines && filterItems.push(mainlines);
+        if(("customer" == d.module || "task" == d.module) && 0 < d.comments.length) {
+          filterItems.push('"commentType":"' + d.comments[0] + '"');
+        } else if("document" == d.module && 0 < d.comments.length) {
+          filterItems.push('"docType":' + JSON.stringify(d.comments));
+        } else if("workflow" == d.module && 0 < d.comments.length){
+          filterItems.push('"formIds":' + JSON.stringify(d.comments));
+        }
+        d.targetObj.data("data-filter", filterItems.join(","));
+        d.targetObj.trigger("filter");
+      });
+      app.utils.datepicker([{
+        el: "input#due-time-begin",
+        callback: function(ev) {
+          d.setDueDate(ev, "input#due-time-begin");
+          d.triggerFilter();
+        }
+      }, {
+        el: "input#due-time-end",
+        callback: function(ev) {
+          d.setDueDate(ev, "input#due-time-end");
+          d.triggerFilter();
+        }
+      }]);
+      if("formdatareport" === d.module) {
+        app.utils.datepicker([{
+          el: "input#report-time-begin",
+          callback: function(ev) {
+            d.triggerFilter()
+          }
+        }, {
+          el: "input#report-time-end",
+          callback: function(ev) {
+            d.triggerFilter();
+          }
+        }]);
+      }
+      c.off("click.filter", ".employee-click").on("click.filter", ".employee-click", function(b) {
+        var a = $(this).attr("data-entity");
+        $(this).hasClass("checked") ? (d.managers.remove(function(b) {
+          return b == a
+        }), $(this).removeClass("checked")) : (d.managers.push(a), $(this).addClass("checked"));
+        d.triggerFilter()
+      });
+      c.off("click.filter", ".comment-click").on("click.filter", ".comment-click", function(b) {
+        var a = $(this).attr("data-entity");
+        "task" == d.module || "customer" == d.module ? $(this).hasClass("checked") ? ($(this).removeClass("checked"), d.comments = []) : ($(".comment-click").removeClass("checked"), $(this).addClass("checked"), d.comments = [], d.comments.push(a)) : $(this).hasClass("checked") ? ($(this).removeClass("checked"), d.comments.remove(function(b) {
+          return b == a
+        })) : ($(this).removeClass("checked"), $(this).addClass("checked"), d.comments.push(a));
+        d.triggerFilter()
+      });
+      c.off("click.filter", ".tag-click").on("click.filter", ".tag-click", function(b) {
+        var a = $(this).attr("data-entity");
+        $(this).hasClass("checked") ? (d.tags.remove(function(b) {
+          return b == a
+        }), $(this).removeClass("checked")) : (d.tags.push(a), $(this).addClass("checked"));
+        d.triggerFilter()
+      });
+      c.off("click.filter", ".mainline-click").on("click.filter", ".mainline-click", function(b) {
+        var a = $(this).attr("data-entity");
+        $(this).hasClass("checked") ? (d.mainlines.remove(function(b) {
+          return b == a
+        }), $(this).removeClass("checked")) : (d.mainlines.push(a), $(this).addClass("checked"));
+        d.triggerFilter()
+      });
+      c.off("search.filter", ".input").on("search.filter", "input", function(b) {
+        b = $.trim($(this).val());
+        var a = $(this).attr("data-entity");
+        b && 0 < b.length ? d.searchData(b, a) : d.queryDefaultData("", d.module, function(b) {
+          "employee" == a ? d.renderDataList(b.employees, "employee") : "tag" == a ? d.renderDataList(b.tags, "tag") : "mainline" == a && d.renderDataList(b.mainlines, "mainline")
+        })
+      });
+      c.off("keyup.filter", ".input").on("keyup.filter", "input", function(b) {
+        13 == (b ? b: window.event ? window.event: null).keyCode && $(this).trigger("search")
+      })
+    },
+    render: function() {
+      var d = this;
+      "mainline" == d.module ? ($("#employee-type-" + d.module).removeClass("hide"), $(".comment-div").addClass("hide"), $(".mainline-div").addClass("hide")) : "tag" == d.module ? ($("#employee-type-" + d.module).removeClass("hide"), $(".comment-div").addClass("hide"), $(".mainline-div").addClass("hide"), $(".tag-div").addClass("hide")) : "blog" == d.module ? ($("#blog-group-tab").removeClass("hide"), $("#employee-type-" + d.module).removeClass("hide"), $("#mainline").addClass("hide"), $("#mainline-filter").addClass("hide"), $("#tag").addClass("hide"), $("#tag-filter").addClass("hide"), $("#comment").addClass("hide")) : "formmanage" == d.module ? ($(".comment-div").addClass("hide"), $(".mainline-div").addClass("hide"), $(".tag-div").addClass("hide"), $("#employee-filter").addClass("hide"), $("#employee-title").addClass("hide"), $(".formstatus-div").removeClass("hide"), $(".relatedstatus-div").removeClass("hide"), $("#btns").addClass("hide")) : "formdatareport" == d.module ? ($(d.el).find("input[name='username']").addClass("hide"), $(d.el).find(".comment-div").addClass("hide"), $(d.el).find(".mainline-div").addClass("hide"), $(d.el).find(".tag-div").addClass("hide"), $(d.el).find(".datareport-div").removeClass("hide"), $(d.el).find("#employee-type-formdatareport").removeClass("hide")) : ($(d.el).find("#comment-type-" + d.module).removeClass("hide"), $(d.el).find("#employee-type-" + d.module).removeClass("hide"), $(d.el).find("#comment-filter-" + d.module).removeClass("hide"));
+      "task" === d.module ? ($(d.el).find("#due-time").removeClass("hide"), $(d.el).find("#due-time-filter").removeClass("hide")) : ($(d.el).find("#due-time").addClass("hide"), $(d.el).find("#due-time-filter").addClass("hide"));
+      d.queryDefaultData("", d.module,
+      function(c) {
+        if ("blog" == d.module) d.renderDataList(c.employees, "employee");
+        else if ("formdatareport" == d.module) {
+          d.renderDataList(c.employees, "employee");
+          c = c.newForms;
+          for (var b = 0; b < c.length; b++) {
+            var a = c[b],
+            a = '<span class="filter-item"><a data-entity="' + a.id + '" class="comment-click">' + a.name + "</a></span>";
+            $(d.el).find("#datareport-form-list").append(a)
+          }
+        } else if (d.renderDataList(c.employees, "employee"), d.renderDataList(c.tags, "tag"), d.renderDataList(c.mainlines, "mainline"), "workflow" == d.module && c.newForms) {
+          c = c.newForms;
+          var g = 5;
+          5 > c.length && (g = c.length);
+          for (b = 0; b < g; b++) a = c[b],
+          a = '<span class="filter-item"><a data-entity="' + a.id + '" class="comment-click">' + a.name + "</a></span>",
+          $(d.el).find("#comment-filter-workflow").append(a)
+        }
+        d.scroll && ($(d.el).css("max-height", "500px").attr("auto-scroll", "yes"), f.layout(d.el));
+        $(d.el).find(".loading_large").hide();
+        $(d.el).find("#info-div").show()
+      })
+    },
+    queryDefaultData: function(d, c, b) {
+      $.ajax({
+        type: "get",
+        url: "/search/filter.json",
+        dataType: "json",
+        data: {
+          searchType: d,
+          module: c
+        },
+        success: function(a) {
+          b && b(a)
+        }
+      })
+    },
+    renderDataList: function(d, c) {
+      var b = 30 < d.length ? 30 : d.length;
+      $(this.el).find("#" + c + "-filter").html("");
+      for (var a = "",
+      g = "",
+      e = "",
+      f = "",
+      k = 0; k < b; k++) {
+        var p = d[k];
+        if (0 > a.indexOf(p.id)) {
+          a += p.id + ",";
+          "tag" == c && (g = p.privacy ? "privacy-tag": "common-tag", e = p.privacy ? "\u6211\u7684\u6807\u7b7e:": "\u516c\u5171\u6807\u7b7e:");
+          var q = $('<span class="' + g + ' filter-item"><a></a></span>'),
+          f = p.name.replace(/</g, "&lt").replace(/>/g, "&gt").replace("/[\r\n]/g", " ");
+          q.find("a").html(f).attr("data-entity", p.id).attr("title", e + f);
+          q.find("a").addClass(c + "-click");
+          $(this.el).find("#" + c + "-filter").append(q)
+        }
+      }
+    },
+    resetArray: function() {
+      this.mainlines.length = 0;
+      this.tags.length = 0;
+      this.managers.length = 0;
+      this.comments.length = 0;
+      this.searchs.length = 0;
+      $(".filter-item .checked").each(function() {
+        $(this).removeClass("checked")
+      })
+    },
+    searchData: function(d, c) {
+      this.resetArray();
+      var b = this,
+      a;
+      0 == d.length && (b.searchs.length = 0);
+      "tag" == c && (a = !0);
+      b.arrayIndexOf(b.searchs, d) || (b.searchs.push(d), 0 < d.length && $.ajax({
+        type: "post",
+        url: "/search/suggestion.json",
+        dataType: "json",
+        contentType: "application/x-www-form-urlencoded;charset=utf-8",
+        data: {
+          searchType: c,
+          module: b.module,
+          allTag: a,
+          keywords: d
+        },
+        success: function(a) {
+          a = a[c + "s"];
+          b.renderDataList(a, c);
+          return a
+        }
+      }))
+    },
+    arrayIndexOf: function(d, c) {
+      if (d && 0 < d.length) {
+        for (var b = 0; b < d.length; b++) if (d[b] == c) return ! 0;
+        return ! 1
+      }
+    },
+    triggerFilter: function() {
+      $(this.el).find("#filter-div").find(".filter-submit").trigger("click.filter")
+    },
+    setDueDate: function(d, c) {
+      var b = d.date.format("{yyyy}-{MM}-{dd}");
+      $(c).val(b)
+    },
+    remove: function() {
+      $(this.el).find("#filter-div").off(".filter");
+      this.managers && (this.managers.length = 0, this.managers = null);
+      this.tags && (this.tags.length = 0, this.tags = null);
+      this.searchs && (this.searchs.length = 0, this.searchs = null);
+      this.comments && (this.comments.length = 0, this.comments = null);
+      this.mainlines && (this.mainlines.length = 0, this.mainlines = null)
+    }
+  });
+
   window.DepartmentSelector = Backbone.View.extend({
     initialize: function(data) {
       this.$el = data = data.$el;
