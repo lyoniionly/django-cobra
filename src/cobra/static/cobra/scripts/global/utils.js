@@ -14,61 +14,61 @@
       callback: function(ev) {},
       eventType: "focusin.datePicker"
     },
-    init: function(a) {
-      var b = [];
-      $.isArray(a) ? b = a: b.push(a);
-      for (var c = 0; c < b.length; c++) {
-        a = b[c];
-        if ($.isFunction(a)) {
-          var d = a;
-          a = {};
-          a.callback = d
+    init: function(data) {
+      var options = [];
+      $.isArray(data) ? options = data: options.push(data);
+      for (var i = 0; i < options.length; i++) {
+        var option = options[i];
+        if ($.isFunction(option)) {
+          var callback = option;
+          option = {};
+          option.callback = callback
         }
-        a = $.extend(!0, {}, this.defaults, a);
-        (function(a) {
-          var b = $(a.el),
-          c = b.attr("format") || "yyyy-mm-dd",
-          e = b.attr("startView") || "month",
-          d = b.attr("minView") || "month",
-          g = b.attr("maxView") || "decade",
-          f = b.attr("position") || "bottom-right",
-          h = b.attr("dateGroup"),
-          n = b.attr("writeValue"),
-          l = b.attr("insertAfter"),
-          z = a.startDate || null,
-          r = a.endDate || null,
-          D = a.callback;
-          b.each(function() {
-            var a = $(this);
-            a.on("focusin.datePicker",
-            function() {
-              a.datetimepicker({
-                format: c,
+        option = $.extend(true, {}, this.defaults, option);
+        (function(option) {
+          var $el = $(option.el),
+            format = $el.attr("format") || "yyyy-mm-dd",
+            startView = $el.attr("startView") || "month",
+            minView = $el.attr("minView") || "month",
+            maxView = $el.attr("maxView") || "decade",
+            position = $el.attr("position") || "bottom-right",
+            dateGroup = $el.attr("dateGroup"),
+            writeValue = $el.attr("writeValue"),
+            insertAfter = $el.attr("insertAfter"),
+            startDate = option.startDate || null,
+            endDate = option.endDate || null,
+            callback = option.callback;
+          $el.each(function() {
+            var $this = $(this);
+            $this.on("focusin.datePicker", function() {
+              $this.datetimepicker({
+                format: format,
                 language: "zh-CN",
-                todayHighlight: !0,
-                todayBtn: h,
-                autoclose: !0,
+                todayHighlight: true,
+                todayBtn: dateGroup,
+                autoclose: true,
                 initialDate: new Date,
-                startView: e,
-                minView: d,
-                maxView: g,
-                pickerPosition: f,
-                showMeridian: !1,
-                writeValue: n,
-                startDate: z,
-                endDate: r
-              }).on("show",
-              function() {
-                l && !a.attr("relocated") && (a.data("datetimepicker").picker.insertAfter(a).css("position", "fixed"), a.attr("relocated", !0))
+                startView: startView,
+                minView: minView,
+                maxView: maxView,
+                pickerPosition: position,
+                showMeridian: false,
+                writeValue: writeValue,
+                startDate: startDate,
+                endDate: endDate
+              }).on("show", function() {
+                if(insertAfter && !$this.attr("relocated")) {
+                  $this.data("datetimepicker").picker.insertAfter($this).css("position", "fixed");
+                  $this.attr("relocated", true);
+                }
               });
-              a.datetimepicker("show");
-              a.off("focusin.datePicker")
-            }).on("changeDate",
-            function(ev) {
-              D(ev);
-            })
-          })
-        })(a)
+              $this.datetimepicker("show");
+              $this.off("focusin.datePicker")
+            }).on("changeDate", function(ev) {
+              callback(ev);
+            });
+          });
+        })(option);
       }
     },
     remove: function(e) {

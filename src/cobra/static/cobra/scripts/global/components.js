@@ -2076,44 +2076,94 @@
           }
         }]);
       }
-      c.off("click.filter", ".employee-click").on("click.filter", ".employee-click", function(b) {
-        var a = $(this).attr("data-entity");
-        $(this).hasClass("checked") ? (d.managers.remove(function(b) {
-          return b == a
-        }), $(this).removeClass("checked")) : (d.managers.push(a), $(this).addClass("checked"));
-        d.triggerFilter()
+      c.off("click.filter", ".employee-click").on("click.filter", ".employee-click", function(e) {
+        var entity = $(this).attr("data-entity");
+        if($(this).hasClass("checked")) {
+          d.managers.remove(function(item) {
+            return item == entity
+          });
+          $(this).removeClass("checked");
+        } else {
+          d.managers.push(entity);
+          $(this).addClass("checked");
+        }
+        d.triggerFilter();
       });
-      c.off("click.filter", ".comment-click").on("click.filter", ".comment-click", function(b) {
-        var a = $(this).attr("data-entity");
-        "task" == d.module || "customer" == d.module ? $(this).hasClass("checked") ? ($(this).removeClass("checked"), d.comments = []) : ($(".comment-click").removeClass("checked"), $(this).addClass("checked"), d.comments = [], d.comments.push(a)) : $(this).hasClass("checked") ? ($(this).removeClass("checked"), d.comments.remove(function(b) {
-          return b == a
-        })) : ($(this).removeClass("checked"), $(this).addClass("checked"), d.comments.push(a));
-        d.triggerFilter()
+      c.off("click.filter", ".comment-click").on("click.filter", ".comment-click", function(e) {
+        var entity = $(this).attr("data-entity");
+        if("task" == d.module || "customer" == d.module) {
+          if($(this).hasClass("checked")) {
+            $(this).removeClass("checked");
+            d.comments = [];
+          } else {
+            $(".comment-click").removeClass("checked");
+            $(this).addClass("checked");
+            d.comments = [];
+            d.comments.push(entity);
+          }
+        } else {
+          if($(this).hasClass("checked")) {
+            $(this).removeClass("checked");
+            d.comments.remove(function(item) {
+              return item == entity
+            });
+          } else {
+            $(this).removeClass("checked");
+            $(this).addClass("checked");
+            d.comments.push(entity);
+          }
+        }
+        d.triggerFilter();
       });
-      c.off("click.filter", ".tag-click").on("click.filter", ".tag-click", function(b) {
-        var a = $(this).attr("data-entity");
-        $(this).hasClass("checked") ? (d.tags.remove(function(b) {
-          return b == a
-        }), $(this).removeClass("checked")) : (d.tags.push(a), $(this).addClass("checked"));
-        d.triggerFilter()
+      c.off("click.filter", ".tag-click").on("click.filter", ".tag-click", function(e) {
+        var entity = $(this).attr("data-entity");
+        if($(this).hasClass("checked")) {
+          d.tags.remove(function(item) {
+            return item == entity
+          });
+          $(this).removeClass("checked");
+        } else {
+          d.tags.push(entity);
+          $(this).addClass("checked");
+        }
+        d.triggerFilter();
       });
-      c.off("click.filter", ".mainline-click").on("click.filter", ".mainline-click", function(b) {
-        var a = $(this).attr("data-entity");
-        $(this).hasClass("checked") ? (d.mainlines.remove(function(b) {
-          return b == a
-        }), $(this).removeClass("checked")) : (d.mainlines.push(a), $(this).addClass("checked"));
-        d.triggerFilter()
+      c.off("click.filter", ".mainline-click").on("click.filter", ".mainline-click", function(e) {
+        var entity = $(this).attr("data-entity");
+        if($(this).hasClass("checked")) {
+          d.mainlines.remove(function(item) {
+            return item == entity
+          });
+          $(this).removeClass("checked");
+        } else {
+          d.mainlines.push(entity);
+          $(this).addClass("checked");
+        }
+        d.triggerFilter();
       });
-      c.off("search.filter", ".input").on("search.filter", "input", function(b) {
-        b = $.trim($(this).val());
-        var a = $(this).attr("data-entity");
-        b && 0 < b.length ? d.searchData(b, a) : d.queryDefaultData("", d.module, function(b) {
-          "employee" == a ? d.renderDataList(b.employees, "employee") : "tag" == a ? d.renderDataList(b.tags, "tag") : "mainline" == a && d.renderDataList(b.mainlines, "mainline")
-        })
+      c.off("search.filter", ".input").on("search.filter", "input", function(e) {
+        var searchValue = $.trim($(this).val());
+        var entity = $(this).attr("data-entity");
+        if(searchValue && 0 < searchValue.length) {
+          d.searchData(searchValue, entity);
+        } else {
+          d.queryDefaultData("", d.module, function(res) {
+            if("employee" == entity) {
+              d.renderDataList(res.employees, "employee");
+            } else if("tag" == entity) {
+              d.renderDataList(res.tags, "tag")
+            } else if("mainline" == entity) {
+              d.renderDataList(res.mainlines, "mainline");
+            }
+          });
+        }
       });
-      c.off("keyup.filter", ".input").on("keyup.filter", "input", function(b) {
-        13 == (b ? b: window.event ? window.event: null).keyCode && $(this).trigger("search")
-      })
+      c.off("keyup.filter", ".input").on("keyup.filter", "input", function(e) {
+        var event = e ? e: window.event ? window.event: null;
+        if(app.config.keyCode.ENTER == event.keyCode) {
+          $(this).trigger("search");
+        }
+      });
     },
     render: function() {
       var d = this;
