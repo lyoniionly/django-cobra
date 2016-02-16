@@ -2166,64 +2166,117 @@
       });
     },
     render: function() {
-      var d = this;
-      "mainline" == d.module ? ($("#employee-type-" + d.module).removeClass("hide"), $(".comment-div").addClass("hide"), $(".mainline-div").addClass("hide")) : "tag" == d.module ? ($("#employee-type-" + d.module).removeClass("hide"), $(".comment-div").addClass("hide"), $(".mainline-div").addClass("hide"), $(".tag-div").addClass("hide")) : "blog" == d.module ? ($("#blog-group-tab").removeClass("hide"), $("#employee-type-" + d.module).removeClass("hide"), $("#mainline").addClass("hide"), $("#mainline-filter").addClass("hide"), $("#tag").addClass("hide"), $("#tag-filter").addClass("hide"), $("#comment").addClass("hide")) : "formmanage" == d.module ? ($(".comment-div").addClass("hide"), $(".mainline-div").addClass("hide"), $(".tag-div").addClass("hide"), $("#employee-filter").addClass("hide"), $("#employee-title").addClass("hide"), $(".formstatus-div").removeClass("hide"), $(".relatedstatus-div").removeClass("hide"), $("#btns").addClass("hide")) : "formdatareport" == d.module ? ($(d.el).find("input[name='username']").addClass("hide"), $(d.el).find(".comment-div").addClass("hide"), $(d.el).find(".mainline-div").addClass("hide"), $(d.el).find(".tag-div").addClass("hide"), $(d.el).find(".datareport-div").removeClass("hide"), $(d.el).find("#employee-type-formdatareport").removeClass("hide")) : ($(d.el).find("#comment-type-" + d.module).removeClass("hide"), $(d.el).find("#employee-type-" + d.module).removeClass("hide"), $(d.el).find("#comment-filter-" + d.module).removeClass("hide"));
-      "task" === d.module ? ($(d.el).find("#due-time").removeClass("hide"), $(d.el).find("#due-time-filter").removeClass("hide")) : ($(d.el).find("#due-time").addClass("hide"), $(d.el).find("#due-time-filter").addClass("hide"));
-      d.queryDefaultData("", d.module,
-      function(c) {
-        if ("blog" == d.module) d.renderDataList(c.employees, "employee");
-        else if ("formdatareport" == d.module) {
-          d.renderDataList(c.employees, "employee");
-          c = c.newForms;
-          for (var b = 0; b < c.length; b++) {
-            var a = c[b],
-            a = '<span class="filter-item"><a data-entity="' + a.id + '" class="comment-click">' + a.name + "</a></span>";
-            $(d.el).find("#datareport-form-list").append(a)
+      var self = this;
+      if("mainline" == self.module) {
+        $("#employee-type-" + self.module).removeClass("hide");
+        $(".comment-div").addClass("hide");
+        $(".mainline-div").addClass("hide");
+      } else if("tag" == self.module) {
+        $("#employee-type-" + self.module).removeClass("hide");
+        $(".comment-div").addClass("hide");
+        $(".mainline-div").addClass("hide");
+        $(".tag-div").addClass("hide");
+      } else if("blog" == self.module) {
+        $("#blog-group-tab").removeClass("hide");
+        $("#employee-type-" + self.module).removeClass("hide");
+        $("#mainline").addClass("hide");
+        $("#mainline-filter").addClass("hide");
+        $("#tag").addClass("hide");
+        $("#tag-filter").addClass("hide");
+        $("#comment").addClass("hide");
+      } else if("formmanage" == self.module) {
+        $(".comment-div").addClass("hide");
+        $(".mainline-div").addClass("hide");
+        $(".tag-div").addClass("hide");
+        $("#employee-filter").addClass("hide");
+        $("#employee-title").addClass("hide");
+        $(".formstatus-div").removeClass("hide");
+        $(".relatedstatus-div").removeClass("hide");
+        $("#btns").addClass("hide");
+      } else if("formdatareport" == self.module) {
+        $(self.el).find("input[name='username']").addClass("hide");
+        $(self.el).find(".comment-div").addClass("hide");
+        $(self.el).find(".mainline-div").addClass("hide");
+        $(self.el).find(".tag-div").addClass("hide");
+        $(self.el).find(".datareport-div").removeClass("hide");
+        $(self.el).find("#employee-type-formdatareport").removeClass("hide");
+      } else {
+        $(self.el).find("#comment-type-" + self.module).removeClass("hide");
+        $(self.el).find("#employee-type-" + self.module).removeClass("hide");
+        $(self.el).find("#comment-filter-" + self.module).removeClass("hide");
+      }
+      if("task" === self.module) {
+        $(self.el).find("#due-time").removeClass("hide");
+        $(self.el).find("#due-time-filter").removeClass("hide");
+      } else {
+        $(self.el).find("#due-time").addClass("hide");
+        $(self.el).find("#due-time-filter").addClass("hide");
+      }
+      self.queryDefaultData("", self.module, function(res) {
+        if ("blog" == self.module) {
+          self.renderDataList(res.employees, "employee");
+        } else if ("formdatareport" == self.module) {
+          self.renderDataList(res.employees, "employee");
+          var newForms = res.newForms;
+          for (var i = 0; i < newForms.length; i++) {
+            var html = '<span class="filter-item"><a data-entity="' + newForms[i].id + '" class="comment-click">' + newForms[i].name + "</a></span>";
+            $(self.el).find("#datareport-form-list").append(html);
           }
-        } else if (d.renderDataList(c.employees, "employee"), d.renderDataList(c.tags, "tag"), d.renderDataList(c.mainlines, "mainline"), "workflow" == d.module && c.newForms) {
-          c = c.newForms;
-          var g = 5;
-          5 > c.length && (g = c.length);
-          for (b = 0; b < g; b++) a = c[b],
-          a = '<span class="filter-item"><a data-entity="' + a.id + '" class="comment-click">' + a.name + "</a></span>",
-          $(d.el).find("#comment-filter-workflow").append(a)
+        } else if (self.renderDataList(res.employees, "employee"), self.renderDataList(res.tags, "tag"), self.renderDataList(res.mainlines, "mainline"), "workflow" == self.module && res.newForms) {
+          var newForms = res.newForms;
+          var newFormLength = 5;
+          if(newForms.length < 5) {
+            newFormLength = newForms.length;
+          }
+          for (var i = 0; i < newFormLength; i++) {
+            var newForm = newForms[i];
+            var html = '<span class="filter-item"><a data-entity="' + newForm.id + '" class="comment-click">' + newForm.name + "</a></span>";
+            $(self.el).find("#comment-filter-workflow").append(html);
+          }
         }
-        d.scroll && ($(d.el).css("max-height", "500px").attr("auto-scroll", "yes"), f.layout(d.el));
-        $(d.el).find(".loading_large").hide();
-        $(d.el).find("#info-div").show()
-      })
+        if(self.scroll) {
+          $(self.el).css("max-height", "500px").attr("auto-scroll", "yes");
+          app.utils.layout(self.el);
+        }
+        $(self.el).find(".loading_large").hide();
+        $(self.el).find("#info-div").show();
+      });
     },
-    queryDefaultData: function(d, c, b) {
+    queryDefaultData: function(searchType, module, callback) {
       $.ajax({
         type: "get",
         url: "/search/filter.json",
         dataType: "json",
         data: {
-          searchType: d,
-          module: c
+          searchType: searchType,
+          module: module
         },
-        success: function(a) {
-          b && b(a)
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
         }
-      })
+      });
     },
-    renderDataList: function(d, c) {
-      var b = 30 < d.length ? 30 : d.length;
-      $(this.el).find("#" + c + "-filter").html("");
-      for (var a = "",
-      g = "",
-      e = "",
-      f = "",
-      k = 0; k < b; k++) {
-        var p = d[k];
-        if (0 > a.indexOf(p.id)) {
-          a += p.id + ",";
-          "tag" == c && (g = p.privacy ? "privacy-tag": "common-tag", e = p.privacy ? "\u6211\u7684\u6807\u7b7e:": "\u516c\u5171\u6807\u7b7e:");
-          var q = $('<span class="' + g + ' filter-item"><a></a></span>'),
-          f = p.name.replace(/</g, "&lt").replace(/>/g, "&gt").replace("/[\r\n]/g", " ");
-          q.find("a").html(f).attr("data-entity", p.id).attr("title", e + f);
-          q.find("a").addClass(c + "-click");
-          $(this.el).find("#" + c + "-filter").append(q)
+    renderDataList: function(data, type) {
+      var len = 30 < data.length ? 30 : data.length;
+      $(this.el).find("#" + type + "-filter").html("");
+      var ids = "",
+        privacyType = "",
+        privacyName = "";
+      for (var i = 0; i < len; i++) {
+        var obj = data[i];
+        if (0 > ids.indexOf(obj.id)) {
+          ids += obj.id + ",";
+          if("tag" == type) {
+            privacyType = obj.privacy ? "privacy-tag": "common-tag";
+            privacyName = obj.privacy ? "我的标签:": "公共标签:";
+          }
+          var $h = $('<span class="' + privacyType + ' filter-item"><a></a></span>');
+          var objNameEscaped = obj.name.replace(/</g, "&lt").replace(/>/g, "&gt").replace("/[\r\n]/g", " ");
+          $h.find("a").html(objNameEscaped).attr("data-entity", obj.id).attr("title", privacyName + objNameEscaped);
+          $h.find("a").addClass(type + "-click");
+          $(this.el).find("#" + type + "-filter").append($h);
         }
       }
     },
@@ -2234,10 +2287,10 @@
       this.comments.length = 0;
       this.searchs.length = 0;
       $(".filter-item .checked").each(function() {
-        $(this).removeClass("checked")
+        $(this).removeClass("checked");
       })
     },
-    searchData: function(d, c) {
+    searchData: function(d, c) { //searchValue, entity
       this.resetArray();
       var b = this,
       a;
