@@ -285,7 +285,7 @@
         $this = $this.data("value");
         g._toggleViewState($this);
       });
-      c.off("mouseenter.TaskList", "#task-filter").on("mouseenter.TaskList", "#task-filter", function(a) {
+      c.off("mouseenter.TaskList", "#task-filter").on("mouseenter.TaskList", "#task-filter", function(e) {
         $(this).addClass("open");
         var $toggledEl = $(this).attr("data-toggle");
         if(!g.dropdownFilter) {
@@ -294,62 +294,87 @@
             module: "task",
             targetObj: $(this),
             userId: g.userId,
-            scroll: !0
+            scroll: true
           });
-          g.dropdownFilter.render(a);
+          g.dropdownFilter.render(e);
         }
         var timer = setTimeout(function() {
-          $($toggledEl).parents(".dropdown-filter").slideDown("fast")
+          $($toggledEl).parents(".dropdown-filter").slideDown("fast");
         }, 300);
         $(this).data("showTimer", timer);
-      }).off("mouseleave.TaskList", "#task-filter").on("mouseleave.TaskList", "#task-filter", function(a) {
+      }).off("mouseleave.TaskList", "#task-filter").on("mouseleave.TaskList", "#task-filter", function(e) {
         $(this).removeClass("open");
-        a = $(this).attr("data-toggle");
-        var e = $(this).data("showTimer");
-        e && clearTimeout(e);
+        var toggleEl = $(this).attr("data-toggle");
+        var showTimer = $(this).data("showTimer");
+        if(showTimer) {
+          clearTimeout(showTimer);
+        }
         $(this).removeData("showTimer");
-        $(a).parents(".dropdown-filter").slideUp(100)
-      }).off("filter.TaskList", "#task-filter").on("filter.TaskList", "#task-filter", function(a) {
-        "mine" == g.type ? g.mine() : (b.pageNo = 1, g.search(!1));
-        $(this).removeClass("open")
+        $(toggleEl).parents(".dropdown-filter").slideUp(100);
+      }).off("filter.TaskList", "#task-filter").on("filter.TaskList", "#task-filter", function(e) {
+        if("mine" == g.type) {
+          g.mine();
+        } else {
+          b.pageNo = 1;
+          g.search(false);
+        }
+        $(this).removeClass("open");
       });
       c.off("click.TaskList", ".orderType").on("click.TaskList", ".orderType", function() {
         $(".orderType").parent("li").removeClass("active");
         $(this).parent("li").addClass("active");
         $("#task-order").attr("data-entity", $(this).attr("data-entity"));
         $("#task-order").attr("data-direction", $(this).attr("data-direction"));
-        "mine" == g.type ? g.mine() : (b.pageNo = 1, g.search(!1));
+        if("mine" == g.type) {
+          g.mine();
+        } else {
+          b.pageNo = 1;
+          g.search(!1);
+        }
         ROUTER.navigate("/tasks/" + g.userId, {
-          trigger: !1
-        })
+          trigger: false
+        });
       });
       c.off("click.TaskList", ".j_mineType ul li").on("click.TaskList", ".j_mineType ul li", function() {
-        $(this).hasClass("active") || ($(this).addClass("active").siblings("li").removeClass("active"), $(this).data("type"), $("#task-taskType").attr("data-entity", $(this).attr("data-entity")), g.mine())
+        if(!$(this).hasClass("active")) {
+          $(this).addClass("active").siblings("li").removeClass("active");
+          $(this).data("type");
+          $("#task-taskType").attr("data-entity", $(this).attr("data-entity"));
+          g.mine();
+        }
       });
-      c.off("search.TaskList", "#tasksearch-keywords").on("search.TaskList", "#tasksearch-keywords", function(a) {
+      c.off("search.TaskList", "#tasksearch-keywords").on("search.TaskList", "#tasksearch-keywords", function(e) {
         b.pageNo = 1;
-        g.search(!1)
+        g.search(false);
       });
-      c.off("keyup.TaskList", "#tasksearch-keywords").on("keyup.TaskList", "#tasksearch-keywords", function(a) {
-        13 == a.which && $(this).trigger("search")
+      c.off("keyup.TaskList", "#tasksearch-keywords").on("keyup.TaskList", "#tasksearch-keywords", function(e) {
+        if(app.config.keyCode.ENTER == e.which) {
+          $(this).trigger("search");
+        }
       });
       c.on("click.TaskList", ".task-watchs", function() {
-        var a = g.findSelectedLi();
-        0 < a.length ? g.watchModel.watch('{"module":"task","ids":"' + a + '"}',
-        function(e) {
-          f.notify("\u6279\u91cf\u5173\u6ce8\u6210\u529f");
-          g.updateFastKey("watch", a)
-        }) : f.notify("\u8bf7\u5148\u9009\u4e2d\u8bb0\u5f55")
+        var ids = g.findSelectedLi();
+        if(0 < ids.length) {
+          g.watchModel.watch('{"module":"task","ids":"' + ids + '"}', function(e) {
+            app.alert('success', "批量关注成功");
+            g.updateFastKey("watch", ids);
+          });
+        } else {
+          app.alert('warning', "请先选中记录");
+        }
       });
       this._$MAP.body.off("click.TaskList", ".task-reminds").on("click.TaskList", ".task-reminds", function(e) {
-        e = g.findSelectedLi();
-        if (0 < e.length) {
-          var b = $(this);
-          b.attr("module", "task");
-          b.attr("targetIds", e); (new a({
-            obj: b
+        var ids = g.findSelectedLi();
+        if (0 < ids.length) {
+          var $this = $(this);
+          $this.attr("module", "task");
+          $this.attr("targetIds", ids);
+          (new a({
+            obj: $this
           })).render()
-        } else f.notify("\u8bf7\u5148\u9009\u4e2d\u8bb0\u5f55")
+        } else {
+          app.alert.notify('warning', "请先选中记录")
+        }
       });
       c.off("click.TaskList", ".shortcut .watch").on("click.TaskList", ".shortcut .watch", function(a) {
         a.stopPropagation();

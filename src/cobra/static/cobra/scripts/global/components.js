@@ -1984,181 +1984,181 @@
       $(this.el).append(app.utils.template("component.filter"));
     },
     delegateEvents: function() {
-      var d = this;
-      var c = $(this.el).find("#filter-div");
-      c.off("click.filter", ".filter-cancle").on("click.filter", ".filter-cancle", function(e) {
-        d.resetArray();
-        c.find(".employee-click").removeClass("checked");
-        c.find(".comment-click").removeClass("checked");
-        c.find(".tag-click").removeClass("checked");
-        c.find(".mainline-click").removeClass("checked");
-        c.find(".datepicker").val("");
-        if("formdatareport" === d.module) {
-          d.queryDefaultData("", "formdatareport", function(res) {
-            d.renderDataList(res.employees, "employee");
+      var self = this;
+      var $filterEl = $(this.el).find("#filter-div");
+      $filterEl.off("click.filter", ".filter-cancle").on("click.filter", ".filter-cancle", function(e) {
+        self.resetArray();
+        $filterEl.find(".employee-click").removeClass("checked");
+        $filterEl.find(".comment-click").removeClass("checked");
+        $filterEl.find(".tag-click").removeClass("checked");
+        $filterEl.find(".mainline-click").removeClass("checked");
+        $filterEl.find(".datepicker").val("");
+        if("formdatareport" === self.module) {
+          self.queryDefaultData("", "formdatareport", function(res) {
+            self.renderDataList(res.employees, "employee");
             var newForms = res.newForms;
-            var $datareportFormList = $(d.el).find("#datareport-form-list").html("");
+            var $datareportFormList = $(self.el).find("#datareport-form-list").html("");
             for (var i = 0; i < newForms.length; i++) {
               var newForm = newForms[i];
               $datareportFormList.append('<span class="filter-item"><a data-entity="' + newForm.id + '" class="comment-click">' + newForm.name + "</a></span>")
             }
           });
         } else {
-          d.queryDefaultData("", d.module, function(res) {
-            d.renderDataList(res.employees, "employee");
-            d.renderDataList(res.tags, "tag");
-            d.renderDataList(res.mainlines, "mainline")
+          self.queryDefaultData("", self.module, function(res) {
+            self.renderDataList(res.employees, "employee");
+            self.renderDataList(res.tags, "tag");
+            self.renderDataList(res.mainlines, "mainline")
           });
         }
         $(".typehead").val("");
-        d.triggerFilter();
+        self.triggerFilter();
       });
-      c.off("click.filter", ".filter-submit").on("click.filter", ".filter-submit", function(e) {
+      $filterEl.off("click.filter", ".filter-submit").on("click.filter", ".filter-submit", function(e) {
         var filterItems = [],
           tags = false,
           primarys = false,
           mainlines = false;
-        if ("formdatareport" === d.module) {
-          d.targetObj.trigger("filter");
+        if ("formdatareport" === self.module) {
+          self.targetObj.trigger("filter");
           return true;
         }
-        $.each(d.$el.find("#due-time-filter input"), function(index, el) {
+        $.each(self.$el.find("#due-time-filter input"), function(index, el) {
           var $e = $(el);
           if($e.val()) {
             filterItems.push('"' + $e.attr("name") + '" : "' + $e.val() + '"');
           }
         });
-        if(d.managers && 0 < d.managers.length) {
-          primarys = '"primarys":' + JSON.stringify(d.managers);
+        if(self.managers && 0 < self.managers.length) {
+          primarys = '"primarys":' + JSON.stringify(self.managers);
         }
-        if(d.tags && 0 < d.tags.length) {
-          tags = '"tags":' + JSON.stringify(d.tags);
+        if(self.tags && 0 < self.tags.length) {
+          tags = '"tags":' + JSON.stringify(self.tags);
         }
-        if(d.mainlines && 0 < d.mainlines.length) {
-          mainlines = '"mainlines":' + JSON.stringify(d.mainlines);
+        if(self.mainlines && 0 < self.mainlines.length) {
+          mainlines = '"mainlines":' + JSON.stringify(self.mainlines);
         }
         primarys && filterItems.push(primarys);
         tags && filterItems.push(tags);
         mainlines && filterItems.push(mainlines);
-        if(("customer" == d.module || "task" == d.module) && 0 < d.comments.length) {
-          filterItems.push('"commentType":"' + d.comments[0] + '"');
-        } else if("document" == d.module && 0 < d.comments.length) {
-          filterItems.push('"docType":' + JSON.stringify(d.comments));
-        } else if("workflow" == d.module && 0 < d.comments.length){
-          filterItems.push('"formIds":' + JSON.stringify(d.comments));
+        if(("customer" == self.module || "task" == self.module) && 0 < self.comments.length) {
+          filterItems.push('"commentType":"' + self.comments[0] + '"');
+        } else if("document" == self.module && 0 < self.comments.length) {
+          filterItems.push('"docType":' + JSON.stringify(self.comments));
+        } else if("workflow" == self.module && 0 < self.comments.length){
+          filterItems.push('"formIds":' + JSON.stringify(self.comments));
         }
-        d.targetObj.data("data-filter", filterItems.join(","));
-        d.targetObj.trigger("filter");
+        self.targetObj.data("data-filter", filterItems.join(","));
+        self.targetObj.trigger("filter");
       });
       app.utils.datepicker([{
         el: "input#due-time-begin",
         callback: function(ev) {
-          d.setDueDate(ev, "input#due-time-begin");
-          d.triggerFilter();
+          self.setDueDate(ev, "input#due-time-begin");
+          self.triggerFilter();
         }
       }, {
         el: "input#due-time-end",
         callback: function(ev) {
-          d.setDueDate(ev, "input#due-time-end");
-          d.triggerFilter();
+          self.setDueDate(ev, "input#due-time-end");
+          self.triggerFilter();
         }
       }]);
-      if("formdatareport" === d.module) {
+      if("formdatareport" === self.module) {
         app.utils.datepicker([{
           el: "input#report-time-begin",
           callback: function(ev) {
-            d.triggerFilter()
+            self.triggerFilter()
           }
         }, {
           el: "input#report-time-end",
           callback: function(ev) {
-            d.triggerFilter();
+            self.triggerFilter();
           }
         }]);
       }
-      c.off("click.filter", ".employee-click").on("click.filter", ".employee-click", function(e) {
+      $filterEl.off("click.filter", ".employee-click").on("click.filter", ".employee-click", function(e) {
         var entity = $(this).attr("data-entity");
         if($(this).hasClass("checked")) {
-          d.managers.remove(function(item) {
+          self.managers.remove(function(item) {
             return item == entity
           });
           $(this).removeClass("checked");
         } else {
-          d.managers.push(entity);
+          self.managers.push(entity);
           $(this).addClass("checked");
         }
-        d.triggerFilter();
+        self.triggerFilter();
       });
-      c.off("click.filter", ".comment-click").on("click.filter", ".comment-click", function(e) {
+      $filterEl.off("click.filter", ".comment-click").on("click.filter", ".comment-click", function(e) {
         var entity = $(this).attr("data-entity");
-        if("task" == d.module || "customer" == d.module) {
+        if("task" == self.module || "customer" == self.module) {
           if($(this).hasClass("checked")) {
             $(this).removeClass("checked");
-            d.comments = [];
+            self.comments = [];
           } else {
             $(".comment-click").removeClass("checked");
             $(this).addClass("checked");
-            d.comments = [];
-            d.comments.push(entity);
+            self.comments = [];
+            self.comments.push(entity);
           }
         } else {
           if($(this).hasClass("checked")) {
             $(this).removeClass("checked");
-            d.comments.remove(function(item) {
+            self.comments.remove(function(item) {
               return item == entity
             });
           } else {
             $(this).removeClass("checked");
             $(this).addClass("checked");
-            d.comments.push(entity);
+            self.comments.push(entity);
           }
         }
-        d.triggerFilter();
+        self.triggerFilter();
       });
-      c.off("click.filter", ".tag-click").on("click.filter", ".tag-click", function(e) {
+      $filterEl.off("click.filter", ".tag-click").on("click.filter", ".tag-click", function(e) {
         var entity = $(this).attr("data-entity");
         if($(this).hasClass("checked")) {
-          d.tags.remove(function(item) {
+          self.tags.remove(function(item) {
             return item == entity
           });
           $(this).removeClass("checked");
         } else {
-          d.tags.push(entity);
+          self.tags.push(entity);
           $(this).addClass("checked");
         }
-        d.triggerFilter();
+        self.triggerFilter();
       });
-      c.off("click.filter", ".mainline-click").on("click.filter", ".mainline-click", function(e) {
+      $filterEl.off("click.filter", ".mainline-click").on("click.filter", ".mainline-click", function(e) {
         var entity = $(this).attr("data-entity");
         if($(this).hasClass("checked")) {
-          d.mainlines.remove(function(item) {
+          self.mainlines.remove(function(item) {
             return item == entity
           });
           $(this).removeClass("checked");
         } else {
-          d.mainlines.push(entity);
+          self.mainlines.push(entity);
           $(this).addClass("checked");
         }
-        d.triggerFilter();
+        self.triggerFilter();
       });
-      c.off("search.filter", ".input").on("search.filter", "input", function(e) {
+      $filterEl.off("search.filter", ".input").on("search.filter", "input", function(e) {
         var searchValue = $.trim($(this).val());
         var entity = $(this).attr("data-entity");
         if(searchValue && 0 < searchValue.length) {
-          d.searchData(searchValue, entity);
+          self.searchData(searchValue, entity);
         } else {
-          d.queryDefaultData("", d.module, function(res) {
+          self.queryDefaultData("", self.module, function(res) {
             if("employee" == entity) {
-              d.renderDataList(res.employees, "employee");
+              self.renderDataList(res.employees, "employee");
             } else if("tag" == entity) {
-              d.renderDataList(res.tags, "tag")
+              self.renderDataList(res.tags, "tag")
             } else if("mainline" == entity) {
-              d.renderDataList(res.mainlines, "mainline");
+              self.renderDataList(res.mainlines, "mainline");
             }
           });
         }
       });
-      c.off("keyup.filter", ".input").on("keyup.filter", "input", function(e) {
+      $filterEl.off("keyup.filter", ".input").on("keyup.filter", "input", function(e) {
         var event = e ? e: window.event ? window.event: null;
         if(app.config.keyCode.ENTER == event.keyCode) {
           $(this).trigger("search");
@@ -2290,50 +2290,262 @@
         $(this).removeClass("checked");
       })
     },
-    searchData: function(d, c) { //searchValue, entity
+    searchData: function(value, type) { //searchValue, entity
       this.resetArray();
-      var b = this,
-      a;
-      0 == d.length && (b.searchs.length = 0);
-      "tag" == c && (a = !0);
-      b.arrayIndexOf(b.searchs, d) || (b.searchs.push(d), 0 < d.length && $.ajax({
-        type: "post",
-        url: "/search/suggestion.json",
-        dataType: "json",
-        contentType: "application/x-www-form-urlencoded;charset=utf-8",
-        data: {
-          searchType: c,
-          module: b.module,
-          allTag: a,
-          keywords: d
-        },
-        success: function(a) {
-          a = a[c + "s"];
-          b.renderDataList(a, c);
-          return a
+      var self = this,
+        isTag;
+      if(value.length == 0) {
+        self.searchs.length = 0;
+      }
+      if("tag" == type) {
+        isTag = true;
+      }
+      if(!self.arrayIndexOf(self.searchs, value)) {
+        self.searchs.push(value);
+        if(value.length > 0) {
+          $.ajax({
+            type: "post",
+            url: "/search/suggestion.json",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded;charset=utf-8",
+            data: {
+              searchType: type,
+              module: self.module,
+              allTag: isTag,
+              keywords: value
+            },
+            success: function(res) {
+              var data = res[type + "s"];
+              self.renderDataList(data, type);
+              return data;
+            }
+          });
         }
-      }))
+      }
     },
-    arrayIndexOf: function(d, c) {
-      if (d && 0 < d.length) {
-        for (var b = 0; b < d.length; b++) if (d[b] == c) return ! 0;
-        return ! 1
+    arrayIndexOf: function(arr, val) {
+      if (arr && 0 < arr.length) {
+        for (var i = 0; i < arr.length; i++) {
+          if (arr[i] == val) {
+            return true;
+          }
+        }
+        return false;
       }
     },
     triggerFilter: function() {
-      $(this.el).find("#filter-div").find(".filter-submit").trigger("click.filter")
+      $(this.el).find("#filter-div").find(".filter-submit").trigger("click.filter");
     },
-    setDueDate: function(d, c) {
-      var b = d.date.format("{yyyy}-{MM}-{dd}");
-      $(c).val(b)
+    setDueDate: function(ev, el) {
+      var date = ev.date.format("{yyyy}-{MM}-{dd}");
+      $(el).val(date);
     },
     remove: function() {
       $(this.el).find("#filter-div").off(".filter");
-      this.managers && (this.managers.length = 0, this.managers = null);
-      this.tags && (this.tags.length = 0, this.tags = null);
-      this.searchs && (this.searchs.length = 0, this.searchs = null);
-      this.comments && (this.comments.length = 0, this.comments = null);
-      this.mainlines && (this.mainlines.length = 0, this.mainlines = null)
+      if(this.managers) {
+        this.managers.length = 0;
+        this.managers = null;
+      }
+      if(this.tags) {
+        this.tags.length = 0;
+        this.tags = null;
+      }
+      if(this.searchs) {
+        this.searchs.length = 0;
+        this.searchs = null;
+      }
+      if(this.comments) {
+        this.comments.length = 0;
+        this.comments = null;
+      }
+      if(this.mainlines) {
+        this.mainlines.length = 0;
+        this.mainlines = null;
+      }
+    }
+  });
+
+  app.components.remind = Backbone.View.extend({
+    el: "body",
+    targetId: "",
+    _module: "",
+    otherIds: "",
+    initialize: function(b) {
+      this.obj = b.obj;
+      this.el = b.el ? b.el: "body";
+      this.targetId = this.obj.attr("targetId");
+      this.targetIds = this.obj.attr("targetIds");
+      this._module = this.obj.attr("module");
+      this.userId = this.obj.attr("data-id");
+      this.userName = this.obj.attr("username");
+      this.type = this.obj.attr("type");
+      this.number = this.obj.attr("number");
+      this.activeYear = this.obj.attr("activeYear");
+      this.currentYear = this.obj.attr("currentYear");
+      this.choiceType = this.obj.attr("choiceType");
+      this.departmentId = this.obj.attr("departmentId");
+      this.model = new app.models.WorkReportModel();
+    },
+    render: function() {
+      var obj = this.obj;
+      var $el = $(this.el);
+      if (0 == $el.find("#remind-div").size()) {
+        $el.append(app.utils.template("component.remind"));
+        var top = obj.offset().top + 40,
+        c = obj.offset().left;
+        if(c + 450 > $(window).width()) {
+          c = $(window).width() - 500;
+        }
+        if(top + 172 > $(window).height() && 172 < top) {
+          top = obj.offset().top - 172;
+        }
+        $("#remind-div").css("left", c + "px").css("top", top + "px");
+        $("#remind-div #" + this._module).removeClass("hide");
+        if("customer" == this._module) {
+          this.customer();
+        } else if("document" == this._module) {
+          this.document();
+        } else if("task" == this._module) {
+          this.task();
+        } else if("workflow" == this._module) {
+          this.workflow();
+        } else if("workreport" == this._module) {
+          this.workreport();
+        } else {
+          if("mainline" == this._module) {
+            this.mainline();
+          }
+        }
+        this.initEvents();
+      }
+    },
+    initEvents: function() {
+      var b = this;
+      $("#remind-div").off(".remind");
+      d({
+        el: "#other-employee input",
+        callback: function(a) {
+          if (a && !$.isEmptyObject(a)) {
+            a = $.isArray(a) ? a: [a];
+            for (var b = 0; b < a.length; b++) {
+              var c = a[b];
+              0 == $("#remindlist #" + c.id).size() && $("#remindlist").append("\x3cspan id\x3d" + c.id + " class\x3d'entity-item'\x3e\x3ca data-value\x3d" + c.id + "\x3e" + c.name + "\x3c/a\x3e\x3cbutton type\x3d'button' class\x3d'close hide' title\x3d'\u5220\u9664'\x3e\u00d7\x3c/button\x3e\x26nbsp;\x3c/span\x3e")
+            }
+          }
+        }
+      });
+      d({
+        el: "#workreport input",
+        callback: function(a) {
+          if (a && !$.isEmptyObject(a)) {
+            a = $.isArray(a) ? a: [a];
+            for (var b = 0; b < a.length; b++) {
+              var c = a[b];
+              0 == $("#workreportRemindlist #" + c.id).size() && $("#workreportRemindlist").append("\x3cspan id\x3d" + c.id + " class\x3d'entity-item'\x3e\x3ca data-value\x3d" + c.id + "\x3e" + c.name + "\x3c/a\x3e\x3cbutton type\x3d'button' class\x3d'close hide' title\x3d'\u5220\u9664'\x3e\u00d7\x3c/button\x3e\x26nbsp;\x3c/span\x3e")
+            }
+          }
+        }
+      });
+      $("#remind-div").on("click.remind", "#remind-submit",
+      function(a) {
+        a.stopPropagation();
+        b.send()
+      });
+      $("#remind-div").on("click.remind", "#remind-cancle",
+      function(a) {
+        a.stopPropagation();
+        b.remove()
+      });
+      $("body").on({
+        "click.remind": function(a) {
+          a = $(a.target);
+          a.hasClass("control-btn") || 0 != a.parents("#remind-div").length || "remind-div" == a.attr("id") || 0 != a.parents("#selector-employee").length || a.hasClass("close") || b.remove()
+        },
+        "keyup.remind": function(a) {
+          27 == a.which && b.remove()
+        }
+      })
+    },
+    customer: function() {
+      $("#remind-textarea").val("\u8fd9\u4e2a\u5ba2\u6237\u9700\u8981\u8054\u7cfb\u8ddf\u8fdb\u3002")
+    },
+    document: function() {
+      $("#remind-textarea").val("\u8bf7\u770b\u4e00\u4e0b\u8fd9\u7bc7\u6587\u6863\u3002")
+    },
+    task: function() {
+      $("#remind-textarea").val("\u8fd9\u4e2a\u4efb\u52a1\u9700\u8981\u6293\u7d27\u5904\u7406\u3002")
+    },
+    workflow: function() {
+      $("#remind-textarea").val("\u8bf7\u5e2e\u5fd9\u5c3d\u5feb\u5904\u7406\u4e00\u4e0b\u8fd9\u4e2a\u5ba1\u6279\uff0c\u8c22\u8c22\uff01")
+    },
+    workreport: function() {
+      $("#remind-div #other-employee").addClass("hide");
+      void 0 !== this.userId ? parseInt(this.activeYear) <= parseInt(this.currentYear) && $("#workreportRemindlist").append("\x3cspan id\x3d" + this.userId + ' class\x3d"entity-item"\x3e\x3ca data-value\x3d' + this.userId + "\x3e" + this.userName + "\x3c/a\x3e\x26nbsp;\x3c/span\x3e") : this.model.queryGoalUserlist(this.currentYear, this.type, this.choiceType, this.number, this.departmentId,
+      function(b) {
+        b = b.employeeList;
+        for (var a = 0; a < b.length; a++) {
+          var c = b[a];
+          $("#workreportRemindlist").append("\x3cspan id\x3d" + c.id + ' class\x3d"entity-item"\x3e\x3ca data-value\x3d' + c.id + "\x3e" + c.username + "\x3c/a\x3e\x26nbsp;\x3c/span\x3e")
+        }
+      });
+      "week" == this.type && $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u7b2c" + this.number + "\u5468\u7684\u62a5\u544a\uff01");
+      "month" == this.type && $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u7b2c" + this.number + "\u6708\u7684\u62a5\u544a\uff01");
+      "season" == this.type && $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u7b2c" + this.number + "\u5b63\u5ea6\u7684\u62a5\u544a\uff01");
+      "halfyear" == this.type && ("2" == this.number ? $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u7ec8\u62a5\u544a\uff01") : $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u4e2d\u62a5\u544a\uff01"))
+    },
+    mainline: function() {
+      $("#remind-textarea").val("\u8bf7\u8ddf\u8e2a\u8fd9\u4e2a\u9879\u76ee,\u5e76\u7ed9\u51fa\u9002\u5f53\u7684\u8fdb\u5ea6\u53cd\u9988\u3002")
+    },
+    send: function() {
+      var b = this,
+      a = "";
+      $("#" + b._module).find("input[type\x3d'checkbox']:checked").each(function() {
+        a += $(this).val() + ","
+      });
+      var c = {};
+      c.checkStr = a;
+      c.ids = "workreport" != b._module ? b.getSeleted() : b.getWorkReportSeleted();
+      c.type = b._module;
+      b.targetId ? c.targetId = "workreport" == b._module ? null: b.targetId: c.targetIds = "workreport" == b._module ? null: b.targetIds;
+      c.content = $("#remind-textarea").val();
+      $.ajax({
+        type: "post",
+        url: "/remind/send.json",
+        dataType: "json",
+        data: c,
+        success: function(a) {
+          f.notify("\u63d0\u9192\u6210\u529f");
+          b.remove()
+        }
+      })
+    },
+    getWorkReportSeleted: function() {
+      var b = "",
+      a = $("#workreportRemindlist").children();
+      if (a && 0 < a.length) {
+        for (var c = 0; c < a.length - 1; c++) var e = $(a[c]),
+        b = b + (e.attr("id") + ",");
+        a = $(a[a.length - 1]);
+        b += a.attr("id")
+      }
+      return b
+    },
+    getSeleted: function() {
+      var b = "",
+      a = $("#remindlist").children();
+      if (a && 0 < a.length) {
+        for (var c = 0; c < a.length - 1; c++) var e = $(a[c]),
+        b = b + (e.attr("id") + ",");
+        a = $(a[a.length - 1]);
+        b += a.attr("id")
+      }
+      return b
+    },
+    remove: function() {
+      $("#remind-div").off(".remind");
+      $(this.obj).off(".remind");
+      $("body").off(".remind");
+      $("#remind-div").remove()
     }
   });
 
