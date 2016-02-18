@@ -2429,7 +2429,9 @@
             a = $.isArray(a) ? a: [a];
             for (var b = 0; b < a.length; b++) {
               var c = a[b];
-              0 == $("#remindlist #" + c.id).size() && $("#remindlist").append("\x3cspan id\x3d" + c.id + " class\x3d'entity-item'\x3e\x3ca data-value\x3d" + c.id + "\x3e" + c.name + "\x3c/a\x3e\x3cbutton type\x3d'button' class\x3d'close hide' title\x3d'\u5220\u9664'\x3e\u00d7\x3c/button\x3e\x26nbsp;\x3c/span\x3e")
+              if(0 == $("#remindlist #" + c.id).size()) {
+                $("#remindlist").append("<span id=" + c.id + " class='entity-item'><a data-value=" + c.id + ">" + c.name + "</a><button type='button' class='close hide' title='删除'>×</button>&nbsp;</span>")
+              }
             }
           }
         }
@@ -2441,7 +2443,9 @@
             a = $.isArray(a) ? a: [a];
             for (var b = 0; b < a.length; b++) {
               var c = a[b];
-              0 == $("#workreportRemindlist #" + c.id).size() && $("#workreportRemindlist").append("\x3cspan id\x3d" + c.id + " class\x3d'entity-item'\x3e\x3ca data-value\x3d" + c.id + "\x3e" + c.name + "\x3c/a\x3e\x3cbutton type\x3d'button' class\x3d'close hide' title\x3d'\u5220\u9664'\x3e\u00d7\x3c/button\x3e\x26nbsp;\x3c/span\x3e")
+              if(0 == $("#workreportRemindlist #" + c.id).size()) {
+                $("#workreportRemindlist").append("<span id=" + c.id + " class='entity-item'><a data-value=" + c.id + ">" + c.name + "</a><button type='button' class='close hide' title='删除'>×</button>\x26nbsp;</span>")
+              }
             }
           }
         }
@@ -2480,12 +2484,12 @@
     },
     workreport: function() {
       $("#remind-div #other-employee").addClass("hide");
-      void 0 !== this.userId ? parseInt(this.activeYear) <= parseInt(this.currentYear) && $("#workreportRemindlist").append("\x3cspan id\x3d" + this.userId + ' class\x3d"entity-item"\x3e\x3ca data-value\x3d' + this.userId + "\x3e" + this.userName + "\x3c/a\x3e\x26nbsp;\x3c/span\x3e") : this.model.queryGoalUserlist(this.currentYear, this.type, this.choiceType, this.number, this.departmentId,
+      void 0 !== this.userId ? parseInt(this.activeYear) <= parseInt(this.currentYear) && $("#workreportRemindlist").append("<span id=" + this.userId + ' class="entity-item"><a data-value=' + this.userId + ">" + this.userName + "</a>\x26nbsp;</span>") : this.model.queryGoalUserlist(this.currentYear, this.type, this.choiceType, this.number, this.departmentId,
       function(b) {
         b = b.employeeList;
         for (var a = 0; a < b.length; a++) {
           var c = b[a];
-          $("#workreportRemindlist").append("\x3cspan id\x3d" + c.id + ' class\x3d"entity-item"\x3e\x3ca data-value\x3d' + c.id + "\x3e" + c.username + "\x3c/a\x3e\x26nbsp;\x3c/span\x3e")
+          $("#workreportRemindlist").append("<span id=" + c.id + ' class="entity-item"><a data-value=' + c.id + ">" + c.username + "</a>\x26nbsp;</span>")
         }
       });
       "week" == this.type && $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u7b2c" + this.number + "\u5468\u7684\u62a5\u544a\uff01");
@@ -2499,7 +2503,7 @@
     send: function() {
       var b = this,
       a = "";
-      $("#" + b._module).find("input[type\x3d'checkbox']:checked").each(function() {
+      $("#" + b._module).find("input[type='checkbox']:checked").each(function() {
         a += $(this).val() + ","
       });
       var c = {};
