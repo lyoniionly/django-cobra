@@ -1943,28 +1943,28 @@
       var c = [];
       $.isArray(d) ? c = d : c.push(d);
       for (var b = 0, a = c.length; b < a; b++) {
-          d = c[b];
-          var e = $(d.el),
-              h = d.callback,
-              m = d.resultHandler;
-          (function(a, b, c, e) {
-              a.off("focusin.tt").on("focusin.tt", function(d) {
-                      (new app.components.TypeaheadView({
-                          $el: a,
-                          clickHandler: b,
-                          remote: c,
-                          resultHandler: e
-                      })).render()
-                  })
-          })(e, h, d.remote, m);
-          var k = e.next(".typeahead-search");
-          k && 0 < k.size() && (k.attr("data-entity", $(d.el).attr("data-entity")), k.attr("module", $(d.el).attr("module")), k.attr("data-multi", $(d.el).attr("data-multi")),
-              function(a, b, c, e) {
-                  c.off("confirmHandler").on("confirmHandler",
-                      function(c, e) {
-                          b(e.objs, a)
-                      })
-              }(e, h, k, m))
+        d = c[b];
+        var e = $(d.el),
+            h = d.callback,
+            m = d.resultHandler;
+        (function(a, b, c, e) {
+            a.off("focusin.tt").on("focusin.tt", function(d) {
+                    (new app.components.TypeaheadView({
+                        $el: a,
+                        clickHandler: b,
+                        remote: c,
+                        resultHandler: e
+                    })).render()
+                })
+        })(e, h, d.remote, m);
+        var k = e.next(".typeahead-search");
+        k && 0 < k.size() && (k.attr("data-entity", $(d.el).attr("data-entity")), k.attr("module", $(d.el).attr("module")), k.attr("data-multi", $(d.el).attr("data-multi")),
+            function(a, b, c, e) {
+                c.off("confirmHandler").on("confirmHandler",
+                    function(c, e) {
+                        b(e.objs, a)
+                    })
+            }(e, h, k, m))
       }
     }
   };
@@ -2420,119 +2420,137 @@
       }
     },
     initEvents: function() {
-      var b = this;
+      var self = this;
       $("#remind-div").off(".remind");
-      d({
+      app.components.typeahead.init({
         el: "#other-employee input",
-        callback: function(a) {
-          if (a && !$.isEmptyObject(a)) {
-            a = $.isArray(a) ? a: [a];
-            for (var b = 0; b < a.length; b++) {
-              var c = a[b];
-              if(0 == $("#remindlist #" + c.id).size()) {
-                $("#remindlist").append("<span id=" + c.id + " class='entity-item'><a data-value=" + c.id + ">" + c.name + "</a><button type='button' class='close hide' title='删除'>×</button>&nbsp;</span>")
+        callback: function(res) {
+          if (res && !$.isEmptyObject(res)) {
+            var data = $.isArray(res) ? res: [res];
+            for (var i = 0; i < data.length; i++) {
+              var obj = data[i];
+              if($("#remindlist #" + obj.id).size() == 0) {
+                $("#remindlist").append("<span id=" + obj.id + " class='entity-item'><a data-value=" + obj.id + ">" + obj.name + "</a><button type='button' class='close hide' title='删除'>×</button>&nbsp;</span>")
               }
             }
           }
         }
       });
-      d({
+      app.components.typeahead.init({
         el: "#workreport input",
-        callback: function(a) {
-          if (a && !$.isEmptyObject(a)) {
-            a = $.isArray(a) ? a: [a];
-            for (var b = 0; b < a.length; b++) {
-              var c = a[b];
-              if(0 == $("#workreportRemindlist #" + c.id).size()) {
-                $("#workreportRemindlist").append("<span id=" + c.id + " class='entity-item'><a data-value=" + c.id + ">" + c.name + "</a><button type='button' class='close hide' title='删除'>×</button>\x26nbsp;</span>")
+        callback: function(res) {
+          if (res && !$.isEmptyObject(res)) {
+            var data = $.isArray(res) ? res: [res];
+            for (var i = 0; i < data.length; i++) {
+              var obj = data[i];
+              if($("#workreportRemindlist #" + obj.id).size()==0) {
+                $("#workreportRemindlist").append("<span id=" + obj.id + " class='entity-item'><a data-value=" + obj.id + ">" + obj.name + "</a><button type='button' class='close hide' title='删除'>×</button>&nbsp;</span>")
               }
             }
           }
         }
       });
-      $("#remind-div").on("click.remind", "#remind-submit",
-      function(a) {
-        a.stopPropagation();
-        b.send()
+      $("#remind-div").on("click.remind", "#remind-submit", function(e) {
+        e.stopPropagation();
+        self.send();
       });
-      $("#remind-div").on("click.remind", "#remind-cancle",
-      function(a) {
-        a.stopPropagation();
-        b.remove()
+      $("#remind-div").on("click.remind", "#remind-cancle", function(e) {
+        e.stopPropagation();
+        self.remove();
       });
       $("body").on({
-        "click.remind": function(a) {
-          a = $(a.target);
-          a.hasClass("control-btn") || 0 != a.parents("#remind-div").length || "remind-div" == a.attr("id") || 0 != a.parents("#selector-employee").length || a.hasClass("close") || b.remove()
+        "click.remind": function(e) {
+          var $target = $(e.target);
+          if(!$target.hasClass("control-btn") && $target.parents("#remind-div").length==0 && "remind-div"!=$target.attr("id") && $target.parents("#selector-employee").length==0 && !$target.hasClass("close")) {
+            self.remove();
+          }
         },
-        "keyup.remind": function(a) {
-          27 == a.which && b.remove()
+        "keyup.remind": function(e) {
+          if(e.which == app.config.keyCode.ESCAPE) {
+            self.remove();
+          }
         }
-      })
+      });
     },
     customer: function() {
-      $("#remind-textarea").val("\u8fd9\u4e2a\u5ba2\u6237\u9700\u8981\u8054\u7cfb\u8ddf\u8fdb\u3002")
+      $("#remind-textarea").val("这个客户需要联系跟进。");
     },
     document: function() {
-      $("#remind-textarea").val("\u8bf7\u770b\u4e00\u4e0b\u8fd9\u7bc7\u6587\u6863\u3002")
+      $("#remind-textarea").val("请看一下这篇文档。");
     },
     task: function() {
-      $("#remind-textarea").val("\u8fd9\u4e2a\u4efb\u52a1\u9700\u8981\u6293\u7d27\u5904\u7406\u3002")
+      $("#remind-textarea").val("这个任务需要抓紧处理。");
     },
     workflow: function() {
-      $("#remind-textarea").val("\u8bf7\u5e2e\u5fd9\u5c3d\u5feb\u5904\u7406\u4e00\u4e0b\u8fd9\u4e2a\u5ba1\u6279\uff0c\u8c22\u8c22\uff01")
+      $("#remind-textarea").val("请帮忙尽快处理一下这个审批，谢谢！");
     },
     workreport: function() {
       $("#remind-div #other-employee").addClass("hide");
-      void 0 !== this.userId ? parseInt(this.activeYear) <= parseInt(this.currentYear) && $("#workreportRemindlist").append("<span id=" + this.userId + ' class="entity-item"><a data-value=' + this.userId + ">" + this.userName + "</a>\x26nbsp;</span>") : this.model.queryGoalUserlist(this.currentYear, this.type, this.choiceType, this.number, this.departmentId,
-      function(b) {
-        b = b.employeeList;
-        for (var a = 0; a < b.length; a++) {
-          var c = b[a];
-          $("#workreportRemindlist").append("<span id=" + c.id + ' class="entity-item"><a data-value=' + c.id + ">" + c.username + "</a>\x26nbsp;</span>")
+      if(void 0 !== this.userId) { // void 0 is undefined
+        if(parseInt(this.activeYear) <= parseInt(this.currentYear)) {
+          $("#workreportRemindlist").append("<span id=" + this.userId + ' class="entity-item"><a data-value=' + this.userId + ">" + this.userName + "</a>&nbsp;</span>");
         }
-      });
-      "week" == this.type && $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u7b2c" + this.number + "\u5468\u7684\u62a5\u544a\uff01");
-      "month" == this.type && $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u7b2c" + this.number + "\u6708\u7684\u62a5\u544a\uff01");
-      "season" == this.type && $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u7b2c" + this.number + "\u5b63\u5ea6\u7684\u62a5\u544a\uff01");
-      "halfyear" == this.type && ("2" == this.number ? $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u7ec8\u62a5\u544a\uff01") : $("#remind-textarea").val("\u8bf7\u63d0\u4ea4" + this.currentYear + "\u5e74\u4e2d\u62a5\u544a\uff01"))
+      } else {
+        this.model.queryGoalUserlist(this.currentYear, this.type, this.choiceType, this.number, this.departmentId, function(res) {
+          var employeeList = res.employeeList;
+          for (var i = 0; i < employeeList.length; i++) {
+            var employee = employeeList[i];
+            $("#workreportRemindlist").append("<span id=" + employee.id + ' class="entity-item"><a data-value=' + employee.id + ">" + employee.username + "</a>&nbsp;</span>")
+          }
+        });
+      }
+      "week" == this.type && $("#remind-textarea").val("请提交" + this.currentYear + "年第" + this.number + "周的报告！");
+      "month" == this.type && $("#remind-textarea").val("请提交" + this.currentYear + "年第" + this.number + "月的报告！");
+      "season" == this.type && $("#remind-textarea").val("请提交" + this.currentYear + "年第" + this.number + "季度的报告！");
+      if("halfyear" == this.type) {
+        if("2" == this.number) {
+          $("#remind-textarea").val("请提交" + this.currentYear + "年终报告！");
+        } else {
+          $("#remind-textarea").val("请提交" + this.currentYear + "年中报告！");
+        }
+      }
     },
     mainline: function() {
-      $("#remind-textarea").val("\u8bf7\u8ddf\u8e2a\u8fd9\u4e2a\u9879\u76ee,\u5e76\u7ed9\u51fa\u9002\u5f53\u7684\u8fdb\u5ea6\u53cd\u9988\u3002")
+      $("#remind-textarea").val("请跟踪这个项目,并给出适当的进度反馈。");
     },
     send: function() {
-      var b = this,
-      a = "";
-      $("#" + b._module).find("input[type='checkbox']:checked").each(function() {
-        a += $(this).val() + ","
+      var self = this, checkStr = "";
+      $("#" + self._module).find("input[type='checkbox']:checked").each(function() {
+        checkStr += $(this).val() + ","
       });
-      var c = {};
-      c.checkStr = a;
-      c.ids = "workreport" != b._module ? b.getSeleted() : b.getWorkReportSeleted();
-      c.type = b._module;
-      b.targetId ? c.targetId = "workreport" == b._module ? null: b.targetId: c.targetIds = "workreport" == b._module ? null: b.targetIds;
-      c.content = $("#remind-textarea").val();
+      var data = {};
+      data.checkStr = checkStr;
+      data.ids = "workreport" != self._module ? self.getSeleted() : self.getWorkReportSeleted();
+      data.type = self._module;
+      if(self.targetId) {
+        data.targetId = "workreport" == self._module ? null: self.targetId;
+      } else {
+        data.targetIds = "workreport" == self._module ? null: self.targetIds;
+      }
+      data.content = $("#remind-textarea").val();
       $.ajax({
         type: "post",
         url: "/remind/send.json",
         dataType: "json",
-        data: c,
+        data: data,
         success: function(a) {
-          f.notify("\u63d0\u9192\u6210\u529f");
-          b.remove()
+          app.alert('success', "提醒成功");
+          self.remove();
         }
       })
     },
     getWorkReportSeleted: function() {
-      var b = "",
-      a = $("#workreportRemindlist").children();
-      if (a && 0 < a.length) {
-        for (var c = 0; c < a.length - 1; c++) var e = $(a[c]),
-        b = b + (e.attr("id") + ",");
-        a = $(a[a.length - 1]);
-        b += a.attr("id")
+      var ids = "",
+        reminds = $("#workreportRemindlist").children();
+      if (reminds && 0 < reminds.length) {
+        for (var i = 0; i < reminds.length - 1; i++) {
+          var remind = $(reminds[i]);
+          ids = ids + (remind.attr("id") + ",");
+        }
+        var lastRemind = $(reminds[reminds.length - 1]);
+        ids += lastRemind.attr("id");
       }
-      return b
+      return ids;
     },
     getSeleted: function() {
       var b = "",
