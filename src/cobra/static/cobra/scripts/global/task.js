@@ -369,77 +369,106 @@
           var $this = $(this);
           $this.attr("module", "task");
           $this.attr("targetIds", ids);
-          (new a({
+          var remindView = new app.components.remind({
             obj: $this
-          })).render()
+          });
+          remindView.render();
         } else {
-          app.alert.notify('warning', "请先选中记录")
+          app.alert('warning', "请先选中记录");
         }
       });
-      c.off("click.TaskList", ".shortcut .watch").on("click.TaskList", ".shortcut .watch", function(a) {
-        a.stopPropagation();
-        var e = {},
-        b = $(this);
-        e.module = b.attr("module");
-        e.id = b.attr("targetId");
-        "true" == b.attr("watched") ? (e._method = "DELETE", g.watchModel.watchOne(e, function(a) {
-          f.notify("\u53d6\u6d88\u5173\u6ce8\u6210\u529f");
-          b.html('\x3ci class\x3d"icon-favourite"\x3e\x3c/i\x3e\x26nbsp;\u5173\u6ce8');
-          b.attr("watched", "false");
-          a = g.subView;
-          a.id && a.id == e.id && a.changeWatch(!1)
-        })) : (e._method = "PUT", g.watchModel.watchOne(e, function(a) {
-          f.notify("\u5173\u6ce8\u6210\u529f");
-          b.html('\x3ci class\x3d"icon-star"\x3e\x3c/i\x3e\x26nbsp;\u53d6\u6d88\u5173\u6ce8');
-          b.attr("watched", "true");
-          a = g.subView;
-          a.id && a.id == e.id && a.changeWatch(!0)
-        }))
+      c.off("click.TaskList", ".shortcut .watch").on("click.TaskList", ".shortcut .watch", function(e) {
+        e.stopPropagation();
+        var data = {};
+        var $this = $(this);
+        data.module = $this.attr("module");
+        data.id = $this.attr("targetId");
+        if("true" == $this.attr("watched")) {
+          data._method = "DELETE";
+          g.watchModel.watchOne(data, function(res) {
+            app.alert('success', "取消关注成功");
+            $this.html('<i class="icon-favourite"></i>&nbsp;关注');
+            $this.attr("watched", "false");
+            var subView = g.subView;
+            if(subView.id && subView.id == data.id) {
+              subView.changeWatch(false);
+            }
+          });
+        } else {
+          data._method = "PUT";
+          g.watchModel.watchOne(data, function(res) {
+            app.alert('success', "关注成功");
+            $this.html('<i class="icon-star"></i>&nbsp;取消关注');
+            $this.attr("watched", "true");
+            var subView = g.subView;
+            if(subView.id && subView.id == data.id) {
+              subView.changeWatch(true);
+            }
+          });
+        }
       });
-      c.off("confirmHandler.TaskList", ".task-share").on("confirmHandler.TaskList", ".task-share", function(a, e) {
-        var b = e.objs;
-        if (b && !$.isEmptyObject(b)) {
-          b = $.isArray(b) ? b: [b];
+      c.off("confirmHandler.TaskList", ".task-share").on("confirmHandler.TaskList", ".task-share", function(event, data) {
+        var objs = data.objs;
+        if (objs && !$.isEmptyObject(objs)) {
+          objs = $.isArray(objs) ? objs: [objs];
           g.sids = "";
-          for (var c = 0; c < b.length; c++) g.sids += b[c].id + ",";
+          for (var i = 0; i < objs.length; i++) {
+            g.sids += objs[i].id + ",";
+          }
           g.shareModel.sids = g.sids;
-          b = g.findSelectedLi();
-          g.shareModel.entityIds = b;
+          g.shareModel.entityIds = g.findSelectedLi();
           g.shareModel._module = "task";
-          g.shareModel.saveAll(function(a) {
-            a.addUserMessage ? f.notify(a.addUserMessage) : f.notify("\u6279\u91cf\u5171\u4eab\u64cd\u4f5c\u6210\u529f")
-          })
+          g.shareModel.saveAll(function(res) {
+            if(res.addUserMessage) {
+              app.alert('info', res.addUserMessage);
+            } else {
+              app.alert('success', "批量共享操作成功");
+            }
+          });
         }
       });
-      c.off("click.TaskList", ".task-share").on("click.TaskList", ".task-share", function(a) {
-        a.stopPropagation();
-        a = g.findSelectedLi();
-        0 < a.length ? (new k({
-          module: "task",
-          entityIdArr: a
-        })).render() : f.notify("\u8bf7\u5148\u9009\u4e2d\u8bb0\u5f55")
+      c.off("click.TaskList", ".task-share").on("click.TaskList", ".task-share", function(e) {
+        e.stopPropagation();
+        var entityIds = g.findSelectedLi();
+        if(0 < entityIds.length) {
+          (new app.components.BatchSelector({
+            module: "task",
+            entityIdArr: entityIds
+          })).render();
+        } else {
+          app.alert('warning',"请先选中记录");
+        }
       });
       c.off("click.TaskList", ".task-finished").on("click.TaskList", ".task-finished", function() {
-        var a = g.findSelectedUsefulLi();
-        0 < a.length ? g.model.updateStatus("finished", a,
-        function(e) {
-          f.notify("\u6279\u91cf\u5b8c\u6210\u64cd\u4f5c\u6210\u529f");
-          g.updateFastKey("finished", a)
-        }) : f.notify("\u8bf7\u9009\u62e9\u6709\u5b8c\u6210\u6743\u9650\u7684\u8bb0\u5f55")
+        var ids = g.findSelectedUsefulLi();
+        if(0 < ids.length) {
+          g.model.updateStatus("finished", ids, function(res) {
+            app.alert('success', "批量完成操作成功");
+            g.updateFastKey("finished", ids);
+          });
+        } else {
+          app.alert('warning', "请选择有完成权限的记录");
+        }
       });
-      c.off("click.TaskList", ".shortcut .finish").on("click.TaskList", ".shortcut .finish", function(a) {
-        a.stopPropagation();
-        var e = $(this);
-        if ($(this).attr("targetId") && $(this).attr("status") && !e.data("post")) {
-          var c = "finished" == e.attr("status") ? "todo": "finished";
-          a = e.attr("targetId");
-          e.data("post", !0);
-          b.updateStatus(c, a,
-          function(a) {
-            e.data("post", !1);
-            a.actionMsg && a.actionMsg.message ? f.notify(a.actionMsg.message) : (f.notify("\u72b6\u6001\u4fee\u6539\u6210\u529f"), g._renderStatus(c, e.parents("li")))
+      c.off("click.TaskList", ".shortcut .finish").on("click.TaskList", ".shortcut .finish", function(e) {
+        e.stopPropagation();
+        var $this = $(this);
+        if ($(this).attr("targetId") && $(this).attr("status") && !$this.data("post")) {
+          var status = "finished" == $this.attr("status") ? "todo": "finished";
+          var targetId = $this.attr("targetId");
+          $this.data("post", true);
+          b.updateStatus(status, targetId, function(res) {
+            $this.data("post", false);
+            if(res.actionMsg && res.actionMsg.message) {
+              app.alert('info', res.actionMsg.message);
+            } else {
+              app.alert('success', "状态修改成功");
+              g._renderStatus(status, $this.parents("li"));
+            }
           })
-        } else f.notify("\u6ca1\u6709\u5b8c\u6210\u6743\u9650")
+        } else {
+          app.alert('warning', "没有完成权限");
+        }
       });
       c.off("keyup.TaskList", "li.task input.input").on("keyup.TaskList", "li.task input.input", function(a, e) {
         var b = $(this),
@@ -511,7 +540,7 @@
             });
             k.find(".e-list-loading").hide();
             k.find("input").remove();
-            k.find(".checkbox").after('\x3cdiv class\x3d"title j_entityslider-toggle" data-module\x3d"task" data-id\x3d"' + a.id + '"\x3e\x3cdiv class\x3d"text" title\x3d"' + a.name + '"\x3e\x3c/div\x3e\x3cspan class\x3d"importance" style\x3d"display:none"\x3e\u7d27\u6025\x3c/span\x3e\x3c/div\x3e');
+            k.find(".checkbox").after('<div class="title j_entityslider-toggle" data-module="task" data-id="' + a.id + '"><div class="text" title="' + a.name + '"></div><span class="importance" style="display:none">\u7d27\u6025</span></div>');
             k.find(".title .text").text(a.name);
             g._refreshViewBaseCount()
           }))
@@ -545,7 +574,7 @@
           default:
             return
           }
-          g._dateGroupValid(k, c) ? (e.placeholder.removeClass("disable"), b.data("cancel", !1), e.placeholder.html("")) : (e.placeholder.addClass("disable"), b.data("cancel", !0), e.placeholder.html("\x26nbsp;\x26nbsp;\u8d77\u59cb\u65e5\u4e0d\u80fd\u5728\u5230\u671f\u65e5\u4e4b\u540e"))
+          g._dateGroupValid(k, c) ? (e.placeholder.removeClass("disable"), b.data("cancel", !1), e.placeholder.html("")) : (e.placeholder.addClass("disable"), b.data("cancel", !0), e.placeholder.html("&nbsp;&nbsp;\u8d77\u59cb\u65e5\u4e0d\u80fd\u5728\u5230\u671f\u65e5\u4e4b\u540e"))
         },
         update: function(a, e) {
           e.item.data("cancel") ? $(this).sortable("cancel") : (g.rebuildSN(e.item.parent()), g.changeGroupWhileSort(e.item), "list" != g.viewState && e.sender && (g.rebuildSN(e.sender), g._changDateGroupByDrag(e.item), g._refreshViewBaseCount()))
@@ -744,7 +773,7 @@
           future: this.$el.find("#mytask-container .j_begin").filter(".future").children(".task-list"),
           memo: this.$el.find("#mytask-container .j_begin").filter(".memo").children(".task-list")
         };
-        for (var e in a) a[e].children("[class~\x3dtask]").remove();
+        for (var e in a) a[e].children("[class~=task]").remove();
         break;
       case "dueDate":
         for (e in a = {
@@ -754,7 +783,7 @@
           future: this.$el.find("#mytask-container .j_due").filter(".future").children(".task-list"),
           memo: this.$el.find("#mytask-container .j_due").filter(".memo").children(".task-list")
         },
-        a) a[e].children("[class~\x3dtask]").remove()
+        a) a[e].children("[class~=task]").remove()
       }
     },
     _renderMeta: function(a) {
@@ -859,17 +888,17 @@
         "data-module": "task",
         "data-id": a.id
       });
-      a.watched ? (g.find(".watch").html('\x3ci class\x3d"icon-star"\x3e\x3c/i\x3e\x26nbsp;\u53d6\u6d88\u5173\u6ce8'), g.find(".watch").attr("watched", "true")) : g.find(".watch").attr("watched", "false");
+      a.watched ? (g.find(".watch").html('<i class="icon-star"></i>&nbsp;\u53d6\u6d88\u5173\u6ce8'), g.find(".watch").attr("watched", "true")) : g.find(".watch").attr("watched", "false");
       g.find(".watch").attr("targetId", a.id);
       g.find(".watch").attr("module", "task");
       "urgency" == a.priority ? g.find(".importance").removeClass("hide").text("\u975e\u5e38\u7d27\u6025").addClass("urgency") : "high" == a.priority && g.find(".importance").removeClass("hide").text("\u7d27\u6025").addClass("high");
-      "finished" != this.type ? this._renderStatus(a.status, g) : g.find(".finish").html('\x3ci class\x3d"icon-finished"\x3e\x3c/i\x3e\x26nbsp;\u6807\u8bb0\u672a\u5b8c\u6210').attr({
+      "finished" != this.type ? this._renderStatus(a.status, g) : g.find(".finish").html('<i class="icon-finished"></i>&nbsp;\u6807\u8bb0\u672a\u5b8c\u6210').attr({
         status: "finished",
         title: "\u5f53\u524d\u72b6\u6001\u4e3a\u5df2\u5b8c\u6210\uff0c\u70b9\u51fb\u8bbe\u7f6e\u4e3a\u672a\u5b8c\u6210"
       });
       this.type && "unRead" == this.type ? g.addClass("unread") : this.type && "newConment" == this.type ? g.addClass("newComment") : (a.newConment && g.addClass("newComment"), a.unread && g.addClass("unread").removeClass("newComment"));
       a.commentCount = 0;
-      0 != a.commentCount && g.find(".comment-count").html('\x3ci class\x3d"icon-chat-3 mr-3"\x3e\x3c/i\x3e\x3cem\x3e' + a.commentCount + "\x3c/em\x3e");
+      0 != a.commentCount && g.find(".comment-count").html('<i class="icon-chat-3 mr-3"></i><em>' + a.commentCount + "</em>");
       g.find(".share").attr("targetId", a.id);
       g.find(".shortcut").removeClass("hide");
       1 < a.permission ? g.addClass("editable") : g.addClass("readonly");
@@ -956,10 +985,10 @@
       })
     },
     _renderStatus: function(a, e) {
-      "finished" == a ? (e.find(".finish").html('\x3ci class\x3d"icon-finished"\x3e\x3c/i\x3e\x26nbsp;\u6807\u8bb0\u672a\u5b8c\u6210').attr({
+      "finished" == a ? (e.find(".finish").html('<i class="icon-finished"></i>&nbsp;\u6807\u8bb0\u672a\u5b8c\u6210').attr({
         status: "finished",
         title: "\u5f53\u524d\u72b6\u6001\u4e3a\u5df2\u5b8c\u6210\uff0c\u70b9\u51fb\u8bbe\u7f6e\u4e3a\u672a\u5b8c\u6210"
-      }), e.find(".title .text").addClass("finished-line")) : (e.find(".finish").html('\x3ci class\x3d"icon-todo"\x3e\x3c/i\x3e\x26nbsp;\u6807\u8bb0\u5b8c\u6210').attr({
+      }), e.find(".title .text").addClass("finished-line")) : (e.find(".finish").html('<i class="icon-todo"></i>&nbsp;\u6807\u8bb0\u5b8c\u6210').attr({
         status: "todo",
         title: "\u5f53\u524d\u72b6\u6001\u4e3a\u672a\u5b8c\u6210\uff0c\u70b9\u51fb\u8bbe\u7f6e\u4e3a\u5b8c\u6210"
       }), e.find(".title .text").removeClass("finished-line"))
@@ -974,7 +1003,7 @@
         id: g
       });
       e.find(".sn").html("");
-      e.find(".title .text").replaceWith('\x3cinput type\x3d"text" class\x3d"input" value\x3d"" tabindex\x3d"-1" maxlength\x3d"100"/\x3e');
+      e.find(".title .text").replaceWith('<input type="text" class="input" value="" tabindex="-1" maxlength="100"/>');
       a.prepend(e).find(".notask").addClass("hide");
       this.rebuildSN(a);
       this.highLight(g);
@@ -983,7 +1012,7 @@
     updateFastKey: function(a, e) {
       for (var g = e.split(","), b = 0; b < g.length - 1; b++) {
         var c = $("#mytask-container #" + g[b]);
-        "watch" == a ? (c.find(".watch").html('\x3ci class\x3d"icon-star"\x3e\x3c/i\x3e\x26nbsp;\u53d6\u6d88\u5173\u6ce8'), c.find(".watch").attr("watched", "true")) : "finished" == a && this._renderStatus("finished", c)
+        "watch" == a ? (c.find(".watch").html('<i class="icon-star"></i>&nbsp;\u53d6\u6d88\u5173\u6ce8'), c.find(".watch").attr("watched", "true")) : "finished" == a && this._renderStatus("finished", c)
       }
     },
     findSelectedUsefulLi: function() {
@@ -1031,7 +1060,7 @@
     },
     changeWatch: function(a, e) {
       var g = $("#mytask-container #" + a);
-      e ? (g.find(".watch").html('\x3ci class\x3d"icon-star"\x3e\x3c/i\x3e\x26nbsp;\u53d6\u6d88\u5173\u6ce8'), g.find(".watch").attr("watched", "true")) : (g.find(".watch").html('\x3ci class\x3d"icon-favourite"\x3e\x3c/i\x3e\x26nbsp;\u5173\u6ce8'), g.find(".watch").attr("watched", "false"))
+      e ? (g.find(".watch").html('<i class="icon-star"></i>&nbsp;\u53d6\u6d88\u5173\u6ce8'), g.find(".watch").attr("watched", "true")) : (g.find(".watch").html('<i class="icon-favourite"></i>&nbsp;\u5173\u6ce8'), g.find(".watch").attr("watched", "false"))
     },
     changeTitle: function(a, e) {
       $("#mytask-container #" + a).find(".title .text").text(e).attr("title", e)

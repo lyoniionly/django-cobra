@@ -1565,6 +1565,143 @@
           '</div>' +
         '</div>' +
       '</div>',
+    'component.remind': '' +
+      '<div id="remind-div" class="remind sbox-white filterSlip_js">' +
+        '<textarea id="remind-textarea" class="form-control" name="comment" rows="3" placeholder=""></textarea>' +
+        '<div class="control-group ">' +
+          '<label class="control-label" style="float:left" title="提醒给">提醒给：</label>' +
+          '<div id="task" class="controls hide">' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="manager" checked value="taskManager">负责人' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="participants" value="taskParticipants">参与人' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="creater" value="taskCreater">创建人' +
+            '</label>' +
+          '</div>' +
+          '<div id="mainline" class="controls hide">' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="manager" checked value="mainlineManager">负责人' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="participants" value="mainlineParticipants">参与人' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="creater" value="mainlineCreater">创建人' +
+            '</label>' +
+          '</div>' +
+          '<div id="document" class="controls hide">' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="share" checked value="documentShare">共享人' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="manager" value="documentManager">负责人' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="creater" value="documentCreater">创建人' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="participants" value="documentParticipants">参与人' +
+            '</label>' +
+          '</div>' +
+          '<div id="customer" class="controls hide">' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="manager" checked value="customerManager">客户经理' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="share" value="customerShare">共享人' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="creater" value="customerCreater">创建人' +
+            '</label>' +
+          '</div>' +
+          '<div id="workflow" class="controls hide">' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="currentmanager" checked value="workflowCurrent">当前办理人' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="allmanager" value="workflowAll">所有办理人' +
+            '</label>' +
+            '<label class="checkbox-inline">' +
+              '<input type="checkbox" name="creater" value="workflowCreater">创建人' +
+            '</label>' +
+          '</div>' +
+          '<div id="workreport" class="controls hide">' +
+            '<div id="workreportRemindlist" class="entity-container"></div>' +
+            '<div class="typeahead-wrapper hide">' +
+              '<div class="remind-user">' +
+                '<input type="text" class="control-input typeahead search" data-entity="employee" data-multi="true" placeholder="输入姓名">' +
+                '<a class="btn typeahead-search"><i class="icon-search"></i></a>' +
+              '</div>' +
+            '</div>' +
+            '<span class="control-btn entity-item-add" title="添加" data-placement="top" data-toggle="tooltip">' +
+              '<a class="icon-plus-thin"></a>' +
+            '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div id="other-employee" class="control-group clearfix">' +
+          '<label class="control-label" style="float:left" title="其他人">其他人：</label>' +
+          '<div id="remindlist" class="entity-container"></div>' +
+          '<div class="typeahead-wrapper hide">' +
+            '<div class="remind-user">' +
+              '<input type="text" class="control-input typeahead search" data-entity="employee" data-multi="true" placeholder="输入姓名">' +
+              '<a class="btn typeahead-search"><i class="icon-search"></i></a>' +
+            '</div>' +
+          '</div>' +
+          '<span class="control-btn entity-item-add" title="添加" data-placement="top" data-toggle="tooltip">' +
+            '<a class="icon-plus-thin"></a>' +
+          '</span>' +
+        '</div>' +
+        '<div class="control-group pull-right">' +
+          '<a id="remind-submit" class="btn btn-sm btn-primary">提交</a>' +
+          '<a id="remind-cancle" class="btn btn-sm">取消</a>' +
+        '</div>' +
+      '</div>',
+    'component.batchselector': '' +
+      '<div class="modal fade" id="batchselectormodal">' +
+        '<div class="modal-dialog">' +
+          '<div class="modal-content">' +
+            '<div class="modal-header">' +
+              '<a class="close" data-dismiss="modal">×</a>' +
+              '<span id="js_title">批量共享</span>' +
+              '<label class="control-label w-90" title="选择人员">已选择<span id="js_usersCount">0</span>位</label>' +
+            '</div>' +
+            '<div class="modal-body entity-info" id="batchselectormodal-info" style="min-height: 200px;">' +
+              '<div id="editShare" class="control-group" icon="#i-share"></div>' +
+            '</div>' +
+            '<div class="modal-body entity-info hide" id="shareall" style="min-height: 200px;">' +
+              '<span class="entity-item">' +
+                '<a class="all" style="margin-top: 5px;">所有人</a>' +
+              '</span>' +
+            '</div>' +
+            '<div class="modal-footer">' +
+              '<a id="btn-save" class="btn btn-sm btn-primary">确定</a>' +
+              '<a class="btn btn-sm" id="btn-cancle" data-dismiss="modal">取消</a>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>',
+    'component.processbar': '' +
+      '<div id="processModal">' +
+        '<div class="modal fade in" style="display: block;">' +
+          '<div class="modal-dialog">' +
+            '<div class="modal-content">' +
+              '<div class="modal-header">' +
+                '<a class="close" id="processModalClose">━</a>' +
+                '<span id="js_title">批量共享操作较慢，请耐心等待!</span>' +
+              '</div>' +
+              '<div class="modal-body entity-info" style="min-height: 70px;">' +
+                '<div class="progress controls tenantinfo-space" style="margin-left: 120px;">' +
+                  '<div class="progress-bar progress-bar-info progress-bar-striped" id="processNum" style="width: 1%;"></div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="modal-backdrop in"></div>' +
+      '</div>',
     'share.simpleshare': '' +
       '<% if(panel=="participants"){%>' +
         '<div id="participants-component">' +

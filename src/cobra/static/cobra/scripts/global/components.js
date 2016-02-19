@@ -2370,9 +2370,9 @@
     targetId: "",
     _module: "",
     otherIds: "",
-    initialize: function(b) {
-      this.obj = b.obj;
-      this.el = b.el ? b.el: "body";
+    initialize: function(options) {
+      this.obj = options.obj;
+      this.el = options.el ? options.el: "body";
       this.targetId = this.obj.attr("targetId");
       this.targetIds = this.obj.attr("targetIds");
       this._module = this.obj.attr("module");
@@ -2389,17 +2389,17 @@
     render: function() {
       var obj = this.obj;
       var $el = $(this.el);
-      if (0 == $el.find("#remind-div").size()) {
+      if ($el.find("#remind-div").size()==0) {
         $el.append(app.utils.template("component.remind"));
         var top = obj.offset().top + 40,
-        c = obj.offset().left;
-        if(c + 450 > $(window).width()) {
-          c = $(window).width() - 500;
+          left = obj.offset().left;
+        if(left + 450 > $(window).width()) {
+          left = $(window).width() - 500;
         }
         if(top + 172 > $(window).height() && 172 < top) {
           top = obj.offset().top - 172;
         }
-        $("#remind-div").css("left", c + "px").css("top", top + "px");
+        $("#remind-div").css("left", left + "px").css("top", top + "px");
         $("#remind-div #" + this._module).removeClass("hide");
         if("customer" == this._module) {
           this.customer();
@@ -2553,21 +2553,291 @@
       return ids;
     },
     getSeleted: function() {
-      var b = "",
-      a = $("#remindlist").children();
-      if (a && 0 < a.length) {
-        for (var c = 0; c < a.length - 1; c++) var e = $(a[c]),
-        b = b + (e.attr("id") + ",");
-        a = $(a[a.length - 1]);
-        b += a.attr("id")
+      var ids = "";
+      var $reminds = $("#remindlist").children();
+      if ($reminds && 0 < $reminds.length) {
+        for (var c = 0; c < $reminds.length - 1; c++) {
+          var e = $($reminds[c]);
+          ids = ids + (e.attr("id") + ",");
+        }
+        var $remind = $($reminds[$reminds.length - 1]);
+        ids += $remind.attr("id");
       }
-      return b
+      return ids;
     },
     remove: function() {
       $("#remind-div").off(".remind");
       $(this.obj).off(".remind");
       $("body").off(".remind");
-      $("#remind-div").remove()
+      $("#remind-div").remove();
+    }
+  });
+
+  app.components.ShareAllMultiSelect = Backbone.View.extend({
+    shareEl: "",
+    initialize: function(options) {
+      this.parentEl = options.parentEl;
+      this.shareEl = this.parentEl + " " + options.shareContainer;
+      this.entityId = options.entityId;
+      this.serverPath = options.serverPath;
+      this._module = options.module;
+      this.groupContainer = options.groupContainer ? options.groupContainer: "#group-share";
+      this.depContainer = options.depContainer ? options.depContainer: "#department-share";
+      this.userContainer = options.userContainer ? options.userContainer: "#user-share";
+      this.addBack = options.addBack;
+      this.removeBack = options.removeBack;
+      $(this.shareEl).html(app.utils.template("share.shareall", {
+        panel: "share"
+      }));
+    },
+    delegateEvents: function() {
+      var self = this;
+      $(self.shareEl).off("click.shareallmultiselect", ".entity-item .close").on("click.shareallmultiselect", ".entity-item .close", function(e) {
+        e.stopPropagation();
+        self.deleteEvent($(this));
+      });
+      $(self.shareEl).find("#share-select").change(function() {
+        var val = $(this).val();
+        if("all" == val) {
+          $(".sharetype-dept").addClass("hide");
+          $(".sharetype-group").addClass("hide");
+          $(".sharetype-user").removeClass("hide");
+          $(self.shareEl).find("#editShare").removeClass("hide");
+          $(self.shareEl).find(".typeahead-wrapper").addClass("hide");
+          $(this).val("user");
+          self.createShareEntryLink("all");
+          if(self.addBack) {
+            self.addBack("all");
+          }
+        } else if("group" == val) {
+          $(".sharetype-dept").addClass("hide");
+          $(".sharetype-group").removeClass("hide");
+          $(".sharetype-user").addClass("hide");
+        } else if("department" == val) {
+          $(".sharetype-dept").removeClass("hide");
+          $(".sharetype-group").addClass("hide");
+          $(".sharetype-user").addClass("hide");
+        } else if("user" == val) {
+          $(".sharetype-dept").addClass("hide");
+          $(".sharetype-group").addClass("hide");
+          $(".sharetype-user").removeClass("hide");
+        }
+      });
+      app.components.typeahead.init([{
+        el: self.shareEl + " .sharetype-group input",
+        callback: function(res) {
+          self.createShareEntryLink("group", res);
+          if(self.addBack) {
+            self.addBack("group", [res]);
+          }
+        }
+      }, {
+        el: self.shareEl + " .sharetype-dept input",
+        callback: function(res) {
+          self.createShareEntryLink("department", res);
+          if(self.addBack) {
+            self.addBack("department", res);
+          }
+        }
+      }, {
+        el: self.shareEl + " .sharetype-user input",
+        callback: function(res) {
+          self.createShareEntryLink("user", res);
+          if(self.addBack) {
+            self.addBack("user", res);
+          }
+        }
+      }]);
+    },
+    deleteEvent: function(e) {
+      if(this.removeBack) {
+        this.removeBack(e);
+      }
+    },
+    render: function() {},
+    createShareEntryLink: function(type, res) {
+      if (res) {
+        var data = [];
+        res instanceof Array ? data = res: data[0] = res;
+        for (var i in data) {
+          var obj = data[i],
+            container = "";
+          if("department" == type) {
+            container = this.depContainer;
+          } else if("group" == type) {
+            container = this.groupContainer
+          } else if("user" == type) {
+            container = this.userContainer;
+          }
+          if(!this.hasUser(obj.id, $(this.shareEl).find("#shareentrys"))) {
+            $(this.shareEl).removeClass("hide");
+            $(this.parentEl).find($(this.shareEl).attr("icon")).addClass("hide");
+            var html = '<span class="entity-item"> <a class="' + type + '" data-value="' + obj.id + '" userId="' + obj.id + '">' + obj.name + "</a></span>";
+            $(this.parentEl).find(container).append(html);
+          }
+        }
+      } else {
+        if("all" == type && $(this.parentEl).find(this.userContainer + " .entity-item .all").length<=0) {
+          $(this.shareEl).removeClass("hide");
+          $(this.parentEl).find($(this.shareEl).attr("icon")).addClass("hide");
+          var html = '<span class="entity-item"> <a class="all" data-value="0" userId="0">所有人</a></span>';
+          $(this.parentEl).find(this.userContainer).append(html);
+        }
+      }
+    },
+    hasUser: function(id, $el) {
+      var flag = false;
+      $el.find("a").each(function() {
+        var userId = $(this).attr("userid");
+        if(parseInt(userId) == parseInt(id)) {
+          flag = true;
+        }
+      });
+      return flag;
+    },
+    getUserIds: function() {
+      var userIds = "";
+      $(this.parentEl).find(this.userContainer + " .user").each(function() {
+        userIds += $(this).data("value") + ",";
+      });
+      return userIds;
+    },
+    getDepartmentIds: function() {
+      var departmentIds = "";
+      $(this.parentEl).find(this.depContainer + " .department").each(function() {
+        departmentIds += $(this).data("value") + ",";
+      });
+      return departmentIds;
+    },
+    getGroupIds: function() {
+      var groupIds = "";
+      $(this.parentEl).find(this.groupContainer + " .group").each(function() {
+        groupIds += $(this).data("value") + ",";
+      });
+      return groupIds;
+    },
+    remove: function() {
+      $(this.el);
+      $(this.el).off(".shareallmultiselect");
+      if(this.typeahead) {
+        this.typeahead.remove();
+        this.typeahead = null;
+      }
+      $(this.el).empty();
+    }
+  });
+
+  app.components.BatchSelector = Backbone.View.extend({
+    initialize: function(options) {
+      this.module = options.module;
+      this.entityIdArr = options.entityIdArr;
+      this.serverPath = options.serverPath;
+      this.el = "#batchselectormodal";
+      $("body").append(app.utils.template("component.batchselector"));
+      this.model = new app.models.Share({
+        entityIds: this.entityIdArr,
+        module: this._module,
+        serverPath: this.serverPath
+      });
+      this.multiSelectView = new app.components.ShareAllMultiSelect({
+        module: options.module,
+        shareContainer: "#editShare",
+        parentEl: this.el,
+        addBack: this.addBack,
+        removeBack: this.removeBack,
+        groupContainer: "#shareentrys",
+        depContainer: "#shareentrys",
+        userContainer: "#shareentrys"
+      });
+    },
+    delegateEvents: function() {
+      var self = this;
+      $(self.el).off("click.batchselect", "#btn-save").on("click.batchselect", "#btn-save", function() {
+        self.save();
+      });
+      $(self.el).off("click.batchselect", "#btn-cancle").on("click.batchselect", "#btn-cancle", function() {
+        self.remove();
+      })
+    },
+    render: function() {
+      $("#batchselectormodal").modal("toggle");
+      this.multiSelectView.render();
+    },
+    addBack: function(type, res) {
+      $(this.parentEl).find("#js_usersCount").html($(this.parentEl).find("#shareentrys .entity-item").length);
+    },
+    removeBack: function($el) {
+      $el.parent().remove();
+      $(this.parentEl).find("#js_usersCount").html($(this.parentEl).find("#shareentrys .entity-item").length);
+    },
+    save: function() {
+      if ($(this.el).find("#shareentrys .entity-item").length==0) {
+        app.alert('warning', "请选择共享者!");
+      } else {
+        var data = {},
+          userIds = this.multiSelectView.getUserIds(),
+          departmentIds = this.multiSelectView.getDepartmentIds(),
+          groupIds = this.multiSelectView.getGroupIds();
+        if($(this.el).find("#shareentrys .entity-item .all").length > 0) {
+          data.entryType = "all";
+        }
+        data.shareType = "sharer";
+        data.module = this.module;
+        data.entityIds = this.entityIdArr;
+        data.sids = userIds;
+        data.departmentIds = departmentIds;
+        data.groupIds = groupIds;
+        $(this.el).find("#btn-cancle").click();
+        $("body").append(app.utils.template("component.processbar"));
+        $(this.el).off("click.batchselect", "#processModalClose").on("click.batchselect", "#processModalClose", function() {
+          $("#processModal").remove();
+        });
+        this.processBar();
+        this.model.saveShareAll(data, this.saveBack);
+      }
+    },
+    saveBack: function(res) {
+      clearInterval(window.processBarTimer);
+      $("#processModal").remove();
+      if(res.msg) {
+        app.alert('info', res.msg);
+      } else {
+        app.alert('success', "批量共享完成!");
+      }
+    },
+    processBar: function() {
+      var data = {};
+      var self = this;
+      window.processBarTimer = window.setInterval(function() {
+        self.model.getProcess(data, self.updateProcess);
+      }, 1000);
+    },
+    updateProcess: function(data) {
+      var precent = data.map.now / data.map.count;
+      $("#processModal").find("#processNum").css("width", 100 * precent.toFixed(2) + "%");
+      $("#processModal").find("#processNum").html(data.map.now + "/" + data.map.count);
+      if (1 <= precent || !data.map.count) {
+        clearInterval(window.processBarTimer);
+        $("#processModal").remove();
+      }
+    },
+    remove: function() {
+      $(this.el);
+      $(this.el).off(".batchselect");
+      if(this.multiSelectView) {
+        this.multiSelectView.remove();
+        this.multiSelectView = null;
+      }
+      if(this.typeahead) {
+        this.typeahead.remove();
+        this.typeahead = null;
+      }
+      if(this.ShareModel) {
+        this.ShareModel.remove();
+        this.ShareModel = null;
+      }
+      $(this.el).empty();
+      $(this.el).remove();
     }
   });
 
