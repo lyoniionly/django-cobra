@@ -470,58 +470,90 @@
           app.alert('warning', "没有完成权限");
         }
       });
-      c.off("keyup.TaskList", "li.task input.input").on("keyup.TaskList", "li.task input.input", function(a, e) {
-        var b = $(this),
-        c = b.parents("ul:first");
-        13 == a.which && (b = b.val()) && $.trim(b) && g._insertBlank(c)
+      c.off("keyup.TaskList", "li.task input.input").on("keyup.TaskList", "li.task input.input", function(e, data) {
+        var $this = $(this);
+        var $el = $this.parents("ul:first");
+        var value = $this.val();
+        if(e.which==app.config.keyCode.ENTER && value && $.trim(value)) {
+          g._insertBlank($el);
+        }
       });
-      c.off("confirmHandler.TaskList", ".shortcut .share").on("confirmHandler.TaskList", ".shortcut .share", function(a, e) {
-        var b = e.objs;
-        if (b && !$.isEmptyObject(b)) {
-          b = $.isArray(b) ? b: [b];
+      c.off("confirmHandler.TaskList", ".shortcut .share").on("confirmHandler.TaskList", ".shortcut .share", function(e, data) {
+        var objs = data.objs;
+        if (objs && !$.isEmptyObject(objs)) {
+          objs = $.isArray(objs) ? objs: [objs];
           g.sids = "";
-          for (var c = 0; c < b.length; c++) g.sids += b[c].id + ",";
-          var k = $(this).attr("targetId");
+          for (var i = 0; i < objs.length; i++) {
+            g.sids += objs[i].id + ",";
+          }
+          var entityIds = $(this).attr("targetId");
           g.shareModel.sids = g.sids;
-          g.shareModel.entityIds = k;
+          g.shareModel.entityIds = entityIds;
           g.shareModel._module = "task";
-          g.shareModel.saveAll(function(a) {
-            a.addUserMessage ? f.notify(a.addUserMessage) : f.notify("\u5171\u4eab\u64cd\u4f5c\u6210\u529f");
-            var e = g.subView;
-            e.id && e.id == k && e.addShare(a.shareEntrys)
-          })
+          g.shareModel.saveAll(function(res) {
+            if(res.addUserMessage) {
+              app.alert('info', res.addUserMessage)
+            } else {
+              app.alert('success', "共享操作成功");
+            }
+            var subView = g.subView;
+            if(subView.id && subView.id == entityIds) {
+              subView.addShare(res.shareEntrys);
+            }
+          });
         }
       });
-      c.off("click.TaskList", ".shortcut .share").on("click.TaskList", ".shortcut .share", function(a) {
-        a.stopPropagation();
-        $(this).hasClass("selector-toggle") ? (new n({
-          $target: $(this)
-        })).open() : f.notify("\u6ca1\u6709\u5171\u4eab\u6743\u9650")
-      });
-      c.off("click.TaskList", ".e-list-head").on("click.TaskList", ".e-list-head", function(a) {
-        if (! (0 < $(a.target).closest(".group-add").length)) {
-          a = $(this).find(".group-switch");
-          var e = a.parents(".group-view").find(".task-list");
-          "on" == a.attr("data-status") ? (a.attr("title", "\u5c55\u5f00"), a.attr("data-status", "off"), a.find("i:last").removeClass().addClass("icon-angle-down"), e.slideUp()) : (a.attr("title", "\u6298\u53e0"), a.attr("data-status", "on"), a.find("i:last").removeClass().addClass("icon-angle-right"), e.slideDown())
+      c.off("click.TaskList", ".shortcut .share").on("click.TaskList", ".shortcut .share", function(e) {
+        e.stopPropagation();
+        if($(this).hasClass("selector-toggle")) {
+          (new window.UserSelector({
+            $target: $(this)
+          })).open();
+        } else {
+          app.alert("没有共享权限");
         }
       });
-      c.off("click.TaskList", "#mytask-container .notask").on("click.TaskList", "#mytask-container .notask", function(a, e) {
-        $(this).parent().siblings().children(".group-add").trigger("click")
+      c.off("click.TaskList", ".e-list-head").on("click.TaskList", ".e-list-head", function(e) {
+        var len = $(e.target).closest(".group-add").length;
+        if (len <= 0) {
+          var $el = $(this).find(".group-switch");
+          var $taskEl = $el.parents(".group-view").find(".task-list");
+          if("on" == $el.attr("data-status")) {
+            $el.attr("title", "展开");
+            $el.attr("data-status", "off");
+            $el.find("i:last").removeClass().addClass("icon-angle-down");
+            $taskEl.slideUp();
+          } else {
+            $el.attr("title", "折叠");
+            $el.attr("data-status", "on");
+            $el.find("i:last").removeClass().addClass("icon-angle-right");
+            $taskEl.slideDown();
+          }
+        }
+      });
+      c.off("click.TaskList", "#mytask-container .notask").on("click.TaskList", "#mytask-container .notask", function(e, data) {
+        $(this).parent().siblings().children(".group-add").trigger("click");
       });
       c.off("click.TaskList", "#mytask-container .group-view .group-add").on("click.TaskList", "#mytask-container .group-view .group-add", function() {
-        var a = $(this).parents(".group-view"),
-        e = a.find(".task-list");
-        if (e.find("input").size()) e.find("input").focus();
-        else {
-          var b = a.find(".group-switch");
-          "off" == b.data("status") && (b.attr("title", "\u6298\u53e0"), b.attr("data-status", "on"), b.find("i:last").removeClass().addClass("icon-angle-down"), a.find(".task-list").slideDown());
-          g._insertBlank(e)
+        var $el = $(this).parents(".group-view");
+        var $taskList = $el.find(".task-list");
+        if ($taskList.find("input").size()) {
+          $taskList.find("input").focus();
+        } else {
+          var $group = $el.find(".group-switch");
+          if("off" == $group.data("status")) {
+            $group.attr("title", "折叠");
+            $group.attr("data-status", "on");
+            $group.find("i:last").removeClass().addClass("icon-angle-down");
+            $el.find(".task-list").slideDown();
+          }
+          g._insertBlank($taskList);
         }
       });
       c.off("focusout.TaskList", "li.task input.input:not([readonly])").on("focusout.TaskList", "li.task input.input:not([readonly])", function(a, e) {
-        var c = $(this),
-        k = c.parents("li:first"),
-        n = c.parents("ul:first");
+        var c = $(this);
+        var k = c.parents("li:first");
+        var n = c.parents("ul:first");
         if (c.val() && c.val().trim()) {
           c.val();
           c.attr("title");
