@@ -269,34 +269,34 @@
       }
     },
     delegateEvents: function() {
-      var g = this,
-        b = this.model,
-        c = this.$el;
-      /*this._$MAP.body.off("click.TaskList", ".goto-top").on("click.TaskList", ".goto-top", function(a) {
+      var self = this,
+        model = this.model,
+        $el = this.$el;
+      /*this._$MAP.body.off("click.TaskList", ".goto-top").on("click.TaskList", ".goto-top", function(e) {
         app.utils.gotoTop(".j_mainscroll")
       });*/
-      c.off("click.TaskList", ".j_moretask").on("click.TaskList", ".j_moretask", function() {
-        b.pageNo++;
-        g.search(true);
+      $el.off("click.TaskList", ".j_moretask").on("click.TaskList", ".j_moretask", function() {
+        model.pageNo++;
+        self.search(true);
       });
-      c.off("click.TaskList", "#view-state li").on("click.TaskList", "#view-state li", function() {
+      $el.off("click.TaskList", "#view-state li").on("click.TaskList", "#view-state li", function() {
         var $this = $(this);
         $this.addClass("active").siblings().removeClass("active");
         $this = $this.data("value");
-        g._toggleViewState($this);
+        self._toggleViewState($this);
       });
-      c.off("mouseenter.TaskList", "#task-filter").on("mouseenter.TaskList", "#task-filter", function(e) {
+      $el.off("mouseenter.TaskList", "#task-filter").on("mouseenter.TaskList", "#task-filter", function(e) {
         $(this).addClass("open");
         var $toggledEl = $(this).attr("data-toggle");
-        if(!g.dropdownFilter) {
-          g.dropdownFilter = new app.components.filter({
+        if(!self.dropdownFilter) {
+          self.dropdownFilter = new app.components.filter({
             el: $toggledEl,
             module: "task",
             targetObj: $(this),
-            userId: g.userId,
+            userId: self.userId,
             scroll: true
           });
-          g.dropdownFilter.render(e);
+          self.dropdownFilter.render(e);
         }
         var timer = setTimeout(function() {
           $($toggledEl).parents(".dropdown-filter").slideDown("fast");
@@ -312,59 +312,59 @@
         $(this).removeData("showTimer");
         $(toggleEl).parents(".dropdown-filter").slideUp(100);
       }).off("filter.TaskList", "#task-filter").on("filter.TaskList", "#task-filter", function(e) {
-        if("mine" == g.type) {
-          g.mine();
+        if("mine" == self.type) {
+          self.mine();
         } else {
-          b.pageNo = 1;
-          g.search(false);
+          model.pageNo = 1;
+          self.search(false);
         }
         $(this).removeClass("open");
       });
-      c.off("click.TaskList", ".orderType").on("click.TaskList", ".orderType", function() {
+      $el.off("click.TaskList", ".orderType").on("click.TaskList", ".orderType", function() {
         $(".orderType").parent("li").removeClass("active");
         $(this).parent("li").addClass("active");
         $("#task-order").attr("data-entity", $(this).attr("data-entity"));
         $("#task-order").attr("data-direction", $(this).attr("data-direction"));
-        if("mine" == g.type) {
-          g.mine();
+        if("mine" == self.type) {
+          self.mine();
         } else {
-          b.pageNo = 1;
-          g.search(!1);
+          model.pageNo = 1;
+          self.search(!1);
         }
-        ROUTER.navigate("/tasks/" + g.userId, {
+        ROUTER.navigate("/tasks/" + self.userId, {
           trigger: false
         });
       });
-      c.off("click.TaskList", ".j_mineType ul li").on("click.TaskList", ".j_mineType ul li", function() {
+      $el.off("click.TaskList", ".j_mineType ul li").on("click.TaskList", ".j_mineType ul li", function() {
         if(!$(this).hasClass("active")) {
           $(this).addClass("active").siblings("li").removeClass("active");
           $(this).data("type");
           $("#task-taskType").attr("data-entity", $(this).attr("data-entity"));
-          g.mine();
+          self.mine();
         }
       });
-      c.off("search.TaskList", "#tasksearch-keywords").on("search.TaskList", "#tasksearch-keywords", function(e) {
-        b.pageNo = 1;
-        g.search(false);
+      $el.off("search.TaskList", "#tasksearch-keywords").on("search.TaskList", "#tasksearch-keywords", function(e) {
+        model.pageNo = 1;
+        self.search(false);
       });
-      c.off("keyup.TaskList", "#tasksearch-keywords").on("keyup.TaskList", "#tasksearch-keywords", function(e) {
+      $el.off("keyup.TaskList", "#tasksearch-keywords").on("keyup.TaskList", "#tasksearch-keywords", function(e) {
         if(app.config.keyCode.ENTER == e.which) {
           $(this).trigger("search");
         }
       });
-      c.on("click.TaskList", ".task-watchs", function() {
-        var ids = g.findSelectedLi();
+      $el.on("click.TaskList", ".task-watchs", function() {
+        var ids = self.findSelectedLi();
         if(0 < ids.length) {
-          g.watchModel.watch('{"module":"task","ids":"' + ids + '"}', function(e) {
+          self.watchModel.watch('{"module":"task","ids":"' + ids + '"}', function(e) {
             app.alert('success', "批量关注成功");
-            g.updateFastKey("watch", ids);
+            self.updateFastKey("watch", ids);
           });
         } else {
           app.alert('warning', "请先选中记录");
         }
       });
       this._$MAP.body.off("click.TaskList", ".task-reminds").on("click.TaskList", ".task-reminds", function(e) {
-        var ids = g.findSelectedLi();
+        var ids = self.findSelectedLi();
         if (0 < ids.length) {
           var $this = $(this);
           $this.attr("module", "task");
@@ -377,7 +377,7 @@
           app.alert('warning', "请先选中记录");
         }
       });
-      c.off("click.TaskList", ".shortcut .watch").on("click.TaskList", ".shortcut .watch", function(e) {
+      $el.off("click.TaskList", ".shortcut .watch").on("click.TaskList", ".shortcut .watch", function(e) {
         e.stopPropagation();
         var data = {};
         var $this = $(this);
@@ -385,40 +385,40 @@
         data.id = $this.attr("targetId");
         if("true" == $this.attr("watched")) {
           data._method = "DELETE";
-          g.watchModel.watchOne(data, function(res) {
+          self.watchModel.watchOne(data, function(res) {
             app.alert('success', "取消关注成功");
             $this.html('<i class="icon-favourite"></i>&nbsp;关注');
             $this.attr("watched", "false");
-            var subView = g.subView;
+            var subView = self.subView;
             if(subView.id && subView.id == data.id) {
               subView.changeWatch(false);
             }
           });
         } else {
           data._method = "PUT";
-          g.watchModel.watchOne(data, function(res) {
+          self.watchModel.watchOne(data, function(res) {
             app.alert('success', "关注成功");
             $this.html('<i class="icon-star"></i>&nbsp;取消关注');
             $this.attr("watched", "true");
-            var subView = g.subView;
+            var subView = self.subView;
             if(subView.id && subView.id == data.id) {
               subView.changeWatch(true);
             }
           });
         }
       });
-      c.off("confirmHandler.TaskList", ".task-share").on("confirmHandler.TaskList", ".task-share", function(event, data) {
+      $el.off("confirmHandler.TaskList", ".task-share").on("confirmHandler.TaskList", ".task-share", function(event, data) {
         var objs = data.objs;
         if (objs && !$.isEmptyObject(objs)) {
           objs = $.isArray(objs) ? objs: [objs];
-          g.sids = "";
+          self.sids = "";
           for (var i = 0; i < objs.length; i++) {
-            g.sids += objs[i].id + ",";
+            self.sids += objs[i].id + ",";
           }
-          g.shareModel.sids = g.sids;
-          g.shareModel.entityIds = g.findSelectedLi();
-          g.shareModel._module = "task";
-          g.shareModel.saveAll(function(res) {
+          self.shareModel.sids = self.sids;
+          self.shareModel.entityIds = self.findSelectedLi();
+          self.shareModel._module = "task";
+          self.shareModel.saveAll(function(res) {
             if(res.addUserMessage) {
               app.alert('info', res.addUserMessage);
             } else {
@@ -427,9 +427,9 @@
           });
         }
       });
-      c.off("click.TaskList", ".task-share").on("click.TaskList", ".task-share", function(e) {
+      $el.off("click.TaskList", ".task-share").on("click.TaskList", ".task-share", function(e) {
         e.stopPropagation();
-        var entityIds = g.findSelectedLi();
+        var entityIds = self.findSelectedLi();
         if(0 < entityIds.length) {
           (new app.components.BatchSelector({
             module: "task",
@@ -439,71 +439,71 @@
           app.alert('warning',"请先选中记录");
         }
       });
-      c.off("click.TaskList", ".task-finished").on("click.TaskList", ".task-finished", function() {
-        var ids = g.findSelectedUsefulLi();
+      $el.off("click.TaskList", ".task-finished").on("click.TaskList", ".task-finished", function() {
+        var ids = self.findSelectedUsefulLi();
         if(0 < ids.length) {
-          g.model.updateStatus("finished", ids, function(res) {
+          self.model.updateStatus("finished", ids, function(res) {
             app.alert('success', "批量完成操作成功");
-            g.updateFastKey("finished", ids);
+            self.updateFastKey("finished", ids);
           });
         } else {
           app.alert('warning', "请选择有完成权限的记录");
         }
       });
-      c.off("click.TaskList", ".shortcut .finish").on("click.TaskList", ".shortcut .finish", function(e) {
+      $el.off("click.TaskList", ".shortcut .finish").on("click.TaskList", ".shortcut .finish", function(e) {
         e.stopPropagation();
         var $this = $(this);
         if ($(this).attr("targetId") && $(this).attr("status") && !$this.data("post")) {
           var status = "finished" == $this.attr("status") ? "todo": "finished";
           var targetId = $this.attr("targetId");
           $this.data("post", true);
-          b.updateStatus(status, targetId, function(res) {
+          model.updateStatus(status, targetId, function(res) {
             $this.data("post", false);
             if(res.actionMsg && res.actionMsg.message) {
               app.alert('info', res.actionMsg.message);
             } else {
               app.alert('success', "状态修改成功");
-              g._renderStatus(status, $this.parents("li"));
+              self._renderStatus(status, $this.parents("li"));
             }
           })
         } else {
           app.alert('warning', "没有完成权限");
         }
       });
-      c.off("keyup.TaskList", "li.task input.input").on("keyup.TaskList", "li.task input.input", function(e, data) {
+      $el.off("keyup.TaskList", "li.task input.input").on("keyup.TaskList", "li.task input.input", function(e, data) {
         var $this = $(this);
         var $el = $this.parents("ul:first");
         var value = $this.val();
         if(e.which==app.config.keyCode.ENTER && value && $.trim(value)) {
-          g._insertBlank($el);
+          self._insertBlank($el);
         }
       });
-      c.off("confirmHandler.TaskList", ".shortcut .share").on("confirmHandler.TaskList", ".shortcut .share", function(e, data) {
+      $el.off("confirmHandler.TaskList", ".shortcut .share").on("confirmHandler.TaskList", ".shortcut .share", function(e, data) {
         var objs = data.objs;
         if (objs && !$.isEmptyObject(objs)) {
           objs = $.isArray(objs) ? objs: [objs];
-          g.sids = "";
+          self.sids = "";
           for (var i = 0; i < objs.length; i++) {
-            g.sids += objs[i].id + ",";
+            self.sids += objs[i].id + ",";
           }
           var entityIds = $(this).attr("targetId");
-          g.shareModel.sids = g.sids;
-          g.shareModel.entityIds = entityIds;
-          g.shareModel._module = "task";
-          g.shareModel.saveAll(function(res) {
+          self.shareModel.sids = self.sids;
+          self.shareModel.entityIds = entityIds;
+          self.shareModel._module = "task";
+          self.shareModel.saveAll(function(res) {
             if(res.addUserMessage) {
               app.alert('info', res.addUserMessage)
             } else {
               app.alert('success', "共享操作成功");
             }
-            var subView = g.subView;
+            var subView = self.subView;
             if(subView.id && subView.id == entityIds) {
               subView.addShare(res.shareEntrys);
             }
           });
         }
       });
-      c.off("click.TaskList", ".shortcut .share").on("click.TaskList", ".shortcut .share", function(e) {
+      $el.off("click.TaskList", ".shortcut .share").on("click.TaskList", ".shortcut .share", function(e) {
         e.stopPropagation();
         if($(this).hasClass("selector-toggle")) {
           (new window.UserSelector({
@@ -513,7 +513,7 @@
           app.alert("没有共享权限");
         }
       });
-      c.off("click.TaskList", ".e-list-head").on("click.TaskList", ".e-list-head", function(e) {
+      $el.off("click.TaskList", ".e-list-head").on("click.TaskList", ".e-list-head", function(e) {
         var len = $(e.target).closest(".group-add").length;
         if (len <= 0) {
           var $el = $(this).find(".group-switch");
@@ -531,10 +531,10 @@
           }
         }
       });
-      c.off("click.TaskList", "#mytask-container .notask").on("click.TaskList", "#mytask-container .notask", function(e, data) {
+      $el.off("click.TaskList", "#mytask-container .notask").on("click.TaskList", "#mytask-container .notask", function(e, data) {
         $(this).parent().siblings().children(".group-add").trigger("click");
       });
-      c.off("click.TaskList", "#mytask-container .group-view .group-add").on("click.TaskList", "#mytask-container .group-view .group-add", function() {
+      $el.off("click.TaskList", "#mytask-container .group-view .group-add").on("click.TaskList", "#mytask-container .group-view .group-add", function() {
         var $el = $(this).parents(".group-view");
         var $taskList = $el.find(".task-list");
         if ($taskList.find("input").size()) {
@@ -547,143 +547,220 @@
             $group.find("i:last").removeClass().addClass("icon-angle-down");
             $el.find(".task-list").slideDown();
           }
-          g._insertBlank($taskList);
+          self._insertBlank($taskList);
         }
       });
-      c.off("focusout.TaskList", "li.task input.input:not([readonly])").on("focusout.TaskList", "li.task input.input:not([readonly])", function(a, e) {
-        var c = $(this);
-        var k = c.parents("li:first");
-        var n = c.parents("ul:first");
-        if (c.val() && c.val().trim()) {
-          c.val();
-          c.attr("title");
-          var p = {};
-          k.attr("data-module") || (n = n.attr("group"), p.content = "", p.name = c.val(), p.sn = k.attr("sn"), k.find(".e-list-loading").show(), c.attr("readonly", !0), b.create(p, n,
-          function(a) {
-            f.notify("\u4efb\u52a1\u521b\u5efa\u6210\u529f");
-            a = b.task;
-            k.attr({
-              id: a.id
-            });
-            k.find(".shortcut").removeClass("hide");
-            k.find(".finish").attr({
-              targetId: a.id,
-              status: a.status
-            });
-            k.find(".e-list-loading").hide();
-            k.find("input").remove();
-            k.find(".checkbox").after('<div class="title j_entityslider-toggle" data-module="task" data-id="' + a.id + '"><div class="text" title="' + a.name + '"></div><span class="importance" style="display:none">\u7d27\u6025</span></div>');
-            k.find(".title .text").text(a.name);
-            g._refreshViewBaseCount()
-          }))
+      $el.off("focusout.TaskList", "li.task input.input:not([readonly])").on("focusout.TaskList", "li.task input.input:not([readonly])", function(a, e) {
+        var $this = $(this);
+        var $li = $this.parents("li:first");
+        var $ul = $this.parents("ul:first");
+        if ($this.val() && $this.val().trim()) {
+          $this.val();
+          $this.attr("title");
+          var data = {};
+          if(!$li.attr("data-module")) {
+            var group = $ul.attr("group");
+            data.content = "";
+            data.name = $this.val();
+            data.sn = $li.attr("sn");
+            $li.find(".e-list-loading").show();
+            $this.attr("readonly", true);
+            model.create(data, group, function(res) {
+              app.alert('success', "任务创建成功");
+              var task = model.task;
+              $li.attr({
+                id: task.id
+              });
+              $li.find(".shortcut").removeClass("hide");
+              $li.find(".finish").attr({
+                targetId: task.id,
+                status: task.status
+              });
+              $li.find(".e-list-loading").hide();
+              $li.find("input").remove();
+              $li.find(".checkbox").after('<div class="title j_entityslider-toggle" data-module="task" data-id="' + task.id + '"><div class="text" title="' + task.name + '"></div><span class="importance" style="display:none">紧急</span></div>');
+              $li.find(".title .text").text(task.name);
+              self._refreshViewBaseCount();
+            })
+          }
         }
       });
-      c.off("click.TaskList", "li.task").on("click.TaskList", "li.task", function(a) {
-        $(this).hasClass("unread") ? (a = $(".j_unread").text().trim(), a = $.isNumeric(a) ? a: 0, 0 >= a - 1 ? $(".j_unread").addClass("hide") : $(".j_unread").text(a - 1)) : $(this).hasClass("newComment") && (a = $(".j_feed").text().trim(), a = $.isNumeric(a) ? a: 0, $.isNumeric(a) && 0 >= a - 1 ? $(".j_feed").addClass("hide") : $(".j_feed").text(a - 1));
+      $el.off("click.TaskList", "li.task").on("click.TaskList", "li.task", function(e) {
+        var unreadCount = 0;
+        var commentCount = 0;
+        if($(this).hasClass("unread")) {
+          unreadCount = $(".j_unread").text().trim();
+          unreadCount = $.isNumeric(unreadCount) ? unreadCount: 0;
+          if(0 >= unreadCount - 1) {
+            $(".j_unread").addClass("hide");
+          } else {
+            $(".j_unread").text(unreadCount - 1);
+          }
+        } else {
+          if($(this).hasClass("newComment")) {
+            commentCount = $(".j_feed").text().trim();
+            commentCount = $.isNumeric(commentCount) ? commentCount: 0;
+            if($.isNumeric(commentCount) && 0 >= commentCount - 1) {
+              $(".j_feed").addClass("hide");
+            } else {
+              $(".j_feed").text(commentCount - 1);
+            }
+          }
+        }
         $(this).removeClass("unread");
-        $(this).removeClass("newComment")
+        $(this).removeClass("newComment");
       });
       this._$MAP.dragableUL.sortable({
         opacity: .9,
         handle: ".title",
-        revert: !0,
+        revert: true,
         connectWith: ".j_center .task-list",
         placeholder: "task-placeholder",
         cancel: ".readonly",
-        over: function(a, e) {
-          var b = e.item,
-          c = $(this),
-          k;
-          switch (g.viewState) {
-          case "beginDate":
-            k = c.attr("group").split("/")[1];
-            c = b.attr("due-date-group");
-            break;
-          case "dueDate":
-            k = b.attr("begin-date-group");
-            c = c.attr("group").split("/")[1];
-            break;
-          default:
-            return
-          }
-          g._dateGroupValid(k, c) ? (e.placeholder.removeClass("disable"), b.data("cancel", !1), e.placeholder.html("")) : (e.placeholder.addClass("disable"), b.data("cancel", !0), e.placeholder.html("&nbsp;&nbsp;\u8d77\u59cb\u65e5\u4e0d\u80fd\u5728\u5230\u671f\u65e5\u4e4b\u540e"))
-        },
-        update: function(a, e) {
-          e.item.data("cancel") ? $(this).sortable("cancel") : (g.rebuildSN(e.item.parent()), g.changeGroupWhileSort(e.item), "list" != g.viewState && e.sender && (g.rebuildSN(e.sender), g._changDateGroupByDrag(e.item), g._refreshViewBaseCount()))
-        }
-      }).disableSelection().off("click.mytask").on("click.mytask", function() {
-        $("textarea:focus, input:focus").length && $("textarea:focus, input:focus").trigger("focusout")
-      });
-      c.off("focusin.mytask", "#qcreatetask").on("focusin.mytask", "#qcreatetask", function() {
-        $(this).parent().addClass("active");
-        g.atmeview.render()
-      });
-      c.off("focusout.mytask", "#qcreatetask").on("focusout.mytask", "#qcreatetask", function() {
-        $(this).parent().removeClass("active")
-      });
-      c.off("keydown.mytask", "#qcreatetask").on("keydown.mytask", "#qcreatetask", function(a) {
-        a.ctrlKey && 13 == a.which && c.find(".j_qcreatetask").trigger("click")
-      });
-      c.off("click.mytask", ".j_qcreatetask").on("click.mytask", ".j_qcreatetask", function() {
-        var a = $("#qcreatetask");
-        if (!a.attr("readonly")) {
-          var e = a.val();
-          if (e && $.trim(e) && "" != $.trim(e)) {
-            var c = null,
-            k = [],
-            n = a.data("userData");
-            if (n) for (var p = 0; p < n.length; p++) if ( - 1 != e.indexOf(n[p].userName)) {
-              var d = "@" + n[p].userName; - 1 != e.indexOf(d) && (c ? k.push(n[p].userId) : c = n[p].userId);
-              e = e.replace(new RegExp(d, "gm"), "")
-            }
-            100 < $.trim(e).length ? f.notify("\u4efb\u52a1\u540d\u5b57\u957f\u5ea6\u4e0d\u8d85\u8fc7100\u5b57") : 0 == $.trim(e).length ? f.notify("\u8bf7\u8f93\u5165\u4efb\u52a1\u540d\u79f0") : (n = {
-              content: ""
-            },
-            n.name = e, n.sn = (new Date).getTime(), n.dueDate = (new Date).getTime(), c && (n.manager = {
-              id: c
-            }), b.create(n, null,
-            function(e) {
-              e = b.task;
-              if (k && 0 < k.length) {
-                var c = g.shareModel;
-                c.sids = k.join(",");
-                c.entityIds = e.id;
-                c.entryType = "user";
-                c._module = "task";
-                c.shareType = "participants";
-                c.saveAll()
-              }
-              f.notify("\u4efb\u52a1\u521b\u5efa\u6210\u529f");
-              g._renderOneTask(e, !0);
-              g._refreshViewBaseCount();
-              g.highLight(e.id);
-              a.attr("readonly", !1).data("manager", null).val("");
-              k = []
-            }))
-          }
-        }
-      })
-    },
-    changeGroupWhileSort: function(a) {
-      if (a) {
-        var e = $(a).parent().attr("group");
-        if (0 < e.indexOf("/") && e.substr(e.indexOf("/"))) {
-          var e = e.substr(e.indexOf("/") + 1),
-          g = this.model,
-          b = g.taskList,
-          c = [];
-          if (b) for (var k = 0,
-          n = b.length; k < n; k++) {
-            if (b[k].id == $(a).data("id")) switch (console.log($(a).data("id")), console.log(e), this.viewState) {
+        over: function(event, ui) {
+          var item = ui.item;
+          var $this = $(this);
+          var dateGroup;
+          var dateType;
+          switch (self.viewState) {
             case "beginDate":
-              b[k].beginDateGroup = e;
+              dateType = $this.attr("group").split("/")[1];
+              dateGroup = item.attr("due-date-group");
               break;
             case "dueDate":
-              b[k].dateGroup = e
-            }
-            c.push(b[k])
+              dateType = item.attr("begin-date-group");
+              dateGroup = $this.attr("group").split("/")[1];
+              break;
+            default:
+              return
           }
-          g.taskList = c
+          if(self._dateGroupValid(dateType, dateGroup)) {
+            ui.placeholder.removeClass("disable");
+            item.data("cancel", false);
+            ui.placeholder.html("");
+          } else {
+            ui.placeholder.addClass("disable");
+            item.data("cancel", true);
+            ui.placeholder.html("&nbsp;&nbsp;起始日不能在到期日之后");
+          }
+        },
+        update: function(event, ui) { //event, ui
+          if(ui.item.data("cancel")) {
+            $(this).sortable("cancel");
+          } else {
+            self.rebuildSN(ui.item.parent());
+            self.changeGroupWhileSort(ui.item);
+            if("list" != self.viewState && ui.sender) {
+              self.rebuildSN(ui.sender);
+              self._changDateGroupByDrag(ui.item);
+              self._refreshViewBaseCount();
+            }
+          }
+        }
+      }).disableSelection().off("click.mytask").on("click.mytask", function() {
+        if($("textarea:focus, input:focus").length) {
+          $("textarea:focus, input:focus").trigger("focusout");
+        }
+      });
+      $el.off("focusin.mytask", "#qcreatetask").on("focusin.mytask", "#qcreatetask", function() {
+        $(this).parent().addClass("active");
+        self.atmeview.render();
+      });
+      $el.off("focusout.mytask", "#qcreatetask").on("focusout.mytask", "#qcreatetask", function() {
+        $(this).parent().removeClass("active");
+      });
+      $el.off("keydown.mytask", "#qcreatetask").on("keydown.mytask", "#qcreatetask", function(e) {
+        if(e.ctrlKey && e.which==app.config.keyCode.ENTER) {
+          $el.find(".j_qcreatetask").trigger("click");
+        }
+      });
+      $el.off("click.mytask", ".j_qcreatetask").on("click.mytask", ".j_qcreatetask", function() {
+        var $createTask = $("#qcreatetask");
+        if (!$createTask.attr("readonly")) {
+          var taskContent = $createTask.val();
+          if (taskContent && $.trim(taskContent) && "" != $.trim(taskContent)) {
+            var userId = null;
+            var userIds = [];
+            var data = $createTask.data("userData");
+            if (data) {
+              for (var i = 0; i < data.length; i++) {
+                if ( - 1 != taskContent.indexOf(data[i].userName)) {
+                  var atUserName = "@" + data[i].userName;
+                  if(- 1 != taskContent.indexOf(atUserName)) {
+                    if(userId) {
+                      userIds.push(data[i].userId)
+                    } else {
+                      userId = data[i].userId;
+                    }
+                  }
+                  taskContent = taskContent.replace(new RegExp(atUserName, "gm"), "");
+                }
+              }
+            }
+            if(100 < $.trim(taskContent).length) {
+              app.alert('warning', "任务名字长度不超过100字");
+            } else {
+              if(0 == $.trim(taskContent).length) {
+                app.alert('warning', "请输入任务名称");
+              } else {
+                data = {
+                  content: ""
+                };
+                data.name = taskContent;
+                data.sn = (new Date).getTime();
+                data.dueDate = (new Date).getTime();
+                if(userId) {
+                  data.manager = {
+                    id: userId
+                  }
+                }
+                model.create(data, null, function(res) {
+                  var task = model.task;
+                  if (userIds && 0 < userIds.length) {
+                    var shareModel = self.shareModel;
+                    shareModel.sids = userIds.join(",");
+                    shareModel.entityIds = task.id;
+                    shareModel.entryType = "user";
+                    shareModel._module = "task";
+                    shareModel.shareType = "participants";
+                    shareModel.saveAll();
+                  }
+                  app.alert('success', "任务创建成功");
+                  self._renderOneTask(task, true);
+                  self._refreshViewBaseCount();
+                  self.highLight(task.id);
+                  $createTask.attr("readonly", false).data("manager", null).val("");
+                  userIds = [];
+                });
+              }
+            }
+          }
+        }
+      });
+    },
+    changeGroupWhileSort: function(el) {
+      if (el) {
+        var group = $(el).parent().attr("group");
+        if (0 < group.indexOf("/") && group.substr(group.indexOf("/"))) {
+          var dateGroup = group.substr(group.indexOf("/") + 1);
+          var model = this.model;
+          var taskList = model.taskList;
+          var tasks = [];
+          if (taskList) {
+            for (var k = 0, n = taskList.length; k < n; k++) {
+              if (taskList[k].id == $(el).data("id")) {
+                switch (this.viewState) {
+                  case "beginDate":
+                    taskList[k].beginDateGroup = dateGroup;
+                    break;
+                  case "dueDate":
+                    taskList[k].dateGroup = dateGroup;
+                }
+              }
+              tasks.push(taskList[k]);
+            }
+          }
+          model.taskList = tasks;
         }
       }
     },
