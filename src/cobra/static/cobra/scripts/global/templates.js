@@ -2074,6 +2074,33 @@
             '</div>' +
           '</li>' +
         '</div>' +
+      '</div>',
+    "task.taskright": '' +
+      '<div class="j_sidebarCtrl graph siderbar-ctrl-btn"></div>' +
+      '<div class="main-sidebar-bd">' +
+        '<div id="task-right">' +
+          '<div class="sbox">' +
+            '<div class="sbox-hd"><h5 class="sbox-title">今天任务统计</h5></div>' +
+            '<div class="sbox-bd">' +
+              '<div class="h-280" id="mytask"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="sbox">' +
+            '<div class="sbox-hd"><h5 class="sbox-title">下属任务统计</h5></div>' +
+            '<div id="sub" class="sbox-bd">' +
+              '<div class="task-underling-stat">' +
+                '<div id="empList" class="underling-filter clearfix"></div>' +
+                '<div class="j_notask no-more hide">该下属没有任务</div>' +
+                '<div id="subtask" class="h-280"></div>' +
+              '</div>' +
+              '<div class="sbox-no-data j_nosub hide">您没有下属</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="hide" id="empItem">' +
+            '<span class=" filter-item"><a userId="" title="" class="j_employee-click"></a></span>' +
+          '</div>' +
+          '<span class=" filter-item j_submore more hide"><a>更多</a></span>' +
+        '</div>' +
       '</div>'
 
   };

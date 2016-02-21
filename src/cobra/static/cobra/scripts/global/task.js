@@ -211,6 +211,256 @@
     }
   });
 
+  app.task.TaskRightView = Backbone.View.extend({
+    initialize: function(options) {
+      this.container = options.container;
+      this.subId = this.userId = options.userId;
+      this.el = "#task-right";
+      this.pageNo = 1;
+      this.pageSize = 5;
+      this.sub = false;
+      $(this.container).html(app.utils.template("task.taskright"));
+    },
+    delegateEvents: function() {
+      var self = this;
+      var $el = $(self.el);
+      $el.on("click.taskright", ".j_submore", function() {
+        self.pageNo++;
+        self.renderSub();
+      });
+      $el.on("click.taskright", ".j_employee-click", function() {
+        var $empList = $(this).parents("#empList");
+        var title = $(this).attr("title");
+        $(this).addClass("checked");
+        self.sub = true;
+        self.name = title;
+        self.subId = $(this).attr("userId");
+        $empList.find('a[title!="' + title + '"]').removeClass("checked");
+        self.subId ? self.renderSubChart(false) : self.renderSubChart(true);
+      });
+    },
+    render: function() {
+      if(app.config.noSubordinates==1) {
+        $(".sbox").last().addClass("hide");
+      }
+      var self = this;
+      $(self.el);
+      self.option = {
+        tooltip: {
+          trigger: "item",
+          formatter: "{a} <br/>{b} : {c}"
+        },
+        legend: {
+          orient: "horizontal",
+          x: "center",
+          y: "bottom",
+          borderColor: "#CCC",
+          borderWidth: 1,
+          textStyle: {
+            fontFamily: "Arial,Microsoft YaHei,sans-serif"
+          },
+          data: [{
+            name: "延期的"
+          }, {
+            name: "未完成的"
+          }, {
+            name: "有进展的"
+          }, {
+            name: "已完成的"
+          }]
+        },
+        toolbox: {
+          show: true,
+          feature: {
+            restore: {
+              show: true
+            },
+            saveAsImage: {
+              show: true,
+              name: ""
+            }
+          }
+        },
+        series: [{
+          name: "任务统计",
+          type: "pie",
+          center: ["50%", "40%"],
+          minAngle: 20,
+          startAngle: 45,
+          radius: ["40%", "70%"],
+          itemStyle: {
+            normal: {
+              label: {
+                show: true,
+                formatter: "{c}"
+              },
+              labelLine: {
+                show: true,
+                length: 5
+              }
+            },
+            emphasis: {
+              label: {
+                show: true,
+                position: "center",
+                textStyle: {
+                  fontSize: "15",
+                  fontWeight: "bold"
+                }
+              }
+            }
+          },
+          data: [{
+            value: 0,
+            name: "未完成的"
+          }, {
+            value: 0,
+            name: "有进展的"
+          }, {
+            value: 0,
+            name: "延期的"
+          }, {
+            value: 0,
+            name: "已完成的"
+          }]
+        }]
+      };
+      self.load(false, function(c) {
+        h.async("/js/echarts.min.js", function() {
+          self.tc = echarts.init($("#mytask")[0]);
+          var b = self.option.series[0].data;
+          var a = c.chartData;
+          var g = $(self.el).find(".sbox-title");
+          if(!a || 0 == a.todoCount && 0 == a.feedCount && 0 == a.dueCount && 0 == a.finishedCount) {
+            b[0].value = 1;
+            b[1].value = 1;
+            b[2].value = 1;
+            b[3].value = 1;
+            self.tc.setOption(self.option);
+            g.text("今天任务统计示例");
+          } else {
+            b[0].value = a.todoCount;
+            b[1].value = a.feedCount;
+            b[2].value = a.dueCount;
+            b[3].value = a.finishedCount;
+            self.tc.setOption(self.option);
+            g.text("今天任务统计");
+          }
+        })
+      });
+      self.renderSub();
+    },
+    renderSub: function() {
+      var $el = $(this.el);
+      var self = this;
+      $.ajax({
+        type: "get",
+        url: "/tasks/subList.json",
+        dataType: "json",
+        data: {
+          pageNo: self.pageNo,
+          pageSize: self.pageSize,
+          userId: self.userId
+        },
+        success: function(res) {
+          var result = res.pageSub.result;
+          if (result && 0 < result.length) {
+            self.sub = true;
+            $el.find("#sub").show();
+            if(self.pageNo==1) {
+              self.renderSubChart(true);
+            }
+            var $empList = $("#empList");
+            $empList.find(".j_submore").remove();
+            if (self.pageNo==1) {
+              var $empItem = $("#empItem span").clone();
+              $empItem.find("a").attr({
+                userId: null,
+                title: "所有下属"
+              }).text("所有下属").addClass("checked");
+              $empList.append($empItem);
+            }
+            $(result).each(function(index, item) {
+              $empItem = $("#empItem span").clone();
+              $empItem.find("a").attr({
+                userId: item.subId,
+                title: item.subName
+              }).text(item.subName);
+              $empList.append($empItem);
+            });
+            if(res.pageSub.hasNext) {
+              $empList.append($(".j_submore ").clone().removeClass("hide"));
+            }
+          } else {
+            $el.find(".j_nosub").show();
+            $("#subtask").addClass("hide");
+          }
+        }
+      });
+    },
+    renderSubChart: function(sub) {
+      var self = this;
+      var name = self.name ? self.name: "下属";
+      $(self.el).find(".j_sub").text(name + "今天任务统计");
+      self.load(sub, function(res) {
+        h.async("/js/echarts.min.js",
+        function() {
+          self.tc1 = echarts.init($("#subtask")[0]);
+          var data = self.option.series[0].data;
+          var chartData = res.chartData;
+          if(!chartData || 0 == chartData.todoCount && 0 == chartData.feedCount && 0 == chartData.dueCount && 0 == chartData.finishedCount) {
+            $("#empList").addClass("hide");
+            $("#subtask").addClass("hide");
+            $(".j_notask").removeClass("hide");
+          } else {
+            data[0].value = chartData.todoCount;
+            data[1].value = chartData.feedCount;
+            data[2].value = chartData.dueCount;
+            data[3].value = chartData.finishedCount;
+            $("#empList").removeClass("hide");
+            $("#subtask").removeClass("hide");
+            $(".j_notask").addClass("hide");
+          }
+          if(self.sub) {
+            $("#empList").removeClass("hide");
+          }
+          self.tc1.setOption(self.option);
+          self.tc1.resize();
+          self.tc1.restore();
+        });
+      });
+    },
+    load: function(sub, callback) {
+      var subId = this.subId;
+      var userId = this.userId;
+      $.ajax({
+        type: "get",
+        url: "/tasks/chartData.json",
+        dataType: "json",
+        data: {
+          userId: subId ? subId: userId,
+          sub: sub
+        },
+        success: function(res) {
+          if(callback) {
+            callback(res);
+          }
+        }
+      })
+    },
+    remove: function() {
+      if(this.tc) {
+        this.tc.clear();
+        this.tc.dispose();
+      }
+      if(this.tc1) {
+        this.tc1.clear();
+        this.tc1.dispose();
+      }
+      $(this.el).off(".taskright");
+    }
+  });
+
   app.task.MyTaskView = Backbone.View.extend({
     el: "#j_taskcenter",
     initialize: function(options) {
@@ -764,91 +1014,107 @@
         }
       }
     },
-    _dateGroupValid: function(a, e) {
-      if (a && e) {
-        var g = this._getDateByGroup("beginDate", a),
-        b = this._getDateByGroup("dueDate", e);
-        return g && b ? g <= b ? !0 : !1 : !0
+    _dateGroupValid: function(beginDateType, dueDateType) {
+      if (beginDateType && dueDateType) {
+        var beginDate = this._getDateByGroup("beginDate", beginDateType);
+        var dueDate = this._getDateByGroup("dueDate", dueDateType);
+        if(beginDate && dueDate) {
+          if(beginDate <= dueDate) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
       }
-      return ! 0
+      return true;
     },
-    _changDateGroupByDrag: function(a) {
-      var e = this.model,
-      g = a.parent().attr("group").split("/"),
-      b = this._getDateByGroup(g[0], g[1]),
-      c = a.attr("id");
-      e.changeProperty(c, g[0], b,
-      function(e) {
-        a.attr({
-          "begin-date-group": e.task.beginDateGroup,
-          "due-date-group": e.task.dueDateGroup
+    _changDateGroupByDrag: function($el) {
+      var model = this.model;
+      var propertyNames = $el.parent().attr("group").split("/");
+      var date = this._getDateByGroup(propertyNames[0], propertyNames[1]);
+      var taskId = $el.attr("id");
+      model.changeProperty(taskId, propertyNames[0], date, function(res) {
+        $el.attr({
+          "begin-date-group": res.task.beginDateGroup,
+          "due-date-group": res.task.dueDateGroup
         });
-        $("#entitySlider .taskId" + c).size() && ("beginDate" == g[0] ? $("#entitySlider #beginDate").trigger("updateDate.Task", b) : $("#entitySlider #dueDate").trigger("updateDate.Task", b))
-      })
+        if($("#entitySlider .taskId" + taskId).size()) {
+          if("beginDate" == propertyNames[0]) {
+            $("#entitySlider #beginDate").trigger("updateDate.Task", date);
+          } else {
+            $("#entitySlider #dueDate").trigger("updateDate.Task", date);
+          }
+        }
+      });
     },
-    _getDateByGroup: function(a, e) {
-      var g = Date.create(),
-      b;
-      switch (e) {
+    _getDateByGroup: function(oldDateType, dateType) {
+      var now = Date.create();
+      var date;
+      switch (dateType) {
         case "past":
         case "delay":
-          b = g.addDays( - 1).format("{yyyy}-{MM}-{dd}");
+          date = now.addDays( - 1).format("{yyyy}-{MM}-{dd}");
           break;
         case "today":
-          b = g.format("{yyyy}-{MM}-{dd}");
+          date = now.format("{yyyy}-{MM}-{dd}");
           break;
         case "tomorrow":
-          b = g.addDays(1).format("{yyyy}-{MM}-{dd}");
+          date = now.addDays(1).format("{yyyy}-{MM}-{dd}");
           break;
         case "future":
-          b = g.addDays(7).format("{yyyy}-{MM}-{dd}");
+          date = now.addDays(7).format("{yyyy}-{MM}-{dd}");
           break;
         case "memo":
-          b = null
+          date = null;
       }
-      return b
+      return date;
     },
     render: function() {
-      var a = this,
-      e = this.$el;
-      a._request(a.type, a.viewState);
-      switch (a.type) {
-      case "mine":
-        e.find("#view-taskType").removeClass("hide");
-        this.mine();
-        break;
-      case "all":
-        $(".j_timeview").removeClass("hide");
-      case "mineManager":
-      case "mineParticipants":
-      case "mineCreate":
-      case "unRead":
-      case "newComment":
-      case "watched":
-      case "shareToMe":
-      case "subordinates":
-      case "finished":
-        e.find("#view-state-toggle").addClass("hide"),
-        e.find("#view-state-toggle").addClass("hide"),
-        $(".task-finished").addClass("hide"),
-        a.viewState = "list",
-        a.search(!1)
+      var self = this;
+      var $el = this.$el;
+      self._request(self.type, self.viewState);
+      switch (self.type) {
+        case "mine":
+          $el.find("#view-taskType").removeClass("hide");
+          this.mine();
+          break;
+        case "all":
+          $(".j_timeview").removeClass("hide");
+        case "mineManager":
+        case "mineParticipants":
+        case "mineCreate":
+        case "unRead":
+        case "newComment":
+        case "watched":
+        case "shareToMe":
+        case "subordinates":
+        case "finished":
+          $el.find("#view-state-toggle").addClass("hide");
+          $el.find("#view-state-toggle").addClass("hide");
+          $(".task-finished").addClass("hide");
+          self.viewState = "list";
+          self.search(false);
       }
-      "watched" == a.type ? $(".task-watchs").addClass("hide") : $(".task-watchs").removeClass("hide");
-      a.renderUserConfig(); (new b({
+      if("watched" == self.type) {
+        $(".task-watchs").addClass("hide");
+      } else {
+        $(".task-watchs").removeClass("hide");
+      }
+      self.renderUserConfig();
+      (new app.task.TaskRightView({
         container: "#mytask-right",
         userId: this.userId
       })).render();
       setTimeout(function() {
-        var e = a.$el.find("#mytask-container .e-list-group");
-        _.each(e,
-        function(a) {
-          $(a).removeClass("animated");
-          $(a).removeClass("zoomIn")
-        })
-      },
-      1500);
-      app.utils.layout(".j_mainscroll")
+        var $listGroup = self.$el.find("#mytask-container .e-list-group");
+        _.each($listGroup, function(el) {
+          $(el).removeClass("animated");
+          $(el).removeClass("zoomIn");
+        });
+      }, 1500);
+      app.utils.layout(".j_mainscroll");
     },
     _renderAfterLoadMine: function() {
       var a = this.model;
