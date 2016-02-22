@@ -20,7 +20,7 @@
       $.ajax({
         contentType: "application/json;charset=UTF-8",
         type: "post",
-        url: "/tasks/" + b.userId + ".json",
+        url: "/tasks/" + self.userId + ".json",
         dataType: "json",
         data: data,
         success: function(res) {
@@ -446,7 +446,7 @@
             callback(res);
           }
         }
-      })
+      });
     },
     remove: function() {
       if(this.tc) {
@@ -470,7 +470,7 @@
       this.viewState = this._getConfig("viewState.task") || "list";
       this.model = new app.task.MyTaskModel(options);
       this.watchModel = new app.task.WatchModel();
-      this.shareModel = new app.components.Share({
+      this.shareModel = new app.models.Share({
         entityId: "",
         module: ""
       });
@@ -1117,89 +1117,113 @@
       app.utils.layout(".j_mainscroll");
     },
     _renderAfterLoadMine: function() {
-      var a = this.model;
+      var model = this.model;
       $("#mytask-loading").addClass("hide");
-      this._renderByViewState(a.taskList, !1);
-      this._renderMeta(!1);
-      this.taskId && this.highLight(this.taskId)
-    },
-    _renderByViewState: function(a, e) {
-      var g = this.viewState;
-      e || this._clearView(this.viewState);
-      switch (g) {
-      case "list":
-        this._renderAsList(a);
-        break;
-      case "dueDate":
-      case "beginDate":
-        this._renderAsDateGroup(a, g)
+      this._renderByViewState(model.taskList, false);
+      this._renderMeta(false);
+      if(this.taskId) {
+        this.highLight(this.taskId);
       }
     },
-    _clearView: function(a) {
-      switch (a) {
-      case "list":
-        this.$el.find("#mytask-container .all-type .task-list").empty();
-        break;
-      case "beginDate":
-        a = {
-          past: this.$el.find("#mytask-container .j_begin").filter(".past").children(".task-list"),
-          today: this.$el.find("#mytask-container .j_begin").filter(".today").children(".task-list"),
-          tomorrow: this.$el.find("#mytask-container .j_begin").filter(".tomorrow").children(".task-list"),
-          future: this.$el.find("#mytask-container .j_begin").filter(".future").children(".task-list"),
-          memo: this.$el.find("#mytask-container .j_begin").filter(".memo").children(".task-list")
-        };
-        for (var e in a) a[e].children("[class~=task]").remove();
-        break;
-      case "dueDate":
-        for (e in a = {
-          delay: this.$el.find("#mytask-container .j_due").filter(".delay").children(".task-list"),
-          today: this.$el.find("#mytask-container .j_due").filter(".today").children(".task-list"),
-          tomorrow: this.$el.find("#mytask-container .j_due").filter(".tomorrow").children(".task-list"),
-          future: this.$el.find("#mytask-container .j_due").filter(".future").children(".task-list"),
-          memo: this.$el.find("#mytask-container .j_due").filter(".memo").children(".task-list")
-        },
-        a) a[e].children("[class~=task]").remove()
+    _renderByViewState: function(tasks, notClear) {
+      var viewState = this.viewState;
+      if(!notClear) {
+        this._clearView(this.viewState);
+      }
+      switch (viewState) {
+        case "list":
+          this._renderAsList(tasks);
+          break;
+        case "dueDate":
+        case "beginDate":
+          this._renderAsDateGroup(tasks, viewState);
+      }
+    },
+    _clearView: function(viewState) {
+      var viewStateEls;
+      switch (viewState) {
+        case "list":
+          this.$el.find("#mytask-container .all-type .task-list").empty();
+          break;
+        case "beginDate":
+          viewStateEls = {
+            past: this.$el.find("#mytask-container .j_begin").filter(".past").children(".task-list"),
+            today: this.$el.find("#mytask-container .j_begin").filter(".today").children(".task-list"),
+            tomorrow: this.$el.find("#mytask-container .j_begin").filter(".tomorrow").children(".task-list"),
+            future: this.$el.find("#mytask-container .j_begin").filter(".future").children(".task-list"),
+            memo: this.$el.find("#mytask-container .j_begin").filter(".memo").children(".task-list")
+          };
+          for (var i in viewStateEls) {
+            viewStateEls[i].children("[class~=task]").remove();
+          }
+          break;
+        case "dueDate":
+          viewStateEls = {
+            delay: this.$el.find("#mytask-container .j_due").filter(".delay").children(".task-list"),
+            today: this.$el.find("#mytask-container .j_due").filter(".today").children(".task-list"),
+            tomorrow: this.$el.find("#mytask-container .j_due").filter(".tomorrow").children(".task-list"),
+            future: this.$el.find("#mytask-container .j_due").filter(".future").children(".task-list"),
+            memo: this.$el.find("#mytask-container .j_due").filter(".memo").children(".task-list")
+          };
+          for (var j in viewStateEls) {
+            viewStateEls[j].children("[class~=task]").remove();
+          }
       }
     },
     _renderMeta: function(a) {
-      var e = this.model,
-      g;
+      var e = this.model;
+      var g;
       switch (this.viewState) {
-      case "list":
-        if (g = this.$el.find("#mytask-container .all-type-view"), a) {
-          a = e.lastPage;
-          var b = (e = a.result) && e.length == a.pageSize;
-          if (e.length) g.children(".no-result").addClass("hide"),
-          g.children("#all-type-list").removeClass("hide"),
-          b ? (g.children(".j_moretask").removeClass("hide"), g.children(".j_nodata").addClass("hide")) : (g.children(".j_moretask").addClass("hide"), g.children(".j_nodata, .center-more").addClass("hide"), 1 < a.pageNo && g.children(".j_nodata").removeClass("hide"));
-          else switch (g.children().addClass("hide"), this.type) {
-          case "mine":
-          case "mineManager":
-          case "mineCreate":
-            g.children(".j_fast-create").removeClass("hide");
-            break;
-          default:
-            g.children(".j_no-result-tip").removeClass("hide")
+        case "list":
+          if (g = this.$el.find("#mytask-container .all-type-view"), a) {
+            a = e.lastPage;
+            var b = (e = a.result) && e.length == a.pageSize;
+            if (e.length) {
+              g.children(".no-result").addClass("hide");
+              g.children("#all-type-list").removeClass("hide");
+              if(b) {
+                g.children(".j_moretask").removeClass("hide");
+                g.children(".j_nodata").addClass("hide");
+              } else {
+                g.children(".j_moretask").addClass("hide");
+                g.children(".j_nodata, .center-more").addClass("hide");
+                if(1 < a.pageNo) {
+                  g.children(".j_nodata").removeClass("hide");
+                }
+              }
+            } else {
+              switch (g.children().addClass("hide"), this.type) {
+                case "mine":
+                case "mineManager":
+                case "mineCreate":
+                  g.children(".j_fast-create").removeClass("hide");
+                  break;
+                default:
+                  g.children(".j_no-result-tip").removeClass("hide");
+                }
+            }
+          } else if (e = e.taskList, g.children().addClass("hide"), e.length) {
+            g.children().addClass("hide").filter("#all-type-list").removeClass("hide");
+          } else {
+            switch (g.children().addClass("hide"), this.type) {
+              case "mine":
+              case "mineManager":
+              case "mineCreate":
+                g.children(".j_fast-create").removeClass("hide");
+                break;
+              default:
+                g.children(".j_no-result-tip").removeClass("hide")
+              }
           }
-        } else if (e = e.taskList, g.children().addClass("hide"), e.length) g.children().addClass("hide").filter("#all-type-list").removeClass("hide");
-        else switch (g.children().addClass("hide"), this.type) {
-        case "mine":
-        case "mineManager":
-        case "mineCreate":
-          g.children(".j_fast-create").removeClass("hide");
-          break;
-        default:
-          g.children(".j_no-result-tip").removeClass("hide")
-        }
       }
     },
-    _toggleViewState: function(a) {
-      var e = this.model;
-      this.viewState = a;
+    _toggleViewState: function(viewState) {
+      var model = this.model;
+      this.viewState = viewState;
       this._request(this.type, this.viewState);
       this.$el.find("#mytask-loading").addClass("hide");
-      this._renderByViewState(e.isPaged ? e.lastPage.result: e.taskList);
-      this.setConfig("viewState.task", a)
+      this._renderByViewState(model.isPaged ? model.lastPage.result: model.taskList);
+      this.setConfig("viewState.task", viewState);
     },
     _getConfig: function(configKey) {
       var config = null;
@@ -1244,9 +1268,11 @@
         }
       }
     },
-    _renderAsDateGroup: function(a, e) {
-      for (var g = 0; g < a.length; g++) this._renderOneTask(a[g]);
-      this._refreshViewBaseCount()
+    _renderAsDateGroup: function(tasks, e) {
+      for (var i = 0; i < tasks.length; i++) {
+        this._renderOneTask(tasks[i]);
+      }
+      this._refreshViewBaseCount();
     },
     _renderOneTask: function(a, e) {
       $("#task-type").attr("data-entity");
@@ -1263,53 +1289,116 @@
         "data-module": "task",
         "data-id": a.id
       });
-      a.watched ? (g.find(".watch").html('<i class="icon-star"></i>&nbsp;\u53d6\u6d88\u5173\u6ce8'), g.find(".watch").attr("watched", "true")) : g.find(".watch").attr("watched", "false");
+      if(a.watched) {
+        g.find(".watch").html('<i class="icon-star"></i>&nbsp;取消关注');
+        g.find(".watch").attr("watched", "true");
+      } else {
+        g.find(".watch").attr("watched", "false");
+      }
       g.find(".watch").attr("targetId", a.id);
       g.find(".watch").attr("module", "task");
-      "urgency" == a.priority ? g.find(".importance").removeClass("hide").text("\u975e\u5e38\u7d27\u6025").addClass("urgency") : "high" == a.priority && g.find(".importance").removeClass("hide").text("\u7d27\u6025").addClass("high");
-      "finished" != this.type ? this._renderStatus(a.status, g) : g.find(".finish").html('<i class="icon-finished"></i>&nbsp;\u6807\u8bb0\u672a\u5b8c\u6210').attr({
-        status: "finished",
-        title: "\u5f53\u524d\u72b6\u6001\u4e3a\u5df2\u5b8c\u6210\uff0c\u70b9\u51fb\u8bbe\u7f6e\u4e3a\u672a\u5b8c\u6210"
-      });
-      this.type && "unRead" == this.type ? g.addClass("unread") : this.type && "newConment" == this.type ? g.addClass("newComment") : (a.newConment && g.addClass("newComment"), a.unread && g.addClass("unread").removeClass("newComment"));
+      if("urgency" == a.priority) {
+        g.find(".importance").removeClass("hide").text("非常紧急").addClass("urgency");
+      } else {
+        if("high" == a.priority) {
+          g.find(".importance").removeClass("hide").text("紧急").addClass("high");
+        }
+      }
+      if("finished" != this.type) {
+        this._renderStatus(a.status, g)
+      } else {
+        g.find(".finish").html('<i class="icon-finished"></i>&nbsp;标记未完成').attr({
+          status: "finished",
+          title: "当前状态为已完成，点击设置为未完成"
+        });
+      }
+      if(this.type && "unRead" == this.type) {
+        g.addClass("unread")
+      } else if(this.type && "newConment" == this.type) {
+        g.addClass("newComment")
+      } else {
+        a.newConment && g.addClass("newComment");
+        a.unread && g.addClass("unread").removeClass("newComment");
+      }
       a.commentCount = 0;
-      0 != a.commentCount && g.find(".comment-count").html('<i class="icon-chat-3 mr-3"></i><em>' + a.commentCount + "</em>");
+      if(0 != a.commentCount) {
+        g.find(".comment-count").html('<i class="icon-chat-3 mr-3"></i><em>' + a.commentCount + "</em>");
+      }
       g.find(".share").attr("targetId", a.id);
       g.find(".shortcut").removeClass("hide");
-      1 < a.permission ? g.addClass("editable") : g.addClass("readonly");
-      1 == a.permission ? (g.find("input").attr("value", a.name).attr("title", a.name).attr("readonly", !0), "subordinates" == this.type && g.find(".finish").attr("targetId", a.id), "subordinates" == this.type && 1 == a.locked && g.find(".finish").removeAttr("targetId"), "subordinates" == this.type && 0 == a.relationflag && g.find(".finish").removeAttr("targetId")) : (g.find(".finish").attr("targetId", a.id), 3 === a.permission && a.locked && g.find(".finish").removeAttr("targetId"), g.find("input").attr("value", a.name).attr("title", a.name));
+      if(1 < a.permission) {
+        g.addClass("editable");
+      } else {
+        g.addClass("readonly");
+      }
+      if(1 == a.permission) {
+        g.find("input").attr("value", a.name).attr("title", a.name).attr("readonly", true);
+        if("subordinates" == this.type) {
+          g.find(".finish").attr("targetId", a.id);
+        }
+        if("subordinates" == this.type && 1 == a.locked) {
+          g.find(".finish").removeAttr("targetId");
+        }
+        if("subordinates" == this.type && 0 == a.relationflag) {
+          g.find(".finish").removeAttr("targetId");
+        }
+      } else {
+        g.find(".finish").attr("targetId", a.id);
+        if(3 === a.permission && a.locked) {
+          g.find(".finish").removeAttr("targetId");
+        }
+        g.find("input").attr("value", a.name).attr("title", a.name);
+      }
       g.find(".title .text").attr("title", a.name).text(a.name);
       var b = a.dueDate ? Date.create(a.dueDate).format("{yyyy}-{MM}-{dd}") : "";
       g.find(".date").html(b);
-      a.manager && a.manager.username != TEAMS.currentUser.username && g.find(".user").html(a.manager.username);
+      if(a.manager && a.manager.username != app.config.currentUser.username) {
+        g.find(".user").html(a.manager.username);
+      }
       b = null;
       switch (this.viewState) {
-      case "beginDate":
-        b = this._$MAP[this.viewState].ulMap[a.beginDateGroup];
-        break;
-      case "dueDate":
-        b = this.$el.find("#mytask-container .j_due");
-        b = {
-          delay: b.filter(".delay").children(".task-list"),
-          today: b.filter(".today").children(".task-list"),
-          tomorrow: b.filter(".tomorrow").children(".task-list"),
-          future: b.filter(".future").children(".task-list"),
-          memo: b.filter(".memo").children(".task-list")
-        } [a.dateGroup];
-        break;
-      case "list":
-        b = this.$el.find("#mytask-container .all-type .task-list")
+        case "beginDate":
+          b = this._$MAP[this.viewState].ulMap[a.beginDateGroup];
+          break;
+        case "dueDate":
+          b = this.$el.find("#mytask-container .j_due");
+          b = {
+            delay: b.filter(".delay").children(".task-list"),
+            today: b.filter(".today").children(".task-list"),
+            tomorrow: b.filter(".tomorrow").children(".task-list"),
+            future: b.filter(".future").children(".task-list"),
+            memo: b.filter(".memo").children(".task-list")
+          }[a.dateGroup];
+          break;
+        case "list":
+          b = this.$el.find("#mytask-container .all-type .task-list");
       }
-      var c = b.children(".task").size(),
+      var c = b.children(".task").size();
       c = c ? c + 1 : 1;
-      e ? (b.prepend(g), this.rebuildSN(b)) : (g.find(".sn").html(c), b.append(g))
+      if(e) {
+        b.prepend(g);
+        this.rebuildSN(b);
+      } else {
+        g.find(".sn").html(c);
+        b.append(g);
+      }
     },
     _refreshViewBaseCount: function() {
       function a() {
-        for (b in g) c = g[b],
-        k = c.parent(),
-        n = c.children(".task").size(),
-        0 < n ? (k.removeClass("hide").find(".j_count").html("(" + n + ")"), c.children(".notask").addClass("hide")) : c.children(".notask").size() ? (c.children(".notask").removeClass("hide"), k.removeClass("hide").find(".j_count").html("")) : k.addClass("hide").find(".j_count").html("")
+        for (b in g) {
+          c = g[b];
+          k = c.parent();
+          n = c.children(".task").size();
+          if(0 < n) {
+            k.removeClass("hide").find(".j_count").html("(" + n + ")");
+            c.children(".notask").addClass("hide");
+          } else if(c.children(".notask").size()) {
+            c.children(".notask").removeClass("hide");
+            k.removeClass("hide").find(".j_count").html("");
+          } else {
+            k.addClass("hide").find(".j_count").html("");
+          }
+        }
       }
       function e(a) {
         c = g;
@@ -1318,60 +1407,93 @@
         case "mine":
         case "mineManager":
         case "mineCreate":
-          c.children().size() ? (k.children(".j_fast-create, .j_no-result-tip").addClass("hide"), c.removeClass("hide")) : (k.children(".j_fast-create").removeClass("hide"), k.children(".j_no-result-tip").addClass("hide"), c.addClass("hide"));
+          if(c.children().size()) {
+            k.children(".j_fast-create, .j_no-result-tip").addClass("hide");
+            c.removeClass("hide");
+          } else {
+            k.children(".j_fast-create").removeClass("hide");
+            k.children(".j_no-result-tip").addClass("hide");
+            c.addClass("hide");
+          }
           break;
         default:
-          c.children().size() ? (k.children(".j_fast-create, .j_no-result-tip").addClass("hide"), c.removeClass("hide")) : (k.children(".j_fast-create").addClass("hide"), k.children(".j_no-result-tip").removeClass("hide"), c.addClass("hide"))
+          if(c.children().size()) {
+            k.children(".j_fast-create, .j_no-result-tip").addClass("hide");
+            c.removeClass("hide");
+          } else {
+            k.children(".j_fast-create").addClass("hide");
+            k.children(".j_no-result-tip").removeClass("hide");
+            c.addClass("hide");
+          }
         }
       }
       var g, b, c, k, n;
       switch (this.viewState) {
-      case "beginDate":
-        g = this._$MAP.beginDate.ulMap;
-        a();
-        break;
-      case "dueDate":
-        g = {
-          delay: this.$el.find("#mytask-container .j_due").filter(".delay").children(".task-list"),
-          today: this.$el.find("#mytask-container .j_due").filter(".today").children(".task-list"),
-          tomorrow: this.$el.find("#mytask-container .j_due").filter(".tomorrow").children(".task-list"),
-          future: this.$el.find("#mytask-container .j_due").filter(".future").children(".task-list"),
-          memo: this.$el.find("#mytask-container .j_due").filter(".memo").children(".task-list")
-        };
-        a();
-        break;
-      case "list":
-        g = this._$MAP.list.ul,
-        e(this.type)
+        case "beginDate":
+          g = this._$MAP.beginDate.ulMap;
+          a();
+          break;
+        case "dueDate":
+          g = {
+            delay: this.$el.find("#mytask-container .j_due").filter(".delay").children(".task-list"),
+            today: this.$el.find("#mytask-container .j_due").filter(".today").children(".task-list"),
+            tomorrow: this.$el.find("#mytask-container .j_due").filter(".tomorrow").children(".task-list"),
+            future: this.$el.find("#mytask-container .j_due").filter(".future").children(".task-list"),
+            memo: this.$el.find("#mytask-container .j_due").filter(".memo").children(".task-list")
+          };
+          a();
+          break;
+        case "list":
+          g = this._$MAP.list.ul;
+          e(this.type);
       }
     },
     renderUserConfig: function() {
       var a = this,
-      e = a._getConfig("order.task.search"),
-      g = a._getConfig("order.task.searchDirection");
-      e && g && $(".orderType").each(function(a) {
-        a = $(this);
-        a.attr("data-entity") == e && a.attr("data-direction") == g && (a.parent().addClass("active"), $("#task-order").attr("data-entity", e).attr("data-direction", g))
-      });
-      a.viewState && a.$el.find("#view-state").children().removeClass("active").each(function(e) {
-        e = $(this);
-        if (e.attr("data-value") == a.viewState) return e.addClass("active"),
-        !1
-      })
+        e = a._getConfig("order.task.search"),
+        g = a._getConfig("order.task.searchDirection");
+      if(e && g) {
+        $(".orderType").each(function(a) {
+          a = $(this);
+          if(a.attr("data-entity") == e && a.attr("data-direction") == g) {
+            a.parent().addClass("active");
+            $("#task-order").attr("data-entity", e).attr("data-direction", g);
+          }
+        });
+      }
+      if(a.viewState) {
+        a.$el.find("#view-state").children().removeClass("active").each(function(e) {
+          e = $(this);
+          if (e.attr("data-value") == a.viewState) {
+            e.addClass("active");
+            return false;
+          }
+        });
+      }
     },
     _renderStatus: function(a, e) {
-      "finished" == a ? (e.find(".finish").html('<i class="icon-finished"></i>&nbsp;\u6807\u8bb0\u672a\u5b8c\u6210').attr({
-        status: "finished",
-        title: "\u5f53\u524d\u72b6\u6001\u4e3a\u5df2\u5b8c\u6210\uff0c\u70b9\u51fb\u8bbe\u7f6e\u4e3a\u672a\u5b8c\u6210"
-      }), e.find(".title .text").addClass("finished-line")) : (e.find(".finish").html('<i class="icon-todo"></i>&nbsp;\u6807\u8bb0\u5b8c\u6210').attr({
-        status: "todo",
-        title: "\u5f53\u524d\u72b6\u6001\u4e3a\u672a\u5b8c\u6210\uff0c\u70b9\u51fb\u8bbe\u7f6e\u4e3a\u5b8c\u6210"
-      }), e.find(".title .text").removeClass("finished-line"))
+      if("finished" == a) {
+        e.find(".finish").html('<i class="icon-finished"></i>&nbsp;\u6807\u8bb0\u672a\u5b8c\u6210').attr({
+          status: "finished",
+          title: "当前状态为已完成，点击设置为未完成"
+        });
+        e.find(".title .text").addClass("finished-line");
+      } else {
+        e.find(".finish").html('<i class="icon-todo"></i>&nbsp;\u6807\u8bb0\u5b8c\u6210').attr({
+          status: "todo",
+          title: "当前状态为未完成，点击设置为完成"
+        });
+        e.find(".title .text").removeClass("finished-line");
+      }
     },
     _insertBlank: function(a) {
-      var e = $("#taskClone").clone(),
-      g = a.attr("group").split("/");
-      "beginDate" == g[0] ? e.attr("begin-date-group", g[1]) : e.attr("due-date-group", g[1]);
+      var e = $("#taskClone").clone();
+      var g = a.attr("group").split("/");
+      if("beginDate" == g[0]) {
+        e.attr("begin-date-group", g[1]);
+      } else {
+        e.attr("due-date-group", g[1]);
+      }
       g = (new Date).getTime();
       e.attr({
         sn: g,
@@ -1382,44 +1504,61 @@
       a.prepend(e).find(".notask").addClass("hide");
       this.rebuildSN(a);
       this.highLight(g);
-      e.find("input.input").focus()
+      e.find("input.input").focus();
     },
     updateFastKey: function(a, e) {
-      for (var g = e.split(","), b = 0; b < g.length - 1; b++) {
+      var g = e.split(",");
+      for (var b = 0; b < g.length - 1; b++) {
         var c = $("#mytask-container #" + g[b]);
-        "watch" == a ? (c.find(".watch").html('<i class="icon-star"></i>&nbsp;\u53d6\u6d88\u5173\u6ce8'), c.find(".watch").attr("watched", "true")) : "finished" == a && this._renderStatus("finished", c)
+        if("watch" == a) {
+          c.find(".watch").html('<i class="icon-star"></i>&nbsp; 取消关注');
+          c.find(".watch").attr("watched", "true");
+        } else {
+          if("finished" == a) {
+            this._renderStatus("finished", c);
+          }
+        }
       }
     },
     findSelectedUsefulLi: function() {
       var a = "";
       $(".j_center .e-list .checkbox").each(function() {
-        $(this).find("i").hasClass("icon-checkbox-checked") && void 0 != $(this).parent("li").find(".finish").attr("targetId") && (a += $(this).parent("li").attr("id") + ",")
+        var hasChecked = $(this).find("i").hasClass("icon-checkbox-checked");
+        var targetId = $(this).parent("li").find(".finish").attr("targetId");
+        if(hasChecked && void 0 != targetId) {
+          a += $(this).parent("li").attr("id") + ",";
+        }
       });
-      return a
+      return a;
     },
     findSelectedLi: function() {
       var a = "";
       $(".j_center .e-list .checkbox").each(function() {
-        $(this).find("i").hasClass("icon-checkbox-checked") && (a += $(this).parent("li").attr("id") + ",")
+        var hasChecked = $(this).find("i").hasClass("icon-checkbox-checked");
+        if(hasChecked) {
+          a += $(this).parent("li").attr("id") + ",";
+        }
       });
-      return a
+      return a;
     },
     highLight: function(a) {
       $("#mytask-container li.active").removeClass("active");
-      $("#mytask-container #" + a).addClass("active")
+      $("#mytask-container #" + a).addClass("active");
     },
     rebuildSN: function(a) {
       a = a.find("li.task");
-      for (var e = 0; e < a.length; e++) $(a[e]).find(".sn").html(e + 1)
+      for (var i = 0; i < a.length; i++) {
+        $(a[i]).find(".sn").html(i + 1);
+      }
     },
     beforeOpenTask: function(a) {
-      this.highLight(a)
+      this.highLight(a);
     },
     insertTask: function(a) {
       this.model.add(a);
-      this._renderOneTask(a, !0);
+      this._renderOneTask(a, true);
       this._refreshViewBaseCount();
-      this.highLight(a.id)
+      this.highLight(a.id);
     },
     removeTask: function(a) {
       this.model.remove(a);
@@ -1427,109 +1566,160 @@
       var e = a.parent();
       a.remove();
       this.rebuildSN(e);
-      this._refreshViewBaseCount()
+      this._refreshViewBaseCount();
     },
     changeStatus: function(a, e) {
       var g = this.$el.find("#mytask-container #" + a);
-      this._renderStatus(e, g)
+      this._renderStatus(e, g);
     },
     changeWatch: function(a, e) {
       var g = $("#mytask-container #" + a);
-      e ? (g.find(".watch").html('<i class="icon-star"></i>&nbsp;\u53d6\u6d88\u5173\u6ce8'), g.find(".watch").attr("watched", "true")) : (g.find(".watch").html('<i class="icon-favourite"></i>&nbsp;\u5173\u6ce8'), g.find(".watch").attr("watched", "false"))
+      if(e) {
+        g.find(".watch").html('<i class="icon-star"></i>&nbsp;取消关注');
+        g.find(".watch").attr("watched", "true");
+      } else {
+        g.find(".watch").html('<i class="icon-favourite"></i>&nbsp;关注');
+        g.find(".watch").attr("watched", "false");
+      }
     },
-    changeTitle: function(a, e) {
-      $("#mytask-container #" + a).find(".title .text").text(e).attr("title", e)
+    changeTitle: function(domId, title) {
+      $("#mytask-container #" + domId).find(".title .text").text(title).attr("title", title);
     },
     changeManager: function(a, e) {
-      a && (a.username != TEAMS.currentUser.username ? $("#mytask-container #" + e + " .user").html(a.username) : $("#mytask-container #" + e + " .user").html(""))
+      if(a) {
+        if(a.username != app.config.currentUser.username) {
+          $("#mytask-container #" + e + " .user").html(a.username);
+        } else {
+          $("#mytask-container #" + e + " .user").html("");
+        }
+      }
     },
     changeDuedate: function(a) {
       var e = $("#mytask-container #" + a.id);
-      0 < e.length && (e = $(e[0]));
+      if(0 < e.length) {
+        e = $(e[0]);
+      }
       var g = a.dueDate ? Date.create(a.dueDate).format("{yyyy}-{MM}-{dd}") : "";
       e.find(".date").html(g);
       if ("dueDate" == this.viewState) {
         if (g = e.attr("due-date-group"), g != a.dueDateGroup) {
-          var g = this._$MAP[this.viewState].ulMap[g],
-          b = this._$MAP[this.viewState].ulMap[a.dueDateGroup];
+          var g = this._$MAP[this.viewState].ulMap[g];
+          var b = this._$MAP[this.viewState].ulMap[a.dueDateGroup];
           e.prependTo(b);
           e.attr("due-date-group", a.dueDateGroup);
           this.changeTaskGroup(a);
           this.rebuildSN(g);
           this.rebuildSN(b);
           this._refreshViewBaseCount();
-          this.highLight(a.id)
+          this.highLight(a.id);
         }
-      } else e.attr("due-date-group", a.dueDateGroup)
+      } else {
+        e.attr("due-date-group", a.dueDateGroup);
+      }
     },
     changeTaskGroup: function(a) {
       if (a) {
-        var e = this.model,
-        g = e.taskList,
-        b = [];
-        if (g) for (var c = 0,
-        k = g.length; c < k; c++) g[c].id == a.id && (g[c].dueDateGroup = a.dueDateGroup, g[c].dateGroup = a.dueDateGroup),
-        b.push(g[c]);
-        e.taskList = b
+        var e = this.model;
+        var g = e.taskList;
+        var b = [];
+        if (g) {
+          for (var c = 0, k = g.length; c < k; c++) {
+            if(g[c].id == a.id) {
+              g[c].dueDateGroup = a.dueDateGroup;
+              g[c].dateGroup = a.dueDateGroup;
+            }
+            b.push(g[c]);
+          }
+        }
+        e.taskList = b;
       }
     },
     changeBeginDate: function(a) {
       var e = $("#mytask-container #" + a.id);
-      0 < e.length && (e = $(e[0]));
+      if(0 < e.length) {
+        e = $(e[0]);
+      }
       if ("beginDate" == this.viewState) {
         var g = e.attr("begin-date-group");
         if (g != a.beginDateGroup) {
-          var g = this._$MAP[this.viewState].ulMap[g],
-          b = this._$MAP[this.viewState].ulMap[a.beginDateGroup];
+          var g = this._$MAP[this.viewState].ulMap[g];
+          var b = this._$MAP[this.viewState].ulMap[a.beginDateGroup];
           e.attr("begin-date-group", a.beginDateGroup);
           e.prependTo(b);
-          0 < g.find("#" + a.id).length && g.find("#" + a.id).remove();
+          if(0 < g.find("#" + a.id).length) {
+            g.find("#" + a.id).remove();
+          }
           this.changeBeginDateGroup(a);
           this.rebuildSN(g);
           this.rebuildSN(b);
           this._refreshViewBaseCount();
-          this.highLight(a.id)
+          this.highLight(a.id);
         }
-      } else e.attr("begin-date-group", a.beginDateGroup)
+      } else {
+        e.attr("begin-date-group", a.beginDateGroup);
+      }
     },
     changeBeginDateGroup: function(a) {
       if (a) {
-        var e = this.model,
-        g = e.taskList,
-        b = [];
-        if (g) for (var c = 0,
-        k = g.length; c < k; c++) g[c].id == a.id && (g[c].dateGroup = a.beginDateGroup, g[c].beginDateGroup = a.beginDateGroup),
-        b.push(g[c]);
-        e.taskList = b
+        var e = this.model;
+        var g = e.taskList;
+        var b = [];
+        if (g) {
+          for (var c = 0, k = g.length; c < k; c++) {
+            if(g[c].id == a.id) {
+              g[c].dateGroup = a.beginDateGroup;
+              g[c].beginDateGroup = a.beginDateGroup;
+            }
+            b.push(g[c]);
+          }
+        }
+        e.taskList = b;
       }
     },
     _buildQueryParam: function() {
-      var a = this.model,
-      e = {},
-      g = $("#task-filter").data("data-filter"),
-      b = $("#task-order").attr("data-entity"),
-      c = $("#task-order").attr("data-direction"),
-      k = $("#task-taskType").attr("data-entity"),
-      n = this.type ? this.type: "mine";
-      if ("mine" == n || null == n)"mineManager" == k ? n = "mineManager": "mineParticipants" == k ? n = "mineParticipants": "mine" == k && (n = "mine");
-      var k = $.trim($("#tasksearch-keywords").val()),
-      p = $("#tasksearch-keywords").attr("placeholder");
-      k == p && (k = "");
+      var a = this.model;
+      var e = {};
+      var g = $("#task-filter").data("data-filter");
+      var b = $("#task-order").attr("data-entity");
+      var c = $("#task-order").attr("data-direction");
+      var k = $("#task-taskType").attr("data-entity");
+      var n = this.type ? this.type: "mine";
+      if ("mine" == n || null == n) {
+        if("mineManager" == k) {
+          n = "mineManager"
+        } else if("mineParticipants" == k) {
+          n = "mineParticipants"
+        } else if("mine" == k) {
+          n = "mine"
+        }
+      }
+      var k = $.trim($("#tasksearch-keywords").val());
+      var p = $("#tasksearch-keywords").attr("placeholder");
+      if(k == p) {
+        k = "";
+      }
       g = g ? JSON.parse("{" + g + "}") : {};
-      k && (n = "all", g.keywords = k);
+      if(k) {
+        n = "all";
+        g.keywords = k;
+      }
       g.type = n;
-      "all" != n && (g.taskStatus = "todo");
+      if("all" != n) {
+        g.taskStatus = "todo";
+      }
       e.filter = g;
-      b && c && (e.order = {
-        property: b,
-        direction: c
-      });
+      if(b && c) {
+        e.order = {
+          property: b,
+          direction: c
+        };
+      }
       a.userId = this.userId ? this.userId: a.userId;
       a.id = this.id ? this.id: a.id;
       e.userId = a.userId;
       e.pageNo = a.pageNo;
-      e.noPageCount = !0;
-      return JSON.stringify(e)
+      e.noPageCount = true;
+      return JSON.stringify(e);
     },
     _request: function(a, e) {
       switch (a) {
@@ -1548,67 +1738,85 @@
           this._$MAP.dueDate.divs.removeClass("hide");
           break;
         case "beginDate":
-          this._$MAP.list.div.addClass("hide"),
-          this._$MAP.list.ul.addClass("hide"),
-          this._$MAP.beginDate.divs.removeClass("hide"),
-          this._$MAP.dueDate.divs.addClass("hide")
+          this._$MAP.list.div.addClass("hide");
+          this._$MAP.list.ul.addClass("hide");
+          this._$MAP.beginDate.divs.removeClass("hide");
+          this._$MAP.dueDate.divs.addClass("hide");
         }
         break;
       default:
-        this._$MAP.list.div.removeClass("hide"),
-        this._$MAP.beginDate.divs.addClass("hide"),
-        this._$MAP.dueDate.divs.addClass("hide")
+        this._$MAP.list.div.removeClass("hide");
+        this._$MAP.beginDate.divs.addClass("hide");
+        this._$MAP.dueDate.divs.addClass("hide");
       }
-      $("#mytask-loading").removeClass("hide")
+      $("#mytask-loading").removeClass("hide");
     },
     mine: function() {
       var a = this,
-      e = this.model,
-      g = this._buildQueryParam();
-      e.load(g,
-      function() {
-        a._renderAfterLoadMine()
-      })
+        e = this.model,
+        g = this._buildQueryParam();
+      e.load(g, function() {
+        a._renderAfterLoadMine();
+      });
     },
     search: function(a) {
       var e = this,
         g = e.model,
         b = e._buildQueryParam();
       g.search(b, function(g) {
-        e._renderAfterSearch(a)
+        e._renderAfterSearch(a);
       });
     },
     _renderAfterSearch: function(a) {
       var e = this.model;
       this.$el.find("#mytask-loading").addClass("hide");
       this._renderByViewState(e.lastPage.result, a);
-      this._renderMeta(!0)
+      this._renderMeta(true);
     },
     _renderAsList: function(a) {
-      for (var e = 0; e < a.length; e++) this._renderOneTask(a[e], !1);
+      for (var i = 0; i < a.length; i++) {
+        this._renderOneTask(a[i], false);
+      }
       a = this.$el.find("#mytask-container .all-type .task-list");
-      0 == a.children().length && this.$el.find("#mytask-container .all-type .j_fast-create").removeClass("hide");
+      if(0 == a.children().length) {
+        this.$el.find("#mytask-container .all-type .j_fast-create").removeClass("hide");
+      }
       this.rebuildSN(a);
-      $(".j_center #check-all").removeClass("icon-checkbox-checked").addClass("icon-checkbox-unchecked")
+      $(".j_center #check-all").removeClass("icon-checkbox-checked").addClass("icon-checkbox-unchecked");
     },
     _renderType: function() {
       var a = "";
-      TEAMS.blogUser && "female" == TEAMS.blogUser.sex ? a = "\u5979": TEAMS.blogUser && (a = "\u4ed6");
+      if(app.config.blogUser && "female" == app.config.blogUser.sex) {
+        a = "她";
+      } else if(app.config.blogUser) {
+        a = "他";
+      }
       $("#view-taskType li").each(function() {
         var e = $(this),
-        g = e.attr("title");
-        g && e.children("a").html(a + g)
-      })
+          g = e.attr("title");
+        if(g) {
+          e.children("a").html(a + g);
+        }
+      });
     },
     undelegateEvents: function() {
-      null != this._$MAP && (this._$MAP.body.off(".TaskList"), this._$MAP.dragableUL.sortable("destroy"));
-      this.$el.off(".TaskList")
+      if(null != this._$MAP) {
+        this._$MAP.body.off(".TaskList");
+        this._$MAP.dragableUL.sortable("destroy");
+      }
+      this.$el.off(".TaskList");
     },
     remove: function() {
       this.undelegateEvents();
       this._$MAP = null;
-      this.header && (this.header.remove(), this.header = null);
-      this.dropdownFilter && (this.dropdownFilter.remove(), this.dropdownFilter = null)
+      if(this.header) {
+        this.header.remove();
+        this.header = null;
+      }
+      if(this.dropdownFilter) {
+        this.dropdownFilter.remove();
+        this.dropdownFilter = null;
+      }
     }
   });
 

@@ -5,6 +5,7 @@ from django.utils.safestring import SafeString
 from cobra.apps.accounts.utils import get_user_info
 from cobra.core.loading import get_model
 from cobra.core.permissions import is_organization_admin, can_manage_org
+from cobra.core.configure.user_config import UserConfig
 
 ## Django 1.5+ compat
 try:
@@ -72,6 +73,12 @@ def organization_current_user(organization, user):
     current_user = get_user_info(user)
     current_user['admin'] = can_manage_org(user, organization)
     return SafeString(json.dumps(current_user))
+
+
+@register.assignment_tag
+def organization_user_config(organization, user):
+    user_config = UserConfig(user)
+    return SafeString(user_config.to_json())
 
 
 @register.assignment_tag

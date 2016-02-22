@@ -192,12 +192,14 @@
 
     {% if project or team or organization %}
       {% organization_current_user organization request.user as current_user_json %}
+      {% organization_user_config organization request.user as user_config_json %}
       {% organization_json organization as organization_json %}
       {% organizations_json organization request.user as organizations_json %}
       {% menu_json request.user as empMenus %}
       app.config.noSubordinates = {% if request.user|has_subordinates:organization %}false{% else %}true{% endif %};
       app.config.currentUser = {{ current_user_json }};
       app.config.organizations = {{ organizations_json }};
+      app.config.userConfig = {{ user_config_json }};
 
       var empMenusContext = {{ empMenus }};
     {% endif %}
