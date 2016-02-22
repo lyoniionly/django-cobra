@@ -1170,49 +1170,53 @@
           }
       }
     },
-    _renderMeta: function(a) {
-      var e = this.model;
-      var g;
+    _renderMeta: function(isShowMore) {
+      var model = this.model;
+      var $typeView;
+      var taskList;
       switch (this.viewState) {
         case "list":
-          if (g = this.$el.find("#mytask-container .all-type-view"), a) {
-            a = e.lastPage;
-            var b = (e = a.result) && e.length == a.pageSize;
-            if (e.length) {
-              g.children(".no-result").addClass("hide");
-              g.children("#all-type-list").removeClass("hide");
-              if(b) {
-                g.children(".j_moretask").removeClass("hide");
-                g.children(".j_nodata").addClass("hide");
+          $typeView = this.$el.find("#mytask-container .all-type-view")
+          if (isShowMore) {
+            var lastPage = model.lastPage;
+            var result = lastPage.result;
+            var hasMore = result && (result.length==lastPage.pageSize);
+            if (result.length) {
+              $typeView.children(".no-result").addClass("hide");
+              $typeView.children("#all-type-list").removeClass("hide");
+              if(hasMore) {
+                $typeView.children(".j_moretask").removeClass("hide");
+                $typeView.children(".j_nodata").addClass("hide");
               } else {
-                g.children(".j_moretask").addClass("hide");
-                g.children(".j_nodata, .center-more").addClass("hide");
-                if(1 < a.pageNo) {
-                  g.children(".j_nodata").removeClass("hide");
+                $typeView.children(".j_moretask").addClass("hide");
+                $typeView.children(".j_nodata, .center-more").addClass("hide");
+                if(1 < lastPage.pageNo) {
+                  $typeView.children(".j_nodata").removeClass("hide");
                 }
               }
             } else {
-              switch (g.children().addClass("hide"), this.type) {
+              $typeView.children().addClass("hide");
+              switch (this.type) {
                 case "mine":
                 case "mineManager":
                 case "mineCreate":
-                  g.children(".j_fast-create").removeClass("hide");
+                  $typeView.children(".j_fast-create").removeClass("hide");
                   break;
                 default:
-                  g.children(".j_no-result-tip").removeClass("hide");
+                  $typeView.children(".j_no-result-tip").removeClass("hide");
                 }
             }
-          } else if (e = e.taskList, g.children().addClass("hide"), e.length) {
-            g.children().addClass("hide").filter("#all-type-list").removeClass("hide");
+          } else if (taskList = model.taskList, $typeView.children().addClass("hide"), taskList.length) {
+            $typeView.children().addClass("hide").filter("#all-type-list").removeClass("hide");
           } else {
-            switch (g.children().addClass("hide"), this.type) {
+            switch ($typeView.children().addClass("hide"), this.type) {
               case "mine":
               case "mineManager":
               case "mineCreate":
-                g.children(".j_fast-create").removeClass("hide");
+                $typeView.children(".j_fast-create").removeClass("hide");
                 break;
               default:
-                g.children(".j_no-result-tip").removeClass("hide")
+                $typeView.children(".j_no-result-tip").removeClass("hide");
               }
           }
       }
@@ -1268,13 +1272,13 @@
         }
       }
     },
-    _renderAsDateGroup: function(tasks, e) {
+    _renderAsDateGroup: function(tasks, viewState) {
       for (var i = 0; i < tasks.length; i++) {
         this._renderOneTask(tasks[i]);
       }
       this._refreshViewBaseCount();
     },
-    _renderOneTask: function(a, e) {
+    _renderOneTask: function(a, isRebuildSN) {
       $("#task-type").attr("data-entity");
       var g = $("#taskClone").clone();
       g.attr({
@@ -1375,7 +1379,7 @@
       }
       var c = b.children(".task").size();
       c = c ? c + 1 : 1;
-      if(e) {
+      if(isRebuildSN) {
         b.prepend(g);
         this.rebuildSN(b);
       } else {
